@@ -32,14 +32,62 @@ public sealed class ExplorerTabAutomationService
         _log.Log($"[MTAB DEBUG] {message}");
     }
 
-    public async Task<ExplorerMtabOpenResult> OpenMtabAsync(IReadOnlyList<string> folderPaths, CancellationToken ct = default)
+    // The automation drives the foreground Explorer window with SendKeys.SendWait,
+    // which blocks the calling thread, and uses the WPF Clipboard and Shell COM,
+    // both of which require an STA apartment. Running the whole flow on a dedicated
+    // background STA thread keeps the UI responsive during multi-folder opens.
+    private static Task<T> RunOnStaThreadAsync<T>(Func<T> work)
     {
+        var tcs = new TaskCompletionSource<T>();
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                tcs.SetResult(work());
+            }
+            catch (Exception ex)
+            {
+                tcs.SetException(ex);
+            }
+        })
+        {
+            IsBackground = true,
+            Name = "MyList.ExplorerAutomation"
+        };
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        return tcs.Task;
+    }
+
+    private static void Delay(int milliseconds, CancellationToken ct)
+    {
+        if (ct.CanBeCanceled)
+        {
+            if (ct.WaitHandle.WaitOne(milliseconds))
+            {
+                ct.ThrowIfCancellationRequested();
+            }
+        }
+        else
+        {
+            Thread.Sleep(milliseconds);
+        }
+    }
+
+    public Task<ExplorerMtabOpenResult> OpenMtabAsync(IReadOnlyList<string> folderPaths, CancellationToken ct = default)
+    {
+        var requestedCount = folderPaths.Count;
         var distinctPaths = folderPaths
             .Where(path => !string.IsNullOrWhiteSpace(path))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        DebugLog($"OpenMtab start. Requested={folderPaths.Count}, distinct={distinctPaths.Count}, paths=[{string.Join(" | ", distinctPaths)}]");
+        return RunOnStaThreadAsync(() => OpenMtabCore(distinctPaths, requestedCount, ct));
+    }
+
+    private ExplorerMtabOpenResult OpenMtabCore(List<string> distinctPaths, int requestedCount, CancellationToken ct)
+    {
+        DebugLog($"OpenMtab start. Requested={requestedCount}, distinct={distinctPaths.Count}, paths=[{string.Join(" | ", distinctPaths)}]");
 
         var result = new ExplorerMtabOpenResult
         {
@@ -68,6 +116,7 @@ public sealed class ExplorerTabAutomationService
             DebugLog($"Single-path mtab. Opened in one window: {distinctPaths[0]}");
             return result;
         }
+
         try
         {
             var existingHandles = GetExplorerWindowHandles();
@@ -75,13 +124,13 @@ public sealed class ExplorerTabAutomationService
             OpenExplorerWindow(distinctPaths[0]);
             DebugLog($"Opened anchor Explorer window path: {distinctPaths[0]}");
 
-            var targetHandle = await WaitForNewExplorerWindowAsync(existingHandles, TimeSpan.FromSeconds(5), ct).ConfigureAwait(true);
+            var targetHandle = WaitForNewExplorerWindow(existingHandles, TimeSpan.FromSeconds(5), ct);
             if (targetHandle == IntPtr.Zero)
             {
                 result.TabsSupported = false;
                 result.OpenedAsWindowsCount = 1;
                 var remainingPaths = distinctPaths.Skip(1).ToList();
-                await OpenAsSeparateWindowsAsync(remainingPaths).ConfigureAwait(true);
+                OpenAsSeparateWindows(remainingPaths, ct);
                 result.OpenedAsWindowsCount += remainingPaths.Count;
                 result.FallbackPaths.AddRange(remainingPaths);
                 DebugLog($"Failed to detect target Explorer handle for tab automation. Fallback windows opened: {remainingPaths.Count}");
@@ -97,7 +146,7 @@ public sealed class ExplorerTabAutomationService
             {
                 ct.ThrowIfCancellationRequested();
                 DebugLog($"Attempting tab open for path: {path}");
-                var openedAsTab = await TryOpenPathInTabAsync(targetHandle, path, ct).ConfigureAwait(true);
+                var openedAsTab = TryOpenPathInTab(targetHandle, path, ct);
                 if (openedAsTab)
                 {
                     result.OpenedAsTabsCount++;
@@ -107,7 +156,7 @@ public sealed class ExplorerTabAutomationService
 
                 result.FailedPaths.Add(path);
                 DebugLog($"Tab open failed. Attempting home-tab cleanup for path: {path}");
-                if (await TryCloseActiveTabAsync(targetHandle, ct).ConfigureAwait(true))
+                if (TryCloseActiveTab(targetHandle, ct))
                 {
                     result.CleanedHomeTabsCount++;
                     DebugLog($"Home tab cleaned after failure: {path}");
@@ -125,7 +174,7 @@ public sealed class ExplorerTabAutomationService
         catch (Exception ex)
         {
             _log.Log(ex, "Explorer tab automation failed, falling back to separate windows.");
-            await OpenAsSeparateWindowsAsync(distinctPaths).ConfigureAwait(true);
+            OpenAsSeparateWindows(distinctPaths, ct);
             result.TabsSupported = false;
             result.OpenedAsTabsCount = 0;
             result.OpenedAsWindowsCount = distinctPaths.Count;
@@ -149,16 +198,25 @@ public sealed class ExplorerTabAutomationService
         }
     }
 
-    public async Task OpenAsSeparateWindowsAsync(IReadOnlyList<string> folderPaths)
+    public Task OpenAsSeparateWindowsAsync(IReadOnlyList<string> folderPaths)
+    {
+        return RunOnStaThreadAsync<object?>(() =>
+        {
+            OpenAsSeparateWindows(folderPaths, CancellationToken.None);
+            return null;
+        });
+    }
+
+    private void OpenAsSeparateWindows(IReadOnlyList<string> folderPaths, CancellationToken ct)
     {
         foreach (var path in folderPaths.Where(path => !string.IsNullOrWhiteSpace(path)).Distinct(StringComparer.OrdinalIgnoreCase))
         {
             OpenExplorerWindow(path);
-            await Task.Delay(80).ConfigureAwait(true);
+            Delay(80, ct);
         }
     }
 
-    private async Task<bool> TryOpenPathInTabAsync(IntPtr explorerHandle, string path, CancellationToken ct)
+    private bool TryOpenPathInTab(IntPtr explorerHandle, string path, CancellationToken ct)
     {
         if (!PathNormalizationHelper.TryNormalizeUserPath(path, out _, out var expectedPathKey))
         {
@@ -169,10 +227,10 @@ public sealed class ExplorerTabAutomationService
         for (var attempt = 1; attempt <= 3; attempt++)
         {
             ct.ThrowIfCancellationRequested();
-            if (!await ActivateExplorerWindowAsync(explorerHandle, ct).ConfigureAwait(true))
+            if (!ActivateExplorerWindow(explorerHandle, ct))
             {
                 DebugLog($"Activate failed. Handle=0x{explorerHandle.ToInt64():X}, path={path}, attempt={attempt}");
-                await Task.Delay(120, ct).ConfigureAwait(true);
+                Delay(120, ct);
                 continue;
             }
 
@@ -187,9 +245,9 @@ public sealed class ExplorerTabAutomationService
             try
             {
                 SendKeys.SendWait("^t");
-                await Task.Delay(220, ct).ConfigureAwait(true);
+                Delay(220, ct);
 
-                newTabSnapshot = await WaitForNewTabSnapshot(explorerHandle, preOpenIdentitySet, NewTabTimeout, ct).ConfigureAwait(true);
+                newTabSnapshot = WaitForNewTabSnapshot(explorerHandle, preOpenIdentitySet, NewTabTimeout, ct);
                 if (newTabSnapshot is null)
                 {
                     _log.Log($"Unable to capture newly created explorer tab for '{path}' (attempt {attempt}), continuing with active-tab keyboard navigation.");
@@ -200,13 +258,13 @@ public sealed class ExplorerTabAutomationService
                     DebugLog($"New tab snapshot detected. identity=0x{newTabSnapshot.ComIdentity.ToInt64():X}, initialUrl='{newTabSnapshot.LocationUrl}', path={path}, attempt={attempt}");
                 }
 
-                if (!await TryNavigateActiveTabWithAddressBarAsync(explorerHandle, path, ct).ConfigureAwait(true))
+                if (!TryNavigateActiveTabWithAddressBar(explorerHandle, path, ct))
                 {
                     DebugLog($"Keyboard navigation command failed. path={path}, attempt={attempt}");
                     continue;
                 }
 
-                if (await TryVerifyPathInExplorerWindowAsync(explorerHandle, expectedPathKey, NavigationVerificationTimeout, ct).ConfigureAwait(true))
+                if (TryVerifyPathInExplorerWindow(explorerHandle, expectedPathKey, NavigationVerificationTimeout, ct))
                 {
                     DebugLog($"Keyboard navigation verification success. path={path}, attempt={attempt}");
                     return true;
@@ -217,7 +275,7 @@ public sealed class ExplorerTabAutomationService
             catch (Exception ex)
             {
                 _log.Log(ex, $"Failed to open explorer tab for path: {path}. Attempt: {attempt}.");
-                await Task.Delay(120, ct).ConfigureAwait(true);
+                Delay(120, ct);
             }
             finally
             {
@@ -236,7 +294,7 @@ public sealed class ExplorerTabAutomationService
         }
     }
 
-    private async Task<ExplorerTabSnapshot?> WaitForNewTabSnapshot(
+    private ExplorerTabSnapshot? WaitForNewTabSnapshot(
         IntPtr explorerHandle,
         IReadOnlyCollection<long> existingIdentitySet,
         TimeSpan timeout,
@@ -274,30 +332,30 @@ public sealed class ExplorerTabAutomationService
             }
 
             DisposeSnapshots(snapshots);
-            await Task.Delay(80, ct).ConfigureAwait(true);
+            Delay(80, ct);
         }
 
         return null;
     }
 
-    private async Task<bool> TryNavigateActiveTabWithAddressBarAsync(IntPtr explorerHandle, string path, CancellationToken ct)
+    private bool TryNavigateActiveTabWithAddressBar(IntPtr explorerHandle, string path, CancellationToken ct)
     {
         try
         {
-            if (!await ActivateExplorerWindowAsync(explorerHandle, ct).ConfigureAwait(true))
+            if (!ActivateExplorerWindow(explorerHandle, ct))
             {
                 return false;
             }
 
             System.Windows.Clipboard.SetText(path);
             SendKeys.SendWait("%d");
-            await Task.Delay(120, ct).ConfigureAwait(true);
+            Delay(120, ct);
             SendKeys.SendWait("^a");
-            await Task.Delay(80, ct).ConfigureAwait(true);
+            Delay(80, ct);
             SendKeys.SendWait("^v");
-            await Task.Delay(120, ct).ConfigureAwait(true);
+            Delay(120, ct);
             SendKeys.SendWait("{ENTER}");
-            await Task.Delay(280, ct).ConfigureAwait(true);
+            Delay(280, ct);
             return true;
         }
         catch (Exception ex)
@@ -307,7 +365,7 @@ public sealed class ExplorerTabAutomationService
         }
     }
 
-    private async Task<bool> TryVerifyPathInExplorerWindowAsync(
+    private bool TryVerifyPathInExplorerWindow(
         IntPtr explorerHandle,
         string expectedPathKey,
         TimeSpan timeout,
@@ -346,21 +404,21 @@ public sealed class ExplorerTabAutomationService
                 DisposeSnapshots(snapshots);
             }
 
-            await Task.Delay(120, ct).ConfigureAwait(true);
+            Delay(120, ct);
         }
 
         DebugLog($"Path not found in Explorer tabs before timeout. handle=0x{explorerHandle.ToInt64():X}, expectedPathKey={expectedPathKey}");
         return false;
     }
 
-    private async Task<bool> TryCloseActiveTabAsync(IntPtr explorerHandle, CancellationToken ct)
+    private bool TryCloseActiveTab(IntPtr explorerHandle, CancellationToken ct)
     {
         if (explorerHandle == IntPtr.Zero)
         {
             return false;
         }
 
-        if (!await ActivateExplorerWindowAsync(explorerHandle, ct).ConfigureAwait(true))
+        if (!ActivateExplorerWindow(explorerHandle, ct))
         {
             return false;
         }
@@ -374,7 +432,7 @@ public sealed class ExplorerTabAutomationService
         try
         {
             SendKeys.SendWait("^w");
-            await Task.Delay(240, ct).ConfigureAwait(true);
+            Delay(240, ct);
             var afterCount = GetShellTabCount(explorerHandle);
             DebugLog($"TryCloseActiveTab result. handle=0x{explorerHandle.ToInt64():X}, before={beforeCount}, after={afterCount}");
             return afterCount >= 0 && afterCount < beforeCount;
@@ -545,10 +603,10 @@ public sealed class ExplorerTabAutomationService
         Process.Start(new ProcessStartInfo("explorer.exe", $"\"{path}\"")
         {
             UseShellExecute = true
-        });
+        })?.Dispose();
     }
 
-    private async Task<IntPtr> WaitForNewExplorerWindowAsync(
+    private IntPtr WaitForNewExplorerWindow(
         IReadOnlyCollection<IntPtr> existingHandles,
         TimeSpan timeout,
         CancellationToken ct)
@@ -564,13 +622,13 @@ public sealed class ExplorerTabAutomationService
                 return candidate;
             }
 
-            await Task.Delay(120, ct).ConfigureAwait(true);
+            Delay(120, ct);
         }
 
         return IntPtr.Zero;
     }
 
-    private async Task<bool> ActivateExplorerWindowAsync(IntPtr handle, CancellationToken ct)
+    private bool ActivateExplorerWindow(IntPtr handle, CancellationToken ct)
     {
         if (handle == IntPtr.Zero)
         {
@@ -588,7 +646,7 @@ public sealed class ExplorerTabAutomationService
 
             SetForegroundWindow(handle);
             BringWindowToTop(handle);
-            await Task.Delay(80, ct).ConfigureAwait(true);
+            Delay(80, ct);
 
             if (GetForegroundWindow() == handle)
             {

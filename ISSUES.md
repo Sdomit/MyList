@@ -35,10 +35,11 @@ Findings from a full code review of the C# sources. Severity reflects user impac
 - **LogService.ReadTail** opens with `FileShare.ReadWrite` (no sharing violation under concurrent append).
 - **MainWindow** — control characters filtered from the search box; drag cursor/flag reset guaranteed via `try/finally` even if `DoDragDrop` throws.
 
-## Open
+## Fixed on branch `fix/explorer-sta-thread` (pending interactive verification)
 
-### High
-- **Explorer automation freezes the UI** — `ExplorerTabAutomationService` runs `SendKeys.SendWait` on the dispatcher thread, so multi-folder opens briefly block the UI. The correct fix is a dedicated STA worker thread; **deferred** because it needs interactive testing against real Explorer windows and a bad change risks breaking the working automation. It is a transient freeze, not a crash or data loss.
+- **Explorer automation froze the UI** — `ExplorerTabAutomationService` ran `SendKeys.SendWait` (plus WPF Clipboard and Shell COM) on the dispatcher thread, so multi-folder mtab opens blocked the UI. The whole flow now runs on a dedicated background **STA** thread (`RunOnStaThreadAsync`); the async/await chain was converted to synchronous, cancellable sleeps. Public method signatures are unchanged, so callers still `await` and resume on the UI thread for result handling. Needs hands-on testing against real Explorer windows before merge.
+
+## Open
 
 ### Low
 - Some dialogs set `Owner = Application.Current.MainWindow` without a null check (throws only in rare shutdown races).
