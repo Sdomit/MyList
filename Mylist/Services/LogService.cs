@@ -66,7 +66,17 @@ public sealed class LogService
                 return Array.Empty<string>();
             }
 
-            var lines = File.ReadAllLines(path);
+            var lines = new List<string>();
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(stream))
+            {
+                string? line;
+                while ((line = reader.ReadLine()) is not null)
+                {
+                    lines.Add(line);
+                }
+            }
+
             return lines.TakeLast(Math.Max(1, lineCount)).ToArray();
         }
         catch

@@ -134,12 +134,18 @@ public sealed class StorageService
 
     public async Task ExportCollectionsAsync(AppData data, string filePath)
     {
+        EnsureDefaults(data);
+        data.SchemaVersion = CurrentSchemaVersion;
+
+        // Snapshot a deep clone on the calling (UI) thread before the first await,
+        // so package serialization cannot race with concurrent UI mutations of the
+        // live collections.
+        var clone = CreateExportClone(data);
+
         await _gate.WaitAsync().ConfigureAwait(false);
         try
         {
-            EnsureDefaults(data);
-            data.SchemaVersion = CurrentSchemaVersion;
-            await WritePackageAsync(CreateExportClone(data), filePath).ConfigureAwait(false);
+            await WritePackageAsync(clone, filePath).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -174,7 +180,7 @@ public sealed class StorageService
         }
     }
 
-    public AppData? RestoreLatestBackup()
+    public async Task<AppData?> RestoreLatestBackupAsync()
     {
         LoadedImportData? loaded = null;
         try
@@ -195,7 +201,7 @@ public sealed class StorageService
                 return null;
             }
 
-            loaded = LoadPackageOrJsonAsync(file).GetAwaiter().GetResult();
+            loaded = await LoadPackageOrJsonAsync(file).ConfigureAwait(false);
             return PrepareImportedData(loaded, "Backup restore");
         }
         catch (Exception ex)
@@ -219,15 +225,12 @@ public sealed class StorageService
 
     private AppData CreateExportClone(AppData data)
     {
-        return new AppData
-        {
-            SchemaVersion = CurrentSchemaVersion,
-            AppSettings = data.AppSettings,
-            Collections = data.Collections,
-            Items = data.Items,
-            ClipboardImportHistory = data.ClipboardImportHistory,
-            MigrationLogs = data.MigrationLogs
-        };
+        // Deep clone via JSON round-trip so the exported snapshot shares no mutable
+        // references with the live data. Runs synchronously on the caller's thread.
+        var json = JsonSerializer.Serialize(data, _options);
+        var clone = JsonSerializer.Deserialize<AppData>(json, _options) ?? new AppData();
+        clone.SchemaVersion = CurrentSchemaVersion;
+        return clone;
     }
 
     private async Task WritePackageAsync(AppData data, string filePath)

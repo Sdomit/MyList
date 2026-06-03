@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Threading;
 using MyList.Helpers;
 using MessageBox = System.Windows.MessageBox;
 
@@ -20,6 +21,7 @@ public partial class MtabEditorWindow : Window, INotifyPropertyChanged
     private bool _isAdjustingRows;
     private string _mtabName = string.Empty;
     private string _summaryText = "No valid folders yet.";
+    private readonly DispatcherTimer _validationTimer;
 
     public MtabEditorWindow(string dialogTitle, string suggestedName, IEnumerable<string>? initialPaths = null)
     {
@@ -30,6 +32,13 @@ public partial class MtabEditorWindow : Window, INotifyPropertyChanged
         _pathRowLimit = Math.Max(DefaultMaxPathRows, existingPaths.Count);
 
         PathEntries.CollectionChanged += OnPathEntriesCollectionChanged;
+
+        _validationTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        _validationTimer.Tick += (_, _) =>
+        {
+            _validationTimer.Stop();
+            RebuildValidation();
+        };
 
         DialogTitle = dialogTitle;
         MtabName = suggestedName;
@@ -143,7 +152,7 @@ public partial class MtabEditorWindow : Window, INotifyPropertyChanged
             var removedAny = RemoveEmptyRows();
             var addedRow = EnsureTrailingEmptyRow();
             RenumberPathEntries();
-            RebuildValidation();
+            ScheduleValidation();
 
             if (addedRow && IsLoaded)
             {
@@ -209,6 +218,12 @@ public partial class MtabEditorWindow : Window, INotifyPropertyChanged
         }
     }
 
+    private void ScheduleValidation()
+    {
+        _validationTimer.Stop();
+        _validationTimer.Start();
+    }
+
     private void RebuildValidation()
     {
         ValidationEntries.Clear();
@@ -266,12 +281,14 @@ public partial class MtabEditorWindow : Window, INotifyPropertyChanged
             return false;
         }
 
-        if (Directory.Exists(path))
+        // UNC paths are accepted without touching the network; Directory.Exists on
+        // an offline share would block the UI thread.
+        if (path.StartsWith(@"\\", StringComparison.Ordinal))
         {
             return true;
         }
 
-        return path.StartsWith(@"\\", StringComparison.Ordinal);
+        return Directory.Exists(path);
     }
 
     private static string ValidationMessageForStatus(PathValidationStatus status)
@@ -287,6 +304,12 @@ public partial class MtabEditorWindow : Window, INotifyPropertyChanged
 
     private void OnSave(object sender, RoutedEventArgs e)
     {
+        if (_validationTimer.IsEnabled)
+        {
+            _validationTimer.Stop();
+            RebuildValidation();
+        }
+
         if (string.IsNullOrWhiteSpace(MtabName))
         {
             MessageBox.Show("Mtab name is required.", "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);

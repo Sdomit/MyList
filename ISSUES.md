@@ -4,41 +4,45 @@ Findings from a full code review of the C# sources. Severity reflects user impac
 
 ## Fixed in the initial commit
 
-- **Launches crash / silently fail on missing paths** — `MainViewModel` open handlers (`OpenItem`, `OpenInNewWindow`, `OpenInTerminal`, `OpenAllItems`, `OpenSelectedItems`) now route every launch through a `TryLaunch` guard that logs and shows a status message instead of throwing out of an `async void`.
-- **NetworkCheckService crashes** — the 30s timer tick was an unguarded `async void`; it enumerated the live `AllItems` collection (could throw *"collection was modified"*); and `RetryCheckAsync` wrote a UI-bound property off the UI thread. Now: tick wrapped in try/catch, items snapshotted before iteration, `HealthState` writes marshalled to the dispatcher, and the `CancellationTokenSource` is disposed instead of leaked.
-- **System theme change crash** — `SystemThemeService` invoked its callback (which mutates WPF UI) on a non-UI thread. Now marshalled to the dispatcher.
-- **Nullable-enum converter crash** — `EnumToBooleanConverter.ConvertBack` threw `Enum.Parse` for nullable-enum binding targets. Now unwraps `Nullable<T>` and uses `Enum.TryParse`.
-- **Swallowed async-command errors** — `AsyncRelayCommand` had no catch around the awaited body; failures vanished. Now logged.
-- **Resource leaks** — tray `ContextMenuStrip` is now disposed; `Process` handles from `LauncherService` / `ManagedActionRunnerService` are disposed.
-- **Misleading hotkey status** — a fallback-registered hotkey could still report *"failed (Win32: 1409)"*; the error code is no longer clobbered.
-- **Duplicate event subscription** — `MainWindow.OnLoaded` re-subscribed `Settings.PropertyChanged` on every re-show; now guarded.
+- **Launches crash / silently fail on missing paths** — `MainViewModel` open handlers now route every launch through a `TryLaunch` guard that logs and shows a status message instead of throwing out of an `async void`.
+- **NetworkCheckService crashes** — unguarded `async void` timer tick, live-collection enumeration, and off-UI-thread `HealthState` writes. Now: tick wrapped, items snapshotted, writes marshalled, `CancellationTokenSource` disposed.
+- **System theme change crash** — `SystemThemeService` callback now marshalled to the dispatcher.
+- **Nullable-enum converter crash** — `EnumToBooleanConverter.ConvertBack` now unwraps `Nullable<T>` and uses `Enum.TryParse`.
+- **Swallowed async-command errors** — `AsyncRelayCommand` now logs failures.
+- **Resource leaks** — tray `ContextMenuStrip` and `Process` handles disposed.
+- **Misleading hotkey status** — error code no longer clobbered on fallback registration.
+- **Duplicate event subscription** — `MainWindow.OnLoaded` guarded.
 
-## Open — High
+## Fixed in the follow-up pass
 
-- **StorageService export shares live references** — `CreateExportClone` reuses the live `Collections`/`Items` instances, so serialization can race with UI-thread mutation. Snapshot/deep-clone before writing.
-- **StorageService.RestoreLatestBackup is sync-over-async** — `.GetAwaiter().GetResult()` on a path that can run on the UI thread. Make it async.
-- **Stale undo indices for bulk operations** — `DeleteSelectedItemsGlobally` and `MoveSelectedToCollection` snapshot `IndexOf` before the composite runs, so undo reinserts items at wrong positions. Compute restore indices at revert time.
-- **Explorer automation freezes the UI** — `ExplorerTabAutomationService` runs `SendKeys.SendWait` on the dispatcher thread; multi-folder opens block the UI. Move to a dedicated STA thread.
+### High
+- **Export race** — `StorageService.ExportCollectionsAsync` now builds a deep clone (JSON round-trip) on the calling UI thread *before* the gate `await`, so package serialization can't race with live-collection mutation.
+- **Sync-over-async restore** — `RestoreLatestBackup()` is now `RestoreLatestBackupAsync()`; the caller awaits it.
+- **Stale undo indices (bulk delete / move)** — actions now capture positions at **apply** time, so the reverse-order composite revert restores each item to its original slot. Moves also append using the `Entries` index space (fixes the separator/`ItemIds` mismatch).
 
-## Open — Medium
+### Medium
+- **App swallowed all UI exceptions** — `DispatcherUnhandledException` still logs and stays resilient, but now surfaces a message box when debug mode is on (no longer fully silent).
+- **DiagnosticsViewModel timer always on** — the 3s refresh timer is now started/stopped on the view's `Loaded`/`Unloaded`, so it doesn't read the log file in the background when diagnostics is closed.
+- **MtabEditorWindow UI block** — UNC paths are accepted without `Directory.Exists` (no block on offline shares) and validation is debounced 250 ms instead of running on every keystroke.
+- **Unbounded icon cache** — `IconService` cache is now capped (512, FIFO eviction).
+- **Incomplete UNC accepted** — `PathNormalizationHelper` now requires server *and* share.
+- **InverseBooleanConverter** — returns `Binding.DoNothing` for non-bool input and implements `ConvertBack` (no `NotSupportedException`).
+- **ManagedActionRunnerService** — stale runtime scripts (>1h) are swept before each run; `ItemModel.LaunchProfile` is null-hardened at the setter.
+- **ClipboardAssetService** — partial `.png` cleaned up on save failure; `SetImage` wrapped; a single bad asset no longer aborts the export/import batch.
+- **StartupService** — failures are logged instead of swallowed; empty executable path guarded.
 
-- **App swallows all UI exceptions** — `App.DispatcherUnhandledException` sets `Handled = true` unconditionally, masking crashes and leaving the app in a possibly-corrupt state. Handle selectively.
-- **DiagnosticsViewModel timer always on** — a 3s `DispatcherTimer` reads the log file and rebuilds a collection for the whole session even when diagnostics is closed. Gate on visibility.
-- **MtabEditorWindow disk I/O per keystroke** — `Directory.Exists` runs on the UI thread on every character. Debounce or validate off-thread.
-- **Search box accepts control characters** — `MainWindow.OnWindowPreviewTextInput` appends raw `e.Text`; filter with `char.IsControl`.
-- **Stuck drag cursor** — `Mouse.OverrideCursor` can remain set if a drag ends without hitting the hide path.
-- **Unbounded icon cache** — `IconService._cache` never evicts; long sessions grow memory.
-- **Path normalization** — incomplete UNC paths (`\\server`, no share) are accepted; the path key is unstable when `Path.GetFullPath` fails on an offline network path.
-- **InverseBooleanConverter** echoes non-bool/null values to a `bool` target, producing wrong enable-state.
-- **ManagedActionRunnerService** — generated runtime scripts are never cleaned up; `LaunchProfile` is dereferenced without a null check.
-- **ClipboardAssetService** — a partial `.png` can be left on IO failure; `Clipboard.SetImage` `COMException` is not caught.
-- **StartupService** — registry write failures are silently swallowed; a null executable path writes a broken Run entry.
+### Low
+- **LogService.ReadTail** opens with `FileShare.ReadWrite` (no sharing violation under concurrent append).
+- **MainWindow** — control characters filtered from the search box; drag cursor/flag reset guaranteed via `try/finally` even if `DoDragDrop` throws.
 
-## Open — Low
+## Open
 
-- Several dialogs set `Owner = Application.Current.MainWindow` without a null check (throws during shutdown).
-- `LogService.ReadTail` can transiently fail under concurrent append (sharing violation).
-- Minor collection-name suffix parsing collisions (`Name_01` vs `Name_1`).
-- `MultiplyValueConverter` silently yields a zero `Thickness` for a 3-value parameter.
+### High
+- **Explorer automation freezes the UI** — `ExplorerTabAutomationService` runs `SendKeys.SendWait` on the dispatcher thread, so multi-folder opens briefly block the UI. The correct fix is a dedicated STA worker thread; **deferred** because it needs interactive testing against real Explorer windows and a bad change risks breaking the working automation. It is a transient freeze, not a crash or data loss.
 
-> The fixed items above were verified by a clean `dotnet build` (0 warnings, 0 errors). Open items were reviewed but not changed in the first commit.
+### Low
+- Some dialogs set `Owner = Application.Current.MainWindow` without a null check (throws only in rare shutdown races).
+- `StorageService.ReplaceFile` fallback (for providers without atomic replace) deletes-then-moves; the primary path uses atomic `File.Replace`.
+- `MultiplyValueConverter` yields a zero `Thickness` for a malformed 3-value `ConverterParameter`.
+
+> All fixes verified by a clean `dotnet build` (0 warnings, 0 errors).
