@@ -1,0 +1,57 @@
+<Window x:Class="MyList.Views.CollectionTransferWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Transfer Item"
+        Width="520"
+        MinWidth="520"
+        SizeToContent="Height"
+        Background="{DynamicResource AppBackground}"
+        Foreground="{DynamicResource TextPrimary}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+    <Border Margin="12"
+            Background="{DynamicResource SurfaceBackground}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="16">
+        <StackPanel>
+            <TextBlock Text="Transfer Item"
+                       FontSize="20"
+                       FontWeight="SemiBold" />
+            <TextBlock Margin="0,10,0,0"
+                       Foreground="{DynamicResource TextSecondary}"
+                       TextWrapping="Wrap"
+                       Text="{Binding Prompt}" />
+
+            <Grid Margin="0,18,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        Content="Copy to Collection"
+                        Style="{StaticResource HeaderPrimaryActionButton}"
+                        MinWidth="160"
+                        MinHeight="34"
+                        Margin="0,0,8,0"
+                        Click="OnCopyToCollection" />
+                <Button Grid.Column="1"
+                        Content="Move to Collection"
+                        Style="{StaticResource HeaderActionButton}"
+                        MinWidth="160"
+                        MinHeight="34"
+                        Margin="0,0,8,0"
+                        Click="OnMoveToCollection" />
+                <Button Grid.Column="2"
+                        Content="Cancel"
+                        Style="{StaticResource HeaderActionButton}"
+                        MinWidth="96"
+                        MinHeight="34"
+                        Click="OnCancel" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

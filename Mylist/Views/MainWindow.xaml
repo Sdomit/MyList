@@ -1,0 +1,1253 @@
+<Window x:Class="MyList.Views.MainWindow"
+        x:Name="RootWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:MyList.Helpers"
+        xmlns:views="clr-namespace:MyList.Views"
+        Title="MyList"
+        Icon="pack://siteoforigin:,,,/desktops.png"
+        Width="990"
+        Height="770"
+        MinWidth="990"
+        MinHeight="770"
+        WindowStartupLocation="CenterScreen"
+        AllowDrop="True"
+        Drop="OnDrop"
+        PreviewDragOver="OnPreviewDragOver"
+        KeyDown="OnWindowKeyDown"
+        Topmost="{Binding Settings.AlwaysOnTop}">
+    <Window.Resources>
+        <DataTemplate x:Key="ListItemTemplate">
+            <Grid>
+                <Border x:Name="ListItemBorder"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="0"
+                        Padding="0"
+                        Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Image Width="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=32}"
+                               Height="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=32}"
+                               Source="{Binding Icon}"
+                               Stretch="Uniform"
+                               SnapsToDevicePixels="True"
+                               UseLayoutRounding="True"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                        <StackPanel Grid.Column="1"
+                                    Margin="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter='10,0,0,0'}">
+                            <TextBlock Text="{Binding Name}"
+                                       FontWeight="SemiBold"
+                                       FontSize="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=13}" />
+                            <TextBlock Text="{Binding DisplayPath}"
+                                       Foreground="{DynamicResource TextSecondary}"
+                                       FontSize="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=11}"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <Border Grid.Column="2"
+                                Padding="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter='6,2'}"
+                                Margin="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter='8,0,0,0'}"
+                                CornerRadius="6"
+                                VerticalAlignment="Center">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Setter Property="Background" Value="{DynamicResource SurfaceElevated}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="Offline">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Setter Property="Background" Value="#665A3C1A" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="Missing">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Setter Property="Background" Value="#665A1A1A" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Setter Property="Background" Value="#66403A5A" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock FontSize="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=10}"
+                                       Foreground="{DynamicResource TextPrimary}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Health" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HealthState}" Value="Offline">
+                                                <Setter Property="Text" Value="Offline" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthState}" Value="Missing">
+                                                <Setter Property="Text" Value="Missing" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
+                                                <Setter Property="Text" Value="No Access" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Open"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Open in new window"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenNewWindowCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Open in Terminal here"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenInTerminalCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <Separator />
+                            <MenuItem Header="Copy"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.CopyPathCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Retry health check"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RetryHealthCheckCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Edit"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditItemCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Edit Mtab..."
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditMtabCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Item.IsMtab, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
+                            <MenuItem Header="Quick edit"
+                                      IsEnabled="{Binding PlacementTarget.DataContext.Item.IsMtab, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource InverseBooleanConverter}}"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.QuickEditItemCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Remove from Collection"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RemoveItemFromCurrentCollectionCommand}">
+                                <MenuItem.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource ItemCollectionActionContextConverter}">
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.DataContext.Item" />
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.Tag" />
+                                    </MultiBinding>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                            <MenuItem Header="Delete Globally"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.DeleteItemGloballyCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                </Border>
+
+                <Border x:Name="SeparatorRowBorder"
+                        Visibility="Collapsed"
+                        Background="Transparent"
+                        Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        MinHeight="18"
+                        Padding="0,3">
+                    <Grid>
+                        <Border Height="1"
+                                VerticalAlignment="Center"
+                                Background="{DynamicResource BorderBrush}" />
+                    </Grid>
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Delete Separator"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RemoveSeparatorCommand}">
+                                <MenuItem.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource CollectionEntryActionContextConverter}">
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.DataContext" />
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.Tag" />
+                                    </MultiBinding>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                </Border>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                    <Setter TargetName="ListItemBorder" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="SeparatorRowBorder" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="GridTileTemplate">
+            <Grid Width="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=128}"
+                  Height="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=128}">
+                <Border x:Name="TileBorder"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        Margin="0"
+                        Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Border HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Padding="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter='6,2'}"
+                                CornerRadius="6">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Setter Property="Background" Value="{DynamicResource SurfaceElevated}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="Offline">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Setter Property="Background" Value="#665A3C1A" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="Missing">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Setter Property="Background" Value="#665A1A1A" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Setter Property="Background" Value="#66403A5A" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock FontSize="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=10}"
+                                       Foreground="{DynamicResource TextPrimary}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Health" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HealthState}" Value="Offline">
+                                                <Setter Property="Text" Value="Offline" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthState}" Value="Missing">
+                                                <Setter Property="Text" Value="Missing" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
+                                                <Setter Property="Text" Value="No Access" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+
+                        <Grid HorizontalAlignment="Center">
+                            <Image x:Name="TileIcon"
+                                   Width="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=48}"
+                                   Height="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=48}"
+                                   Source="{Binding Icon}"
+                                   Stretch="Uniform"
+                                   HorizontalAlignment="Center"
+                                   SnapsToDevicePixels="True"
+                                   UseLayoutRounding="True"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                            <Path x:Name="TileFallbackIcon"
+                                  Width="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=48}"
+                                  Height="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=48}"
+                                  Fill="{DynamicResource TextSecondary}"
+                                  Stretch="Uniform"
+                                  Visibility="Collapsed"
+                                  Data="M3,9 L13,9 L15.8,12 L29,12 L29,25 C29,26.1 28.1,27 27,27 L5,27 C3.9,27 3,26.1 3,25 Z M3,8 C3,6.9 3.9,6 5,6 L12.5,6 C13.1,6 13.7,6.2 14.2,6.7 L16.2,8.8 L27,8.8 C28.1,8.8 29,9.7 29,10.8 L29,11 L15.2,11 L12.4,8.2 C12.1,7.9 11.7,7.8 11.3,7.8 Z" />
+                        </Grid>
+
+                        <TextBlock Grid.Row="1"
+                                   Text="{Binding Name}"
+                                   Margin="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,8,0,0'}"
+                                   FontSize="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=13}"
+                                   TextAlignment="Center"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding Name}"
+                                   Foreground="{DynamicResource TextPrimary}" />
+                        <TextBlock Grid.Row="2"
+                                   Text="{Binding DisplayPath}"
+                                   Margin="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,4,0,0'}"
+                                   FontSize="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=10}"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   TextAlignment="Center"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   Visibility="Collapsed">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMtab}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsClipboardImage}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsActionItem}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Open"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Open in new window"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenNewWindowCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Open in Terminal here"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenInTerminalCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <Separator />
+                            <MenuItem Header="Copy"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.CopyPathCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Retry health check"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RetryHealthCheckCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Edit"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditItemCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Edit Mtab..."
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditMtabCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Item.IsMtab, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
+                            <MenuItem Header="Quick edit"
+                                      IsEnabled="{Binding PlacementTarget.DataContext.Item.IsMtab, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource InverseBooleanConverter}}"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.QuickEditItemCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Remove from Collection"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RemoveItemFromCurrentCollectionCommand}">
+                                <MenuItem.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource ItemCollectionActionContextConverter}">
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.DataContext.Item" />
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.Tag" />
+                                    </MultiBinding>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                            <MenuItem Header="Delete Globally"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.DeleteItemGloballyCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                </Border>
+
+                <Border x:Name="SeparatorTileBorder"
+                        Visibility="Collapsed"
+                        Margin="0"
+                        Height="{Binding DataContext.Settings.ItemScale, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource MultiplyValueConverter}, ConverterParameter=18}"
+                        CornerRadius="8"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        Background="{DynamicResource SurfaceBackground}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}">
+                    <Grid Margin="10,5">
+                        <Border Height="1"
+                                VerticalAlignment="Center"
+                                Background="{DynamicResource BorderBrush}" />
+                    </Grid>
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Delete Separator"
+                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RemoveSeparatorCommand}">
+                                <MenuItem.CommandParameter>
+                                    <MultiBinding Converter="{StaticResource CollectionEntryActionContextConverter}">
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.DataContext" />
+                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.Tag" />
+                                    </MultiBinding>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                </Border>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                    <Setter TargetName="TileBorder" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="SeparatorTileBorder" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
+                    <Setter TargetName="TileIcon" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="TileFallbackIcon" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AccordionGridViewTemplate">
+            <ListBox ItemsSource="{Binding FilteredEntries}"
+                     Tag="{Binding}"
+                     SelectionMode="Extended"
+                     SelectionChanged="OnItemSelectionChanged"
+                     ItemContainerStyle="{StaticResource TileListBoxItemStyle}"
+                     ItemTemplate="{StaticResource GridTileTemplate}"
+                     MouseLeftButtonUp="OnItemMouseLeftButtonUp"
+                     PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
+                     PreviewMouseMove="OnItemPreviewMouseMove"
+                     Drop="OnItemDrop"
+                     AllowDrop="True">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AccordionListViewTemplate">
+            <ListBox ItemsSource="{Binding FilteredEntries}"
+                     Tag="{Binding}"
+                     SelectionMode="Extended"
+                     SelectionChanged="OnItemSelectionChanged"
+                     ItemContainerStyle="{StaticResource ItemRowListBoxItemStyle}"
+                     ItemTemplate="{StaticResource ListItemTemplate}"
+                     MouseLeftButtonUp="OnItemMouseLeftButtonUp"
+                     PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
+                     PreviewMouseMove="OnItemPreviewMouseMove"
+                     Drop="OnItemDrop"
+                     AllowDrop="True" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="CollectionTabTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0"
+                        Width="8"
+                        Height="8"
+                        Margin="0,0,8,0"
+                        CornerRadius="4"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource TextSecondary}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSmart}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Name}"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="HeaderHostStyle" TargetType="Border">
+            <Setter Property="helpers:Spacing.Value" Value="{DynamicResource DensitySectionGap}" />
+            <Setter Property="Padding">
+                <Setter.Value>
+                    <Binding RelativeSource="{RelativeSource Self}"
+                             Path="(helpers:Spacing.Value)"
+                             Converter="{StaticResource MultiplyValueConverter}"
+                             ConverterParameter="1" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HeaderSearchHostStyle" TargetType="Grid">
+            <Setter Property="helpers:Spacing.Value" Value="{DynamicResource DensitySectionGap}" />
+            <Setter Property="Margin">
+                <Setter.Value>
+                    <Binding RelativeSource="{RelativeSource Self}"
+                             Path="(helpers:Spacing.Value)"
+                             Converter="{StaticResource MultiplyValueConverter}"
+                             ConverterParameter="1,0" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HeaderTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                    <Setter Property="FontSize" Value="16" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DockAwareSearchBoxStyle" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="MinHeight" Value="32" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                    <Setter Property="MinHeight" Value="28" />
+                    <Setter Property="FontSize" Value="12" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DockAwareHeaderPrimaryActionButton" TargetType="Button" BasedOn="{StaticResource HeaderPrimaryActionButton}">
+            <Setter Property="Margin">
+                <Setter.Value>
+                    <Binding RelativeSource="{RelativeSource Self}"
+                             Path="(helpers:Spacing.Value)"
+                             Converter="{StaticResource MultiplyValueConverter}"
+                             ConverterParameter="0,0,1,0" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                    <Setter Property="MinHeight" Value="30" />
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="MinWidth" Value="78" />
+                    <Setter Property="Padding" Value="10,4" />
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter Property="Margin">
+                        <Setter.Value>
+                            <Binding RelativeSource="{RelativeSource Self}"
+                                     Path="(helpers:Spacing.Value)"
+                                     Converter="{StaticResource MultiplyValueConverter}"
+                                     ConverterParameter="0,0,1,1" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DockAwareHeaderActionButton" TargetType="Button" BasedOn="{StaticResource HeaderActionButton}">
+            <Setter Property="Margin">
+                <Setter.Value>
+                    <Binding RelativeSource="{RelativeSource Self}"
+                             Path="(helpers:Spacing.Value)"
+                             Converter="{StaticResource MultiplyValueConverter}"
+                             ConverterParameter="0,0,1,0" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                    <Setter Property="MinHeight" Value="30" />
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="MinWidth" Value="92" />
+                    <Setter Property="Padding" Value="10,4" />
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter Property="Margin">
+                        <Setter.Value>
+                            <Binding RelativeSource="{RelativeSource Self}"
+                                     Path="(helpers:Spacing.Value)"
+                                     Converter="{StaticResource MultiplyValueConverter}"
+                                     ConverterParameter="0,0,1,1" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DockAwareHeaderUtilityButton" TargetType="Button" BasedOn="{StaticResource HeaderUtilityButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                    <Setter Property="MinHeight" Value="30" />
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="MinWidth" Value="110" />
+                    <Setter Property="Padding" Value="10,4" />
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter Property="Margin">
+                        <Setter.Value>
+                            <Binding RelativeSource="{RelativeSource Self}"
+                                     Path="(helpers:Spacing.Value)"
+                                     Converter="{StaticResource MultiplyValueConverter}"
+                                     ConverterParameter="0,0,1,1" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ContentHostGridStyle" TargetType="Grid">
+            <Setter Property="helpers:Spacing.Value" Value="{DynamicResource DensitySectionGap}" />
+            <Setter Property="Margin">
+                <Setter.Value>
+                    <Binding RelativeSource="{RelativeSource Self}"
+                             Path="(helpers:Spacing.Value)"
+                             Converter="{StaticResource MultiplyValueConverter}"
+                             ConverterParameter="1" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarCollectionsStyle" TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+            <Setter Property="Width" Value="160" />
+            <Setter Property="helpers:Spacing.Value" Value="{DynamicResource DensitySectionGap}" />
+            <Setter Property="Margin">
+                <Setter.Value>
+                    <Binding RelativeSource="{RelativeSource Self}"
+                             Path="(helpers:Spacing.Value)"
+                             Converter="{StaticResource MultiplyValueConverter}"
+                             ConverterParameter="0,0,1,0" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                    <Setter Property="Width" Value="118" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Panel.ZIndex="28"
+                Background="{DynamicResource ToolbarBackground}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Style="{StaticResource HeaderHostStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="pack://siteoforigin:,,,/desktops.png"
+                           Width="30"
+                           Height="30"
+                           helpers:Spacing.Value="{DynamicResource DensitySectionGap}"
+                           Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}" />
+                </StackPanel>
+
+                <Grid Grid.Row="0" Grid.Column="1" Style="{StaticResource HeaderSearchHostStyle}" VerticalAlignment="Center">
+                    <TextBox x:Name="SearchBox"
+                             Style="{StaticResource DockAwareSearchBoxStyle}"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Search items, tags, or paths"
+                               Foreground="{DynamicResource TextSecondary}"
+                               Margin="12,0,0,0"
+                               VerticalAlignment="Center"
+                               IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Settings"
+                            Style="{StaticResource DockAwareHeaderUtilityButton}"
+                            Command="{Binding ToggleSettingsCommand}" />
+                </StackPanel>
+
+                <Grid Grid.Row="1"
+                      Grid.ColumnSpan="3"
+                      helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                      Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,1,0,0'}">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MinWidth="0" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}">
+                        <Button Content="Add File" Style="{StaticResource DockAwareHeaderPrimaryActionButton}" Command="{Binding AddFileCommand}" />
+                        <Button Content="Add Folder" Style="{StaticResource DockAwareHeaderPrimaryActionButton}" Command="{Binding AddFolderCommand}" />
+                        <Button Content="{Binding ClipboardButtonText}" Style="{StaticResource DockAwareHeaderPrimaryActionButton}" Command="{Binding AddFromClipboardCommand}" />
+                        <Button Content="More" Style="{StaticResource DockAwareHeaderActionButton}" Margin="0" Click="OnMoreActionsClick">
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Open All"
+                                              Command="{Binding PlacementTarget.DataContext.OpenAllCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    <MenuItem Header="Add Collection"
+                                              Command="{Binding PlacementTarget.DataContext.AddCollectionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    <MenuItem Header="Add Separator"
+                                              Command="{Binding PlacementTarget.DataContext.AddSeparatorCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    <MenuItem Header="New Action..."
+                                              Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    <MenuItem Header="New Mtab..."
+                                              Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top">
+                        <Button Content="Toggle View"
+                                Style="{StaticResource DockAwareHeaderUtilityButton}"
+                                helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                Command="{Binding ToggleViewModeCommand}" />
+                        <Button Content="Next Collection"
+                                Style="{StaticResource DockAwareHeaderUtilityButton}"
+                                Command="{Binding ToggleCollectionCommand}" />
+                    </StackPanel>
+                </Grid>
+
+                <WrapPanel Grid.Row="1"
+                           Grid.ColumnSpan="3"
+                           helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                           Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,1,0,0'}">
+                    <WrapPanel.Style>
+                        <Style TargetType="WrapPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Settings.LayoutMode}" Value="Docked">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </WrapPanel.Style>
+                    <Button Content="Add File" Style="{StaticResource DockAwareHeaderPrimaryActionButton}" Command="{Binding AddFileCommand}" />
+                    <Button Content="Add Folder" Style="{StaticResource DockAwareHeaderPrimaryActionButton}" Command="{Binding AddFolderCommand}" />
+                    <Button Content="{Binding ClipboardButtonText}" Style="{StaticResource DockAwareHeaderPrimaryActionButton}" Command="{Binding AddFromClipboardCommand}" />
+                    <Button Content="More" Style="{StaticResource DockAwareHeaderActionButton}" Click="OnMoreActionsClick">
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Open All"
+                                          Command="{Binding PlacementTarget.DataContext.OpenAllCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Add Collection"
+                                          Command="{Binding PlacementTarget.DataContext.AddCollectionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="Add Separator"
+                                          Command="{Binding PlacementTarget.DataContext.AddSeparatorCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="New Action..."
+                                          Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <MenuItem Header="New Mtab..."
+                                          Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                    <Button Content="Toggle View"
+                            Style="{StaticResource DockAwareHeaderUtilityButton}"
+                            Command="{Binding ToggleViewModeCommand}" />
+                    <Button Content="Next Collection"
+                            Style="{StaticResource DockAwareHeaderUtilityButton}"
+                            Command="{Binding ToggleCollectionCommand}" />
+                </WrapPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Panel.ZIndex="0"
+                Background="{DynamicResource ContentAreaBackground}">
+            <Border.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add File..."
+                              Command="{Binding PlacementTarget.DataContext.AddFileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                    <MenuItem Header="Add Folder..."
+                              Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                    <MenuItem Header="Add From Clipboard..."
+                              Command="{Binding PlacementTarget.DataContext.AddFromClipboardCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                    <MenuItem Header="Add Separator"
+                              Command="{Binding PlacementTarget.DataContext.AddSeparatorCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                    <MenuItem Header="New Action..."
+                              Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                    <MenuItem Header="New Mtab..."
+                              Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                </ContextMenu>
+            </Border.ContextMenu>
+            <Grid Style="{StaticResource ContentHostGridStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Sidebar layout -->
+                <ListBox Grid.Column="0"
+                         Style="{StaticResource SidebarCollectionsStyle}"
+                         ItemsSource="{Binding Collections}"
+                         SelectedItem="{Binding SelectedCollection}"
+                         DisplayMemberPath="Name"
+                         Visibility="{Binding Settings.CollectionsLayout, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Sidebar}"
+                         PreviewMouseLeftButtonDown="OnCollectionPreviewMouseLeftButtonDown"
+                         PreviewMouseMove="OnCollectionPreviewMouseMove"
+                         Drop="OnCollectionDrop"
+                         AllowDrop="True">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                            <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu>
+                                        <MenuItem Header="Open all"
+                                                  Command="{Binding PlacementTarget.Tag.OpenAllCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                        <MenuItem Header="Rename"
+                                                  Command="{Binding PlacementTarget.Tag.RenameCollectionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                        <MenuItem Header="Delete"
+                                                  Command="{Binding PlacementTarget.Tag.DeleteCollectionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Grid.Column" Value="0" />
+                        <Setter Property="Grid.ColumnSpan" Value="2" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Settings.CollectionsLayout}" Value="Sidebar">
+                                <Setter Property="Grid.Column" Value="1" />
+                                <Setter Property="Grid.ColumnSpan" Value="1" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Tabs layout -->
+                <WrapPanel Grid.Row="0"
+                           helpers:Spacing.Value="{DynamicResource DensitySectionGap}"
+                           Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,0,1'}"
+                           Orientation="Horizontal"
+                           VerticalAlignment="Top"
+                           Visibility="{Binding Settings.CollectionsLayout, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Tabs}">
+                    <ListBox x:Name="CollectionsTabStrip"
+                             Style="{StaticResource CollectionTabsListBoxStyle}"
+                             MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
+                             ItemsSource="{Binding Collections}"
+                             SelectedItem="{Binding SelectedCollection}"
+                             ItemTemplate="{StaticResource CollectionTabTemplate}"
+                             PreviewMouseLeftButtonDown="OnCollectionPreviewMouseLeftButtonDown"
+                             PreviewMouseMove="OnCollectionPreviewMouseMove"
+                             PreviewDragOver="OnTabCollectionPreviewDragOver"
+                             DragLeave="OnTabCollectionDragLeave"
+                             Drop="OnCollectionDrop"
+                             AllowDrop="True">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource CollectionTabListBoxItemStyle}">
+                                <Setter Property="ContextMenu">
+                                    <Setter.Value>
+                                        <ContextMenu>
+                                            <MenuItem Header="Open all"
+                                                      Command="{Binding PlacementTarget.Tag.OpenAllCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                            <MenuItem Header="Rename"
+                                                      Command="{Binding PlacementTarget.Tag.RenameCollectionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                            <MenuItem Header="Delete"
+                                                      Command="{Binding PlacementTarget.Tag.DeleteCollectionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                        </ContextMenu>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+
+                    <Button Content="+"
+                            Style="{StaticResource CollectionAddTabButtonStyle}"
+                            VerticalAlignment="Top"
+                            ToolTip="New Collection"
+                            Command="{Binding AddCollectionCommand}" />
+                </WrapPanel>
+
+                <!-- Accordion layout -->
+                <ItemsControl Grid.Row="1"
+                              ItemsSource="{Binding Collections}"
+                              Visibility="{Binding Settings.CollectionsLayout, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Accordion}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Expander Header="{Binding Name}" IsExpanded="{Binding IsExpanded}">
+                                <ContentControl Content="{Binding}">
+                                    <ContentControl.Style>
+                                        <Style TargetType="ContentControl">
+                                            <Setter Property="ContentTemplate" Value="{StaticResource AccordionGridViewTemplate}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.Settings.ViewMode, RelativeSource={RelativeSource AncestorType=Window}}" Value="List">
+                                                    <Setter Property="ContentTemplate" Value="{StaticResource AccordionListViewTemplate}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Main items area -->
+                <Grid Grid.Row="1">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Settings.CollectionsLayout}" Value="Accordion">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0"
+                          helpers:Spacing.Value="{DynamicResource DensitySectionGap}"
+                          Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,0,1'}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding SelectedCollection.Name, TargetNullValue=No collection}"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" />
+                            <TextBlock Text="  ·  " Foreground="{DynamicResource TextSecondary}" />
+                            <TextBlock Text="{Binding SelectedCollection.Items.Count, StringFormat={}{0} items, TargetNullValue=0 items}"
+                                       Foreground="{DynamicResource TextSecondary}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="1"
+                                   helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                   Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,1,0,0'}"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   FontSize="11"
+                                   Text="{Binding SearchStatusText}"
+                                   Visibility="{Binding HasSearchStatus, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+
+                    <StackPanel Grid.Row="1">
+                        <Border Background="{DynamicResource SurfaceBackground}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                Padding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1'}"
+                                Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,0,1'}"
+                                Visibility="{Binding IsQuickEditOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0"
+                                         helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                         Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                         Text="{Binding QuickEditName}" />
+                                <TextBox Grid.Column="1"
+                                         helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                         Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                         Text="{Binding QuickEditPath}" />
+                                <TextBox Grid.Column="2"
+                                         helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                         Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                         Text="{Binding QuickEditTags}" />
+                                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                    <Button Content="Save"
+                                            helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                            Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                            Command="{Binding SaveQuickEditCommand}" />
+                                    <Button Content="Cancel" Command="{Binding CancelQuickEditCommand}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Background="{DynamicResource SurfaceBackground}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                Padding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1'}"
+                                Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,0,1'}"
+                                Visibility="{Binding IsBulkToolbarVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="{Binding SelectedItems.Count, StringFormat={}{0} selected}"
+                                           VerticalAlignment="Center"
+                                           helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                           Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}" />
+                                <Button Grid.Column="1"
+                                        Content="Open"
+                                        helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                        Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                        Command="{Binding OpenSelectedCommand}" />
+                                <Button Grid.Column="2"
+                                        Content="Remove Here"
+                                        helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                        Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                        Command="{Binding RemoveSelectedFromCurrentCollectionCommand}" />
+                                <Button Grid.Column="3"
+                                        Content="Delete Global"
+                                        helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                        Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                        Command="{Binding DeleteSelectedGloballyCommand}" />
+                                <Button Grid.Column="4"
+                                        Content="Favorite"
+                                        helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                        Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,1,0'}"
+                                        Command="{Binding ToggleFavoriteSelectedCommand}" />
+                                <Button Grid.Column="5" Content="Tag..." HorizontalAlignment="Left" Command="{Binding AddTagToSelectedCommand}" />
+                                <ComboBox Grid.Column="6"
+                                          Width="170"
+                                          helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                          Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1,0,1,0'}"
+                                          ItemsSource="{Binding Collections}"
+                                          SelectedItem="{Binding BulkTargetCollection}"
+                                          DisplayMemberPath="Name" />
+                                <Button Grid.Column="7" Content="Move" Command="{Binding MoveSelectedToCollectionCommand}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <Grid Grid.Row="2"
+                          helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                          Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1,0'}">
+                        <ListBox x:Name="GridItems"
+                                 ItemsSource="{Binding SelectedCollection.FilteredEntries}"
+                                 Tag="{Binding SelectedCollection}"
+                                 SelectionMode="Extended"
+                                 SelectionChanged="OnItemSelectionChanged"
+                                 ItemContainerStyle="{StaticResource TileListBoxItemStyle}"
+                                 ItemTemplate="{StaticResource GridTileTemplate}"
+                                 Visibility="{Binding Settings.ViewMode, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Grid}"
+                                 MouseLeftButtonUp="OnItemMouseLeftButtonUp"
+                                 PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
+                                 PreviewMouseMove="OnItemPreviewMouseMove"
+                                 Drop="OnItemDrop"
+                                 AllowDrop="True"
+                                 helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                 Padding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1,0'}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+
+                        <ListBox x:Name="ListItems"
+                                 ItemsSource="{Binding SelectedCollection.FilteredEntries}"
+                                 Tag="{Binding SelectedCollection}"
+                                 SelectionMode="Extended"
+                                 SelectionChanged="OnItemSelectionChanged"
+                                 ItemContainerStyle="{StaticResource ItemRowListBoxItemStyle}"
+                                 ItemTemplate="{StaticResource ListItemTemplate}"
+                                 Visibility="{Binding Settings.ViewMode, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=List}"
+                                 MouseLeftButtonUp="OnItemMouseLeftButtonUp"
+                                 PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
+                                 PreviewMouseMove="OnItemPreviewMouseMove"
+                                 Drop="OnItemDrop"
+                                 AllowDrop="True"
+                                 helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                 Padding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1,0'}" />
+
+                        <Border Background="{DynamicResource SurfaceBackground}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="12"
+                                helpers:Spacing.Value="{DynamicResource DensityCardPadding}"
+                                Padding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1'}"
+                                Visibility="{Binding SelectedCollection.FilteredEntries.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <StackPanel HorizontalAlignment="Center" Width="280">
+                                <TextBlock Text="No items yet" FontSize="16" FontWeight="SemiBold" TextAlignment="Center" />
+                                <TextBlock Text="Add a folder, app, or file to get started. You can also paste a path from clipboard."
+                                           TextAlignment="Center"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                           Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,1,0,2'}"
+                                           TextWrapping="Wrap" />
+                                <Button Content="Add Folder"
+                                        Command="{Binding AddFolderCommand}"
+                                        Style="{StaticResource PrimaryButton}"
+                                        helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                        Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,0,1'}" />
+                                <Button Content="Add File"
+                                        Command="{Binding AddFileCommand}"
+                                        helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                                        Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='0,0,0,1'}" />
+                                <Button Content="Add From Clipboard" Command="{Binding AddFromClipboardCommand}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+        </Border>
+
+        <Border Grid.Row="2"
+                Background="{DynamicResource ToolbarBackground}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1,1,1,0"
+                helpers:Spacing.Value="{DynamicResource DensityInlineGap}"
+                Padding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1'}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding VisibleItemCount, StringFormat=Visible: {0}}"
+                           Foreground="{DynamicResource TextSecondary}" />
+                <TextBlock Grid.Column="1"
+                           helpers:Spacing.Value="{DynamicResource DensitySectionGap}"
+                           Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1,0,0,0'}"
+                           Text="{Binding OfflineItemCount, StringFormat=Issues: {0}}"
+                           Foreground="{DynamicResource TextSecondary}" />
+                <TextBlock Grid.Column="2"
+                           helpers:Spacing.Value="{DynamicResource DensitySectionGap}"
+                           Margin="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:Spacing.Value), Converter={StaticResource MultiplyValueConverter}, ConverterParameter='1,0,0,0'}"
+                           Text="{Binding FavoriteItemCount, StringFormat=Favorites: {0}}"
+                           Foreground="{DynamicResource TextSecondary}" />
+                <TextBlock Grid.Column="3"
+                           HorizontalAlignment="Right"
+                           Text="{Binding StatusText}"
+                           Foreground="{DynamicResource TextSecondary}"
+                           TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </Border>
+
+        <Button Grid.RowSpan="3"
+                Panel.ZIndex="25"
+                Style="{StaticResource OverlayBackdropButton}"
+                Command="{Binding CloseSettingsCommand}"
+                Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <Border x:Name="DragDeleteHintHost"
+                Grid.RowSpan="3"
+                Panel.ZIndex="26"
+                Visibility="Collapsed"
+                IsHitTestVisible="False"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,54"
+                Background="{DynamicResource SurfaceElevated}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="14,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="DragDeleteHintIcon"
+                           Text="Drag"
+                           Margin="0,0,8,0"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Accent}" />
+                <TextBlock x:Name="DragDeleteHintText"
+                           Text="Drag outside window to delete"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimary}" />
+            </StackPanel>
+        </Border>
+
+        <!-- Settings panel overlay -->
+        <Border Grid.Row="1"
+                Panel.ZIndex="30"
+                Style="{StaticResource SettingsDrawerHost}"
+                Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <views:SettingsView DataContext="{Binding Settings}" />
+        </Border>
+
+        <!-- Item editor panel -->
+        <Border Grid.Row="1"
+                Panel.ZIndex="35"
+                Style="{StaticResource SettingsDrawerHost}"
+                Visibility="{Binding Editor.IsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <views:ItemEditorView DataContext="{Binding Editor}" />
+        </Border>
+
+        <Popup x:Name="PathCopyToast"
+               AllowsTransparency="True"
+               Focusable="False"
+               IsHitTestVisible="False"
+               PopupAnimation="Fade"
+               StaysOpen="True">
+            <Border Background="{DynamicResource SurfaceElevated}"
+                    BorderBrush="{DynamicResource Accent}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="12,7">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="✓"
+                               Margin="0,0,8,0"
+                               FontSize="14"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource Accent}" />
+                    <TextBlock Text="Path copied"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}" />
+                </StackPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</Window>
