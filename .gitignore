@@ -1,0 +1,42 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# Project-specific publish/output dirs (see MyList.csproj DefaultItemExcludes)
+dist/
+artifacts/
+bin2/
+obj2/
+obj_pub/
+publish/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+
+# Rider / ReSharper
+.idea/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+project.nuget.cache
+project.assets.json
+
+# Logs and OS files
+*.log
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,138 @@
+<Window x:Class="MyList.Views.MtabEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Mtab Editor"
+        Width="760"
+        Height="560"
+        MinWidth="700"
+        MinHeight="500"
+        Background="{DynamicResource AppBackground}"
+        Foreground="{DynamicResource TextPrimary}"
+        WindowStartupLocation="CenterOwner">
+    <Border Margin="12"
+            Background="{DynamicResource SurfaceBackground}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="16">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{Binding DialogTitle}"
+                       FontSize="18"
+                       FontWeight="SemiBold" />
+
+            <Grid Grid.Row="1"
+                  Margin="0,12,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="280" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                    <TextBlock Text="Mtab name" Margin="0,0,0,6" />
+                    <TextBox Text="{Binding MtabName, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Text="Folder paths"
+                               Margin="0,12,0,6" />
+                    <Border MinHeight="220"
+                            MaxHeight="300"
+                            Background="{DynamicResource SurfaceElevated}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="10">
+                        <ScrollViewer x:Name="PathRowsScrollViewer"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      CanContentScroll="False">
+                            <ItemsControl ItemsSource="{Binding PathEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,10">
+                                            <TextBlock Text="{Binding Label}"
+                                                       Margin="0,0,0,4"
+                                                       Foreground="{DynamicResource TextSecondary}" />
+                                            <TextBox Text="{Binding PathText, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBlock Text="{Binding ValidationMessage}"
+                                                       Margin="0,4,0,0"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+
+                <Border Grid.Column="1"
+                        Background="{DynamicResource SurfaceElevated}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="{Binding SummaryText}"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap" />
+
+                        <ListBox Grid.Row="1"
+                                 Margin="0,8,0,0"
+                                 ItemsSource="{Binding ValidationEntries}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,2">
+                                        <TextBlock Text="{Binding Label}"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Input}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding Input}" />
+                                        <TextBlock Text="{Binding Message}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextSecondary}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Foreground="{DynamicResource TextSecondary}"
+                           Text="Only local folders and UNC paths are allowed. New Mtabs grow up to 10 path rows."
+                           VerticalAlignment="Top" />
+
+                <StackPanel Grid.Row="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Margin="0,12,0,0">
+                    <Button Content="Cancel"
+                            Width="100"
+                            Margin="0,0,8,0"
+                            Click="OnCancel" />
+                    <Button Content="{Binding ConfirmButtonText}"
+                            Width="120"
+                            Style="{StaticResource PrimaryButton}"
+                            Click="OnSave" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

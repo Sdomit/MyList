@@ -1,0 +1,36 @@
+<Window x:Class="MyList.Views.CommandPaletteWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Command Palette"
+        Width="620"
+        Height="420"
+        WindowStyle="ToolWindow"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        KeyDown="OnWindowKeyDown">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="QueryBox"
+                 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
+                 MinHeight="34" />
+
+        <ListBox x:Name="CommandList"
+                 Grid.Row="1"
+                 Margin="0,10,0,0"
+                 ItemsSource="{Binding FilteredEntries}"
+                 SelectedItem="{Binding SelectedEntry}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,2">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondary}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>

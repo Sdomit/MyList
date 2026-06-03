@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Thickness x:Key="DensityButtonPadding">12,6</Thickness>
+    <Thickness x:Key="DensityListItemPadding">6</Thickness>
+    <sys:Double x:Key="DensityInlineGap">8</sys:Double>
+    <sys:Double x:Key="DensitySectionGap">12</sys:Double>
+    <sys:Double x:Key="DensityCardPadding">24</sys:Double>
+    <sys:Double x:Key="DensityHeaderButtonMinHeight">34</sys:Double>
+    <Thickness x:Key="DensityTileMargin">4</Thickness>
+    <Thickness x:Key="DensityTilePadding">10</Thickness>
+</ResourceDictionary>
