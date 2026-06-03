@@ -9,6 +9,8 @@ public sealed class StartupService
     private const string RunKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
     private const string AppName = "MyList";
 
+    private readonly LogService _log = LogService.Instance;
+
     public void SetStartup(bool enable)
     {
         try
@@ -16,12 +18,19 @@ public sealed class StartupService
             using var key = Registry.CurrentUser.OpenSubKey(RunKey, true);
             if (key is null)
             {
+                _log.Log("Cannot update startup entry: Run registry key unavailable.");
                 return;
             }
 
             if (enable)
             {
-                var path = Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty;
+                var path = Process.GetCurrentProcess().MainModule?.FileName;
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    _log.Log("Cannot enable startup: executable path unavailable.");
+                    return;
+                }
+
                 key.SetValue(AppName, $"\"{path}\"");
             }
             else
@@ -29,9 +38,9 @@ public sealed class StartupService
                 key.DeleteValue(AppName, false);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // ignore
+            _log.Log(ex, $"Failed to {(enable ? "enable" : "disable")} startup entry.");
         }
     }
 }

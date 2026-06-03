@@ -16,6 +16,8 @@ namespace MyList.Services;
 public sealed class IconService
 {
     private readonly ConcurrentDictionary<string, ImageSource> _cache = new();
+    private readonly ConcurrentQueue<string> _cacheKeys = new();
+    private const int MaxCacheEntries = 512;
     private readonly ClipboardAssetService _clipboardAssetService;
     private readonly object _folderIconLock = new();
     private ImageSource? _folderIcon;
@@ -43,7 +45,7 @@ public sealed class IconService
         var icon = LoadIcon(item);
         if (icon is not null)
         {
-            _cache[key] = icon;
+            StoreInCache(key, icon);
         }
 
         return icon;
@@ -67,11 +69,27 @@ public sealed class IconService
             var icon = LoadIcon(item);
             if (icon is not null)
             {
-                _cache[key] = icon;
+                StoreInCache(key, icon);
             }
 
             return icon;
         }, cancellationToken);
+    }
+
+    private void StoreInCache(string key, ImageSource icon)
+    {
+        if (_cache.TryAdd(key, icon))
+        {
+            _cacheKeys.Enqueue(key);
+            while (_cache.Count > MaxCacheEntries && _cacheKeys.TryDequeue(out var oldKey))
+            {
+                _cache.TryRemove(oldKey, out _);
+            }
+        }
+        else
+        {
+            _cache[key] = icon;
+        }
     }
 
     public void QueueIconRefresh(ItemModel item)

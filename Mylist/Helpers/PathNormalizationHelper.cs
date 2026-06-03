@@ -108,7 +108,7 @@ public static class PathNormalizationHelper
 
         if (cleaned.StartsWith(@"\\", StringComparison.Ordinal))
         {
-            return cleaned.Length > 2;
+            return HasUncServerAndShare(cleaned);
         }
 
         return Path.IsPathRooted(cleaned);
@@ -134,7 +134,7 @@ public static class PathNormalizationHelper
 
         if (cleaned.StartsWith(@"\\", StringComparison.Ordinal))
         {
-            if (cleaned.Length <= 2)
+            if (!HasUncServerAndShare(cleaned))
             {
                 validationStatus = PathValidationStatus.InvalidFormat;
                 return false;
@@ -235,6 +235,23 @@ public static class PathNormalizationHelper
         var trimmed = path.TrimEnd('\\');
         var parts = trimmed.Substring(2).Split('\\', StringSplitOptions.RemoveEmptyEntries);
         return parts.Length == 2;
+    }
+
+    private static bool HasUncServerAndShare(string path)
+    {
+        if (!path.StartsWith(@"\\", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var trimmed = path.TrimEnd('\\');
+        if (trimmed.Length <= 2)
+        {
+            return false;
+        }
+
+        var parts = trimmed.Substring(2).Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2;
     }
 
     private static bool TryExtractPromptPath(string line, out string path)

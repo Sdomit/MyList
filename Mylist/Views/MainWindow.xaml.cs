@@ -440,6 +440,11 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (string.IsNullOrEmpty(e.Text) || e.Text.Any(char.IsControl))
+        {
+            return;
+        }
+
         SearchBox.Focus();
         SearchBox.Text += e.Text;
         SearchBox.CaretIndex = SearchBox.Text.Length;
@@ -543,11 +548,18 @@ public partial class MainWindow : Window
         _isCollectionEntryDragActive = true;
         ShowDragDeleteHint(false);
 
-        var dragResult = DragDrop.DoDragDrop(listBox, data, DragDropEffects.Move | DragDropEffects.Copy);
-        ClearCollectionTabDragIndicators();
-        HideDragDeleteHint();
-        _isCollectionEntryDragActive = false;
-        _isDragging = false;
+        DragDropEffects dragResult;
+        try
+        {
+            dragResult = DragDrop.DoDragDrop(listBox, data, DragDropEffects.Move | DragDropEffects.Copy);
+        }
+        finally
+        {
+            ClearCollectionTabDragIndicators();
+            HideDragDeleteHint();
+            _isCollectionEntryDragActive = false;
+            _isDragging = false;
+        }
 
         if (dragResult == DragDropEffects.None && ViewModel is not null && IsCursorOutsideWindow())
         {
@@ -679,8 +691,14 @@ public partial class MainWindow : Window
 
         var data = new System.Windows.DataObject();
         data.SetData(typeof(CollectionViewModel), collection);
-        DragDrop.DoDragDrop(listBox, data, DragDropEffects.Move);
-        ClearCollectionTabDragIndicators();
+        try
+        {
+            DragDrop.DoDragDrop(listBox, data, DragDropEffects.Move);
+        }
+        finally
+        {
+            ClearCollectionTabDragIndicators();
+        }
     }
 
     private void OnCollectionDrop(object sender, DragEventArgs e)

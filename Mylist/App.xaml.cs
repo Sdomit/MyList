@@ -79,6 +79,15 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             log.Log(args.Exception, "Unhandled UI exception");
+            if (RuntimeStatus.DebugMode)
+            {
+                System.Windows.MessageBox.Show(
+                    $"An unexpected error occurred:\n\n{args.Exception.Message}\n\nThe app will keep running. See the log for details.",
+                    "MyList",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+
             args.Handled = true;
         };
 

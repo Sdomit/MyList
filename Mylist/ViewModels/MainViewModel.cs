@@ -2163,26 +2163,29 @@ public sealed class MainViewModel : ViewModelBase
 
         foreach (var item in SelectedItems.Distinct())
         {
-            var sourceIndex = source is null ? -1 : source.Model.ItemIds.IndexOf(item.Id);
-            var targetIndex = target.Model.ItemIds.Count;
+            var capturedItem = item;
+            var sourceIndex = -1;
 
             actions.Add(new DelegateUndoableAction(
-                $"Move {item.Name}",
+                $"Move {capturedItem.Name}",
                 () =>
                 {
+                    // Capture the source slot at apply time and append to the target's
+                    // end so multi-item moves keep order and undo restores positions.
                     if (source is not null && !source.IsSmart)
                     {
-                        RemoveItemFromCollection(source, item);
+                        sourceIndex = GetEntryIndex(source, capturedItem);
+                        RemoveItemFromCollection(source, capturedItem);
                     }
 
-                    InsertItemIntoCollection(target, item, targetIndex);
+                    InsertItemIntoCollection(target, capturedItem, target.Model.Entries.Count);
                 },
                 () =>
                 {
-                    RemoveItemFromCollection(target, item);
-                    if (source is not null && !source.IsSmart && sourceIndex >= 0)
+                    RemoveItemFromCollection(target, capturedItem);
+                    if (source is not null && !source.IsSmart)
                     {
-                        InsertItemIntoCollection(source, item, sourceIndex);
+                        InsertItemIntoCollection(source, capturedItem, sourceIndex >= 0 ? sourceIndex : source.Model.Entries.Count);
                     }
                 }));
         }
@@ -3643,16 +3646,21 @@ public sealed class MainViewModel : ViewModelBase
 
     private IUndoableAction CreateDeleteItemGloballyAction(ItemModel item)
     {
-        var allItemsIndex = AllItems.IndexOf(item);
-        var collectionLinks = Collections
-            .Where(collection => collection.Model.ItemIds.Contains(item.Id))
-            .Select(collection => new CollectionLinkSnapshot(collection, GetEntryIndex(collection, item)))
-            .ToList();
+        var allItemsIndex = -1;
+        var collectionLinks = new List<CollectionLinkSnapshot>();
 
         return new DelegateUndoableAction(
             "Delete Item Globally",
             () =>
             {
+                // Capture positions at apply time so reverting a bulk delete (which
+                // reverts actions in reverse order) restores each item to its slot.
+                allItemsIndex = AllItems.IndexOf(item);
+                collectionLinks = Collections
+                    .Where(collection => collection.Model.ItemIds.Contains(item.Id))
+                    .Select(collection => new CollectionLinkSnapshot(collection, GetEntryIndex(collection, item)))
+                    .ToList();
+
                 foreach (var link in collectionLinks)
                 {
                     RemoveItemFromCollection(link.Collection, item);
@@ -3664,7 +3672,8 @@ public sealed class MainViewModel : ViewModelBase
             {
                 if (!AllItems.Contains(item))
                 {
-                    AllItems.Insert(Math.Clamp(allItemsIndex, 0, AllItems.Count), item);
+                    var insertIndex = allItemsIndex < 0 ? AllItems.Count : allItemsIndex;
+                    AllItems.Insert(Math.Clamp(insertIndex, 0, AllItems.Count), item);
                 }
 
                 foreach (var link in collectionLinks)
@@ -4084,7 +4093,7 @@ public sealed class MainViewModel : ViewModelBase
 
     private async Task RestoreBackupAsync()
     {
-        var restored = _storageService.RestoreLatestBackup();
+        var restored = await _storageService.RestoreLatestBackupAsync();
         if (restored is null)
         {
             MessageBox.Show("No backups found.", "Restore", MessageBoxButton.OK, MessageBoxImage.Information);

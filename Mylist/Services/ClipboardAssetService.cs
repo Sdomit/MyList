@@ -33,10 +33,32 @@ public sealed class ClipboardAssetService
         var assetFileName = $"{Guid.NewGuid():N}.png";
         var assetPath = Path.Combine(AssetDirectory, assetFileName);
 
-        using var stream = File.Create(assetPath);
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
-        encoder.Save(stream);
+        try
+        {
+            using (var stream = File.Create(assetPath))
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+                encoder.Save(stream);
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.Log(ex, $"Failed to save clipboard image: {assetPath}");
+            try
+            {
+                if (File.Exists(assetPath))
+                {
+                    File.Delete(assetPath);
+                }
+            }
+            catch
+            {
+                // best-effort cleanup of the partial file
+            }
+
+            return null;
+        }
 
         return new ClipboardImageAssetInfo(
             assetFileName,
@@ -78,8 +100,16 @@ public sealed class ClipboardAssetService
             return false;
         }
 
-        System.Windows.Clipboard.SetImage(bitmap);
-        return true;
+        try
+        {
+            System.Windows.Clipboard.SetImage(bitmap);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _log.Log(ex, "Failed to copy image to clipboard.");
+            return false;
+        }
     }
 
     public void ExportReferencedAssets(IEnumerable<ItemModel> items, string destinationDirectory)
@@ -95,7 +125,14 @@ public sealed class ClipboardAssetService
             }
 
             var destinationPath = Path.Combine(destinationDirectory, assetName);
-            File.Copy(sourcePath, destinationPath, overwrite: true);
+            try
+            {
+                File.Copy(sourcePath, destinationPath, overwrite: true);
+            }
+            catch (Exception ex)
+            {
+                _log.Log(ex, $"Failed to export clipboard asset '{assetName}'.");
+            }
         }
     }
 
@@ -117,7 +154,14 @@ public sealed class ClipboardAssetService
             }
 
             var destinationPath = Path.Combine(AssetDirectory, assetName);
-            File.Copy(sourcePath, destinationPath, overwrite: true);
+            try
+            {
+                File.Copy(sourcePath, destinationPath, overwrite: true);
+            }
+            catch (Exception ex)
+            {
+                _log.Log(ex, $"Failed to import clipboard asset '{assetName}'.");
+            }
         }
     }
 

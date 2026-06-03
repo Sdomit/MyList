@@ -141,7 +141,7 @@ public sealed class ItemModel : ObservableObject
     public ItemLaunchProfile LaunchProfile
     {
         get => _launchProfile;
-        set => SetProperty(ref _launchProfile, value);
+        set => SetProperty(ref _launchProfile, value ?? new ItemLaunchProfile());
     }
 
     public bool IsClipboardText

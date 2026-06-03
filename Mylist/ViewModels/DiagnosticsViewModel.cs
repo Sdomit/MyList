@@ -24,9 +24,19 @@ public sealed class DiagnosticsViewModel : ViewModelBase
 
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         _refreshTimer.Tick += (_, _) => Refresh();
-        _refreshTimer.Start();
 
         Refresh();
+    }
+
+    public void StartAutoRefresh()
+    {
+        Refresh();
+        _refreshTimer.Start();
+    }
+
+    public void StopAutoRefresh()
+    {
+        _refreshTimer.Stop();
     }
 
     public ICommand RefreshCommand { get; }

@@ -29,6 +29,7 @@ public sealed class ManagedActionRunnerService
         try
         {
             Directory.CreateDirectory(RuntimeDirectory);
+            CleanupStaleScripts();
             var runtimePath = WriteRuntimeScript(item);
             var startInfo = BuildStartInfo(item, runtimePath);
             Process.Start(startInfo)?.Dispose();
@@ -39,6 +40,37 @@ public sealed class ManagedActionRunnerService
             _log.Log(ex, $"Failed to run action item '{item.Name}'.");
             error = ex.Message;
             return false;
+        }
+    }
+
+    private void CleanupStaleScripts()
+    {
+        try
+        {
+            if (!Directory.Exists(RuntimeDirectory))
+            {
+                return;
+            }
+
+            var cutoff = DateTime.UtcNow.AddHours(-1);
+            foreach (var file in Directory.GetFiles(RuntimeDirectory))
+            {
+                try
+                {
+                    if (File.GetLastWriteTimeUtc(file) < cutoff)
+                    {
+                        File.Delete(file);
+                    }
+                }
+                catch
+                {
+                    // best-effort: a script still in use will be retried next run
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.Log(ex, "Failed to clean up stale action-runtime scripts.");
         }
     }
 
