@@ -215,6 +215,10 @@
     <sys:Double x:Key="Token.Size.IconButton">28</sys:Double>
     <sys:Double x:Key="Token.Size.ItemIcon">24</sys:Double>
     <sys:Double x:Key="Token.Size.HealthDot">7</sys:Double>
+    <GridLength x:Key="Token.Grid.TitleBar">38</GridLength>
+    <GridLength x:Key="Token.Grid.Sidebar">220</GridLength>
+    <GridLength x:Key="Token.Grid.Preview">320</GridLength>
+    <GridLength x:Key="Token.Grid.StatusBar">26</GridLength>
 
     <!-- Compatibility aliases for the existing application style layer -->
     <SolidColorBrush x:Key="AppBackground" Color="{DynamicResource Token.BgMicaColor}" />

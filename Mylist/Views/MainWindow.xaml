@@ -2,6 +2,7 @@
         x:Name="RootWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:MyList.Converters"
         xmlns:views="clr-namespace:MyList.Views"
         Title="MyList"
         Icon="pack://siteoforigin:,,,/desktops.png"
@@ -19,6 +20,17 @@
         PreviewDragOver="OnPreviewDragOver"
         KeyDown="OnWindowKeyDown"
         Topmost="{Binding Settings.AlwaysOnTop}">
+    <Window.InputBindings>
+        <KeyBinding Key="N"
+                    Modifiers="Control"
+                    Command="{Binding OpenInlineAddCommand}" />
+        <KeyBinding Key="V"
+                    Modifiers="Control+Shift"
+                    Command="{Binding OpenClipboardReviewPaneCommand}" />
+        <KeyBinding Key="D"
+                    Modifiers="Control"
+                    Command="{Binding OpenDuplicateManagerPaneCommand}" />
+    </Window.InputBindings>
     <Window.Resources>
         <Geometry x:Key="Icon.Search">M9,1 A8,8 0 1 0 9,17 A8,8 0 1 0 9,1 M15,15 L21,21</Geometry>
         <Geometry x:Key="Icon.Plus">M8,1 L8,15 M1,8 L15,8</Geometry>
@@ -31,6 +43,7 @@
         <Geometry x:Key="Icon.Edit">M2,13 L2,16 L5,16 L15,6 L12,3 Z M10,5 L13,8</Geometry>
         <Geometry x:Key="Icon.Back">M14,2 L4,8 L14,14 M4,8 L17,8</Geometry>
         <Geometry x:Key="Icon.Close">M2,2 L14,14 M14,2 L2,14</Geometry>
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Invert="True" />
 
         <DataTemplate x:Key="CollectionTemplate">
             <Grid>
@@ -244,9 +257,9 @@
 
     <Grid Background="{DynamicResource Token.BgMicaBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{DynamicResource Token.Size.TitleBar}" />
+            <RowDefinition Height="{DynamicResource Token.Grid.TitleBar}" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="{DynamicResource Token.Size.StatusBar}" />
+            <RowDefinition Height="{DynamicResource Token.Grid.StatusBar}" />
         </Grid.RowDefinitions>
 
         <!-- Quiet title bar -->
@@ -347,7 +360,7 @@
                         <MenuItem Header="Folder..." Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                         <MenuItem Header="Mtab" Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                         <MenuItem Header="Action / script" Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                        <MenuItem Header="Clipboard" Command="{Binding PlacementTarget.DataContext.AddFromClipboardCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                        <MenuItem Header="Clipboard" Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
@@ -366,9 +379,9 @@
                 </Style>
             </Grid.Style>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="{DynamicResource Token.Size.Sidebar}" />
+                <ColumnDefinition Width="{DynamicResource Token.Grid.Sidebar}" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="{DynamicResource Token.Size.Preview}" />
+                <ColumnDefinition Width="{DynamicResource Token.Grid.Preview}" />
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
@@ -438,7 +451,7 @@
                                    Style="{StaticResource Simple.SectionLabel}"
                                    Text="TOOLS" />
                         <Button Style="{StaticResource Simple.NavButton}"
-                                Command="{Binding AddFromClipboardCommand}">
+                                Command="{Binding OpenClipboardReviewPaneCommand}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="16" />
@@ -451,12 +464,12 @@
                                       Stroke="{DynamicResource Token.TextTertiaryBrush}"
                                       StrokeThickness="1.3"
                                       Stretch="Uniform" />
-                                <TextBlock Grid.Column="1" Margin="9,0,0,0" Text="Clipboard inbox" />
+                                <TextBlock Grid.Column="1" Margin="9,0,6,0" Text="Clipboard" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Grid.Column="2" Style="{StaticResource Simple.MonoText}" Text="Ctrl+Shift+V" />
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource Simple.NavButton}"
-                                Command="{Binding Settings.OpenDuplicateManagerCommand}">
+                                Command="{Binding OpenDuplicateManagerPaneCommand}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="16" />
@@ -522,7 +535,8 @@
             <Border Grid.Column="1"
                     Style="{StaticResource Simple.Pane}"
                     CornerRadius="10,10,0,0"
-                    BorderThickness="1,0,1,0">
+                    BorderThickness="1,0,1,0"
+                    Visibility="{Binding IsCollectionPaneVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -574,7 +588,8 @@
                                 Style="{StaticResource Simple.GhostButton}"
                                 BorderBrush="{DynamicResource Token.BorderSoftBrush}"
                                 BorderThickness="1"
-                                Click="OnMoreActionsClick">
+                                Visibility="{Binding IsAddFormOpen, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                Click="OnInlineAddOpenClick">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border x:Name="Chrome"
@@ -599,7 +614,7 @@
                                     <MenuItem Header="Add folder..." Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                     <MenuItem Header="New Mtab" Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                     <MenuItem Header="New action / script" Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                    <MenuItem Header="Add from clipboard" Command="{Binding PlacementTarget.DataContext.AddFromClipboardCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    <MenuItem Header="Add from clipboard" Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                     <MenuItem Header="Add separator" Command="{Binding PlacementTarget.DataContext.AddSeparatorCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                 </ContextMenu>
                             </Button.ContextMenu>
@@ -624,6 +639,54 @@
                                            Text="drop a file, paste a path, or click here" />
                             </Grid>
                         </Button>
+
+                        <Border Margin="16,10,16,6"
+                                Padding="8"
+                                Background="{DynamicResource Token.BgSubtleBrush}"
+                                BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                Visibility="{Binding IsAddFormOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="InlineAddBox"
+                                         Margin="0,0,6,0"
+                                         Text="{Binding InlineAddValue, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="Paste or type a rooted file, folder, or UNC path"
+                                         KeyDown="OnInlineAddKeyDown" />
+                                <Button Grid.Column="1"
+                                        Content="File..."
+                                        Style="{StaticResource Simple.GhostButton}"
+                                        Command="{Binding AddFileCommand}" />
+                                <Button Grid.Column="2"
+                                        Margin="4,0,0,0"
+                                        Content="Folder..."
+                                        Style="{StaticResource Simple.GhostButton}"
+                                        Command="{Binding AddFolderCommand}" />
+                                <Button Grid.Column="3"
+                                        Margin="4,0,0,0"
+                                        Content="Mtab"
+                                        Style="{StaticResource Simple.GhostButton}"
+                                        Command="{Binding NewMtabCommand}" />
+                                <Button Grid.Column="4"
+                                        Margin="6,0,0,0"
+                                        Content="Add"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Command="{Binding SaveInlineAddCommand}" />
+                                <Button Grid.Column="5"
+                                        Margin="4,0,0,0"
+                                        Content="Cancel"
+                                        Style="{StaticResource Simple.GhostButton}"
+                                        Command="{Binding CancelInlineAddCommand}" />
+                            </Grid>
+                        </Border>
 
                         <Border Grid.Row="1"
                                 Margin="16,0,16,6"
@@ -709,7 +772,8 @@
             <!-- Preview pane -->
             <Border Grid.Column="2"
                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                    CornerRadius="10,10,0,0">
+                    CornerRadius="10,10,0,0"
+                    Visibility="{Binding IsCollectionPaneVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid>
                     <Grid Style="{StaticResource PreviewVisibilityWhenEmpty}">
                         <StackPanel Margin="18,18">
@@ -815,13 +879,14 @@
                                         </Style>
                                     </StackPanel.Style>
                                     <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="FOLDERS" Margin="0,0,0,8" />
-                                    <ItemsControl ItemsSource="{Binding SelectedItem.MtabPaths}">
+                                    <ItemsControl ItemsSource="{Binding InlineMtabPaths}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="0,0,0,5">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="22" />
                                                         <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
                                                     <Border Width="20"
                                                             Height="20"
@@ -836,23 +901,50 @@
                                                     </Border>
                                                     <Border Grid.Column="1"
                                                             Margin="6,0,0,0"
-                                                            Padding="8,6"
+                                                            Padding="6,3"
                                                             Background="{DynamicResource Token.BgSubtleBrush}"
                                                             BorderBrush="{DynamicResource Token.BorderHairBrush}"
                                                             BorderThickness="1"
                                                             CornerRadius="{DynamicResource Token.RadiusMd}">
-                                                        <TextBlock Style="{StaticResource Simple.MonoText}"
-                                                                   Text="{Binding}"
-                                                                   TextWrapping="Wrap" />
+                                                        <TextBox Padding="2"
+                                                                 Background="{DynamicResource Token.TransparentBrush}"
+                                                                 BorderThickness="0"
+                                                                 FontFamily="{DynamicResource Token.FontMono}"
+                                                                 FontSize="11"
+                                                                 Text="{Binding PathText, UpdateSourceTrigger=PropertyChanged}" />
                                                     </Border>
+                                                    <Button Grid.Column="2"
+                                                            Width="24"
+                                                            Height="24"
+                                                            MinWidth="24"
+                                                            Margin="4,0,0,0"
+                                                            Padding="0"
+                                                            Content="x"
+                                                            Style="{StaticResource Simple.GhostButton}"
+                                                            Command="{Binding DataContext.RemoveInlineMtabPathCommand, ElementName=RootWindow}"
+                                                            CommandParameter="{Binding}"
+                                                            ToolTip="Remove folder" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-                                    <Button Margin="0,4,0,0"
-                                            Content="Edit folders"
-                                            Command="{Binding EditMtabCommand}"
-                                            CommandParameter="{Binding SelectedItem}" />
+                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                                        <Button Content="Add folder path"
+                                                Style="{StaticResource Simple.GhostButton}"
+                                                Command="{Binding AddInlineMtabPathCommand}" />
+                                        <Button Margin="4,0,0,0"
+                                                Content="Reload"
+                                                Style="{StaticResource Simple.GhostButton}"
+                                                Command="{Binding ReloadInlineMtabCommand}" />
+                                        <Button Margin="4,0,0,0"
+                                                Content="Save folders"
+                                                Style="{StaticResource PrimaryButton}"
+                                                Command="{Binding SaveInlineMtabCommand}" />
+                                    </StackPanel>
+                                    <TextBlock Margin="0,6,0,0"
+                                               Style="{StaticResource Simple.MetaText}"
+                                               Text="{Binding InlineMtabStatusText}"
+                                               TextWrapping="Wrap" />
                                     <Border Height="180"
                                             Margin="0,16,0,0"
                                             Background="{DynamicResource Token.BgSubtleBrush}"
@@ -976,6 +1068,15 @@
                     </Grid>
                 </Grid>
             </Border>
+
+            <views:ClipboardReviewView Grid.Column="1"
+                                       Grid.ColumnSpan="2"
+                                       Panel.ZIndex="5"
+                                       Visibility="{Binding IsClipboardReviewPaneOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <views:DuplicateManagerView Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Panel.ZIndex="5"
+                                        Visibility="{Binding IsDuplicateManagerPaneOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
         </Grid>
 
         <!-- Status bar -->
@@ -1017,7 +1118,7 @@
               Background="{DynamicResource Token.BgMicaBrush}"
               Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="{DynamicResource Token.Size.TitleBar}" />
+                <RowDefinition Height="{DynamicResource Token.Grid.TitleBar}" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid Margin="14,0,10,0">

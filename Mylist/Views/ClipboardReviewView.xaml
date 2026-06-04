@@ -1,0 +1,252 @@
+<UserControl x:Class="MyList.Views.ClipboardReviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource Token.TransparentBrush}"
+             Foreground="{DynamicResource Token.TextPrimaryBrush}"
+             FontFamily="{DynamicResource Token.FontUi}">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ClipboardPathRow">
+            <Grid Margin="10,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Ellipse Width="7"
+                         Height="7"
+                         Fill="{DynamicResource Token.StatusOkBrush}"
+                         VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Margin="9,0,0,0">
+                    <TextBlock Style="{StaticResource Simple.MonoText}"
+                               Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                               Text="{Binding DisplayPath}"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTip="{Binding DisplayPath}" />
+                    <TextBlock Margin="0,3,0,0"
+                               Style="{StaticResource Simple.MetaText}"
+                               Text="{Binding Reason}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SkippedPathRow">
+            <Grid Margin="10,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Ellipse Width="7"
+                         Height="7"
+                         Fill="{DynamicResource Token.StatusBadBrush}"
+                         VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Margin="9,0,0,0">
+                    <TextBlock Style="{StaticResource Simple.MonoText}"
+                               Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                               Text="{Binding DisplayPath}"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTip="{Binding DisplayPath}" />
+                    <TextBlock Margin="0,3,0,0"
+                               Foreground="{DynamicResource Token.StatusBadBrush}"
+                               FontSize="10.5"
+                               Text="{Binding Reason}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="ClipboardSection" TargetType="Border" BasedOn="{StaticResource Simple.Card}">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="ClipToBounds" Value="True" />
+        </Style>
+    </UserControl.Resources>
+
+    <Border Margin="0,8,12,8"
+            Style="{StaticResource Simple.Pane}"
+            CornerRadius="{DynamicResource Token.RadiusXl}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Padding="20,16"
+                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource Simple.PaneTitle}" Text="Clipboard inbox" />
+                        <TextBlock Margin="0,4,0,0"
+                                   Style="{StaticResource Simple.MetaText}"
+                                   Text="{Binding ClipboardReviewSummaryText}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Margin="0,0,8,0"
+                                   Style="{StaticResource Simple.MetaText}"
+                                   Text="Add to"
+                                   VerticalAlignment="Center" />
+                        <ComboBox Width="190"
+                                  ItemsSource="{Binding ClipboardTargetCollections}"
+                                  DisplayMemberPath="Name"
+                                  SelectedItem="{Binding SelectedClipboardTargetCollection}" />
+                        <Button Margin="6,0,0,0"
+                                Content="Refresh"
+                                Command="{Binding RefreshClipboardReviewCommand}" />
+                        <Button Margin="6,0,0,0"
+                                Content="Back"
+                                Style="{StaticResource Simple.GhostButton}"
+                                Command="{Binding CloseToolPaneCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1" Margin="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="260" />
+                </Grid.ColumnDefinitions>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <Border Style="{StaticResource ClipboardSection}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Padding="10,8"
+                                        Background="{DynamicResource Token.BgSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderThickness="0,0,0,1">
+                                    <TextBlock Style="{StaticResource Simple.SectionLabel}"
+                                               Foreground="{DynamicResource Token.StatusOkBrush}"
+                                               Text="{Binding ClipboardWillAddHeader}" />
+                                </Border>
+                                <ListBox Grid.Row="1"
+                                         ItemsSource="{Binding ClipboardWillAddEntries}"
+                                         ItemTemplate="{StaticResource ClipboardPathRow}"
+                                         IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource ClipboardSection}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Padding="10,8"
+                                        Background="{DynamicResource Token.BgSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderThickness="0,0,0,1">
+                                    <TextBlock Style="{StaticResource Simple.SectionLabel}"
+                                               Foreground="{DynamicResource Token.AccentBrush}"
+                                               Text="{Binding ClipboardWillLinkHeader}" />
+                                </Border>
+                                <ListBox Grid.Row="1"
+                                         ItemsSource="{Binding ClipboardWillLinkEntries}"
+                                         ItemTemplate="{StaticResource ClipboardPathRow}"
+                                         IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource ClipboardSection}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Border Padding="10,8"
+                                        Background="{DynamicResource Token.BgSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderThickness="0,0,0,1">
+                                    <TextBlock Style="{StaticResource Simple.SectionLabel}"
+                                               Foreground="{DynamicResource Token.StatusBadBrush}"
+                                               Text="{Binding ClipboardSkippedHeader}" />
+                                </Border>
+                                <ListBox Grid.Row="1"
+                                         ItemsSource="{Binding ClipboardSkippedEntries}"
+                                         ItemTemplate="{StaticResource SkippedPathRow}"
+                                         IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Border Grid.Column="2" Style="{StaticResource Simple.Card}" Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Border Padding="10,9"
+                                Background="{DynamicResource Token.BgSubtleBrush}"
+                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderThickness="0,0,0,1">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="HISTORY" />
+                                <TextBlock Margin="0,3,0,0"
+                                           Style="{StaticResource Simple.MetaText}"
+                                           Text="Re-apply a recent import" />
+                            </StackPanel>
+                        </Border>
+                        <ListBox Grid.Row="1"
+                                 Margin="5"
+                                 ItemsSource="{Binding ClipboardHistoryEntries}"
+                                 SelectedItem="{Binding SelectedClipboardHistoryEntry}"
+                                 ItemContainerStyle="{StaticResource Simple.ItemListBoxItem}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding CollectionName}"
+                                                   FontWeight="Medium"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Margin="0,3,0,0"
+                                                   Style="{StaticResource Simple.MetaText}"
+                                                   Text="{Binding Summary}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Margin="0,3,0,0"
+                                                   Style="{StaticResource Simple.MonoText}"
+                                                   Text="{Binding TimestampUtc, StringFormat={}{0:yyyy-MM-dd HH:mm}}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Button Grid.Row="2"
+                                Margin="8"
+                                Content="Re-apply selected"
+                                Command="{Binding ReapplyClipboardHistoryCommand}" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="2"
+                    Padding="16,10"
+                    Background="{DynamicResource Token.BgMicaBrush}"
+                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderThickness="0,1,0,0">
+                <Grid>
+                    <TextBlock Margin="0,0,210,0"
+                               Style="{StaticResource Simple.MetaText}"
+                               Text="{Binding ClipboardReviewStatusText}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center" />
+                    <Button Width="190"
+                            HorizontalAlignment="Right"
+                            Content="{Binding ClipboardApplyButtonText}"
+                            Style="{StaticResource PrimaryButton}"
+                            IsEnabled="{Binding CanApplyClipboardReview}"
+                            Command="{Binding ApplyClipboardReviewCommand}" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

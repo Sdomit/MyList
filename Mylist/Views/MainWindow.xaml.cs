@@ -372,7 +372,12 @@ public partial class MainWindow : Window
 
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N)
         {
-            ViewModel.AddFileCommand.Execute(null);
+            ViewModel.OpenInlineAddCommand.Execute(null);
+            Dispatcher.BeginInvoke(() =>
+            {
+                InlineAddBox.Focus();
+                Keyboard.Focus(InlineAddBox);
+            });
             e.Handled = true;
             return;
         }
@@ -386,14 +391,14 @@ public partial class MainWindow : Window
 
         if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key == Key.V)
         {
-            ViewModel.AddFromClipboardCommand.Execute(null);
+            ViewModel.OpenClipboardReviewPaneCommand.Execute(null);
             e.Handled = true;
             return;
         }
 
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D)
         {
-            ViewModel.OpenDuplicateManager();
+            ViewModel.OpenDuplicateManagerPaneCommand.Execute(null);
             e.Handled = true;
             return;
         }
@@ -464,6 +469,20 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (e.Key == Key.Escape && (ViewModel.IsClipboardReviewPaneOpen || ViewModel.IsDuplicateManagerPaneOpen))
+        {
+            ViewModel.CloseToolPaneCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape && ViewModel.IsAddFormOpen)
+        {
+            ViewModel.CancelInlineAddCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
         if (Keyboard.FocusedElement is TextBox)
         {
             return;
@@ -471,9 +490,9 @@ public partial class MainWindow : Window
 
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
         {
-            if (ViewModel.AddFromClipboardCommand.CanExecute(null))
+            if (ViewModel.OpenClipboardReviewPaneCommand.CanExecute(null))
             {
-                ViewModel.AddFromClipboardCommand.Execute(null);
+                ViewModel.OpenClipboardReviewPaneCommand.Execute(null);
             }
             e.Handled = true;
             return;
@@ -492,6 +511,40 @@ public partial class MainWindow : Window
         if (e.Key == Key.Enter && ViewModel.SelectedItem is not null)
         {
             ViewModel.OpenItemCommand.Execute(ViewModel.SelectedItem);
+            e.Handled = true;
+        }
+    }
+
+    private void OnInlineAddOpenClick(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        ViewModel.OpenInlineAddCommand.Execute(null);
+        Dispatcher.BeginInvoke(() =>
+        {
+            InlineAddBox.Focus();
+            Keyboard.Focus(InlineAddBox);
+        });
+    }
+
+    private void OnInlineAddKeyDown(object sender, KeyEventArgs e)
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Enter && ViewModel.SaveInlineAddCommand.CanExecute(null))
+        {
+            ViewModel.SaveInlineAddCommand.Execute(null);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            ViewModel.CancelInlineAddCommand.Execute(null);
             e.Handled = true;
         }
     }
