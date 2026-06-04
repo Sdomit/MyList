@@ -146,6 +146,7 @@ public sealed class MainViewModel : ViewModelBase
         ReloadInlineMtabCommand = new RelayCommand(() => LoadInlineMtabDraft(SelectedItem), () => SelectedItem?.IsMtab == true);
         NewActionCommand = new RelayCommand(OpenNewActionDialog);
         NewMtabCommand = new RelayCommand(OpenNewMtabDialog);
+        CaptureExplorerWindowsAsMtabCommand = new RelayCommand(CaptureExplorerWindowsAsMtab);
         AddSeparatorCommand = new RelayCommand(AddSeparator, CanAddSeparator);
 
         OpenItemCommand = new RelayCommand<ItemModel?>(OpenItem);
@@ -477,6 +478,7 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand ReloadInlineMtabCommand { get; }
     public ICommand NewActionCommand { get; }
     public ICommand NewMtabCommand { get; }
+    public ICommand CaptureExplorerWindowsAsMtabCommand { get; }
     public ICommand AddSeparatorCommand { get; }
     public ICommand OpenItemCommand { get; }
     public ICommand OpenNewWindowCommand { get; }
@@ -823,6 +825,7 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         InlineMtabPaths.Add(new InlineMtabPathViewModel(string.Empty));
+        UpdateInlineMtabLayout();
         InlineMtabStatusText = "Enter the new folder path, then save.";
     }
 
@@ -834,6 +837,7 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         InlineMtabPaths.Remove(path);
+        UpdateInlineMtabLayout();
         InlineMtabStatusText = "Save to apply the updated folder list.";
     }
 
@@ -870,7 +874,16 @@ public sealed class MainViewModel : ViewModelBase
             InlineMtabPaths.Add(new InlineMtabPathViewModel(path));
         }
 
+        UpdateInlineMtabLayout();
         InlineMtabStatusText = $"{InlineMtabPaths.Count} folders. Edit paths inline, then save.";
+    }
+
+    private void UpdateInlineMtabLayout()
+    {
+        for (var index = 0; index < InlineMtabPaths.Count; index++)
+        {
+            InlineMtabPaths[index].UpdateLayout(index + 1, InlineMtabPaths.Count);
+        }
     }
 
     public void MergeDuplicateGroup(DuplicateGroup group)
@@ -2125,6 +2138,41 @@ public sealed class MainViewModel : ViewModelBase
         StatusText = status;
     }
 
+    private void CaptureExplorerWindowsAsMtab()
+    {
+        var capturedPaths = _explorerTabAutomationService.CaptureOpenFolderPaths();
+        if (capturedPaths.Count < 2)
+        {
+            MessageBox.Show(
+                "Open at least two Explorer folders before capturing them as an Mtab.",
+                "Capture Explorer Windows",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
+        var editor = new MtabEditorWindow(
+            "Capture Explorer Windows",
+            BuildSuggestedMtabNameFromPaths(capturedPaths),
+            capturedPaths)
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        if (editor.ShowDialog() != true)
+        {
+            return;
+        }
+
+        if (!CreateMtabFromPaths(editor.MtabName, editor.ValidPaths, ResolveTargetCollection(), out var status))
+        {
+            MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        StatusText = status;
+    }
+
     private void OpenNewActionDialog()
     {
         var dialog = new ActionItemWindow("New Action")
@@ -2176,24 +2224,13 @@ public sealed class MainViewModel : ViewModelBase
             return;
         }
 
-        var existingPaths = GetMtabFolderPaths(item);
-        var editor = new MtabEditorWindow("Edit Mtab", item.Name, existingPaths)
-        {
-            Owner = Application.Current.MainWindow
-        };
-
-        if (editor.ShowDialog() != true)
-        {
-            return;
-        }
-
-        if (!UpdateMtabFromPaths(item, editor.MtabName, editor.ValidPaths, out var status))
-        {
-            MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        StatusText = status;
+        CloseToolPane();
+        IsSettingsOpen = false;
+        Editor.Close();
+        SetSelectedItems(new[] { item });
+        LoadInlineMtabDraft(item);
+        InlineMtabStatusText = "Edit folder paths inline, then save.";
+        StatusText = $"Editing Mtab '{item.Name}' in the preview pane.";
     }
 
     private void EditActionItem(ItemModel item)
@@ -4334,6 +4371,7 @@ public sealed class MainViewModel : ViewModelBase
             new() { Name = "New Action", Description = "Create an internal command, batch, or PowerShell item", Execute = () => NewActionCommand.Execute(null) },
             new() { Name = "Add Separator", Description = "Insert a visual divider in the current collection", Execute = () => AddSeparatorCommand.Execute(null) },
             new() { Name = "New Mtab", Description = "Create explorer multi-tab group", Execute = () => NewMtabCommand.Execute(null) },
+            new() { Name = "Capture Explorer Windows", Description = "Create an Mtab from open Explorer folders", Execute = () => CaptureExplorerWindowsAsMtabCommand.Execute(null) },
             new() { Name = "Open Settings", Description = "Toggle settings drawer", Execute = () => ToggleSettingsCommand.Execute(null) },
             new() { Name = "Open Diagnostics", Description = "Open diagnostics page", Execute = ToggleDiagnostics },
             new() { Name = "Open Duplicate Manager", Description = "Manage duplicate paths", Execute = OpenDuplicateManagerPane },

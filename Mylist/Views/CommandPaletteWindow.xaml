@@ -13,6 +13,8 @@
         WindowStartupLocation="CenterOwner"
         KeyDown="OnWindowKeyDown">
     <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
+        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <Geometry x:Key="PaletteSearchIcon">M9,1 A8,8 0 1 0 9,17 A8,8 0 1 0 9,1 M15,15 L21,21</Geometry>
         <Geometry x:Key="PaletteCommandIcon">M2,4 L14,4 L14,14 L2,14 Z M5,1 L11,1 M5,8 L11,8 M5,11 L9,11</Geometry>
 

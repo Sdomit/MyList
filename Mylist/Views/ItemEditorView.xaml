@@ -5,6 +5,8 @@
              Foreground="{DynamicResource Token.TextPrimaryBrush}"
              FontFamily="{DynamicResource Token.FontUi}">
     <UserControl.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
+        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <Style x:Key="EditorFieldLabel" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Token.TextSecondaryBrush}" />
             <Setter Property="FontSize" Value="11" />
@@ -192,7 +194,7 @@
                 <Button Content="Save changes"
                         Width="112"
                         Margin="8,0,0,0"
-                        Style="{StaticResource PrimaryButton}"
+                        Style="{StaticResource Simple.PrimaryButton}"
                         Command="{Binding SaveCommand}" />
             </StackPanel>
         </Border>

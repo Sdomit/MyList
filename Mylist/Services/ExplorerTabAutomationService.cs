@@ -158,6 +158,33 @@ public sealed class ExplorerTabAutomationService
         }
     }
 
+    public IReadOnlyList<string> CaptureOpenFolderPaths()
+    {
+        var paths = new List<string>();
+        foreach (var handle in GetExplorerWindowHandles())
+        {
+            var snapshots = GetShellTabSnapshotsByHwnd(handle);
+            try
+            {
+                foreach (var snapshot in snapshots)
+                {
+                    if (TryGetPathFromLocationUrl(snapshot.LocationUrl, out var path, out _))
+                    {
+                        paths.Add(path);
+                    }
+                }
+            }
+            finally
+            {
+                DisposeSnapshots(snapshots);
+            }
+        }
+
+        return paths
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
     private async Task<bool> TryOpenPathInTabAsync(IntPtr explorerHandle, string path, CancellationToken ct)
     {
         if (!PathNormalizationHelper.TryNormalizeUserPath(path, out _, out var expectedPathKey))
@@ -510,9 +537,18 @@ public sealed class ExplorerTabAutomationService
 
     private static string? ToPathKeyFromLocationUrl(string? locationUrl)
     {
+        return TryGetPathFromLocationUrl(locationUrl, out _, out var pathKey)
+            ? pathKey
+            : null;
+    }
+
+    private static bool TryGetPathFromLocationUrl(string? locationUrl, out string normalizedPath, out string pathKey)
+    {
+        normalizedPath = string.Empty;
+        pathKey = string.Empty;
         if (string.IsNullOrWhiteSpace(locationUrl))
         {
-            return null;
+            return false;
         }
 
         var trimmedLocation = locationUrl.Trim();
@@ -532,12 +568,10 @@ public sealed class ExplorerTabAutomationService
 
         if (string.IsNullOrWhiteSpace(pathCandidate))
         {
-            return null;
+            return false;
         }
 
-        return PathNormalizationHelper.TryNormalizeUserPath(pathCandidate, out _, out var pathKey)
-            ? pathKey
-            : null;
+        return PathNormalizationHelper.TryNormalizeUserPath(pathCandidate, out normalizedPath, out pathKey);
     }
 
     private static void OpenExplorerWindow(string path)

@@ -405,7 +405,7 @@ public partial class MainWindow : Window
 
         if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Alt) && e.Key == Key.M)
         {
-            ViewModel.NewMtabCommand.Execute(null);
+            ViewModel.CaptureExplorerWindowsAsMtabCommand.Execute(null);
             e.Handled = true;
             return;
         }

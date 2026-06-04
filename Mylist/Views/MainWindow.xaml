@@ -32,6 +32,8 @@
                     Command="{Binding OpenDuplicateManagerPaneCommand}" />
     </Window.InputBindings>
     <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
+        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <Geometry x:Key="Icon.Search">M9,1 A8,8 0 1 0 9,17 A8,8 0 1 0 9,1 M15,15 L21,21</Geometry>
         <Geometry x:Key="Icon.Plus">M8,1 L8,15 M1,8 L15,8</Geometry>
         <Geometry x:Key="Icon.Folder">M1,4 L6,4 L8,6 L17,6 L17,15 L1,15 Z</Geometry>
@@ -350,7 +352,7 @@
             </Border>
 
             <Button Grid.Column="2"
-                    Style="{StaticResource PrimaryButton}"
+                    Style="{StaticResource Simple.PrimaryButton}"
                     Content="Add"
                     Margin="0,0,4,0"
                     Click="OnMoreActionsClick">
@@ -678,7 +680,7 @@
                                 <Button Grid.Column="4"
                                         Margin="6,0,0,0"
                                         Content="Add"
-                                        Style="{StaticResource PrimaryButton}"
+                                        Style="{StaticResource Simple.PrimaryButton}"
                                         Command="{Binding SaveInlineAddCommand}" />
                                 <Button Grid.Column="5"
                                         Margin="4,0,0,0"
@@ -708,7 +710,7 @@
                                 <TextBox Grid.Column="2" Text="{Binding QuickEditTags}" Margin="0,0,6,0" />
                                 <StackPanel Grid.Column="3" Orientation="Horizontal">
                                     <Button Content="Cancel" Style="{StaticResource Simple.GhostButton}" Command="{Binding CancelQuickEditCommand}" />
-                                    <Button Content="Save" Margin="4,0,0,0" Style="{StaticResource PrimaryButton}" Command="{Binding SaveQuickEditCommand}" />
+                                    <Button Content="Save" Margin="4,0,0,0" Style="{StaticResource Simple.PrimaryButton}" Command="{Binding SaveQuickEditCommand}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -761,7 +763,7 @@
                                            TextWrapping="Wrap" />
                                 <Button Content="Add folder"
                                         Width="110"
-                                        Style="{StaticResource PrimaryButton}"
+                                        Style="{StaticResource Simple.PrimaryButton}"
                                         Command="{Binding AddFolderCommand}" />
                             </StackPanel>
                         </Grid>
@@ -821,7 +823,7 @@
                                            Text="{Binding SelectedItem.DisplayPath}"
                                            TextWrapping="Wrap" />
                                 <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                                    <Button Style="{StaticResource PrimaryButton}"
+                                    <Button Style="{StaticResource Simple.PrimaryButton}"
                                             Command="{Binding OpenItemCommand}"
                                             CommandParameter="{Binding SelectedItem}">
                                         <StackPanel Orientation="Horizontal">
@@ -892,7 +894,7 @@
                                                             Height="20"
                                                             Background="{DynamicResource Token.AccentSoftBrush}"
                                                             CornerRadius="{DynamicResource Token.RadiusSm}">
-                                                        <TextBlock Text="F"
+                                                        <TextBlock Text="{Binding Number}"
                                                                    Foreground="{DynamicResource Token.TextAccentBrush}"
                                                                    FontSize="10"
                                                                    FontWeight="SemiBold"
@@ -928,49 +930,162 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-                                    <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                                    <Grid Margin="0,4,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
                                         <Button Content="Add folder path"
                                                 Style="{StaticResource Simple.GhostButton}"
                                                 Command="{Binding AddInlineMtabPathCommand}" />
-                                        <Button Margin="4,0,0,0"
+                                        <Button Grid.Column="1"
+                                                Margin="4,0,0,0"
                                                 Content="Reload"
                                                 Style="{StaticResource Simple.GhostButton}"
                                                 Command="{Binding ReloadInlineMtabCommand}" />
-                                        <Button Margin="4,0,0,0"
-                                                Content="Save folders"
-                                                Style="{StaticResource PrimaryButton}"
-                                                Command="{Binding SaveInlineMtabCommand}" />
-                                    </StackPanel>
+                                    </Grid>
                                     <TextBlock Margin="0,6,0,0"
                                                Style="{StaticResource Simple.MetaText}"
                                                Text="{Binding InlineMtabStatusText}"
                                                TextWrapping="Wrap" />
-                                    <Border Height="180"
-                                            Margin="0,16,0,0"
+                                    <TextBlock Margin="0,16,0,8"
+                                               Style="{StaticResource Simple.SectionLabel}"
+                                               Text="PREVIEW" />
+                                    <Border Height="210"
                                             Background="{DynamicResource Token.BgSubtleBrush}"
                                             BorderBrush="{DynamicResource Token.BorderHairBrush}"
                                             BorderThickness="1"
                                             CornerRadius="{DynamicResource Token.RadiusMd}">
-                                        <Grid>
-                                            <Ellipse Width="10"
+                                        <Canvas Width="260"
+                                                Height="200"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                ClipToBounds="False">
+                                            <ItemsControl Width="260"
+                                                          Height="200"
+                                                          ItemsSource="{Binding InlineMtabPaths}"
+                                                          IsHitTestVisible="False">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <Canvas />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Line X1="130"
+                                                              Y1="100"
+                                                              X2="{Binding LineX2}"
+                                                              Y2="{Binding LineY2}"
+                                                              Stroke="{DynamicResource Token.AccentBrush}"
+                                                              StrokeThickness="1.5"
+                                                              StrokeDashArray="3,3"
+                                                              Opacity="0.4" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <Ellipse Canvas.Left="125"
+                                                     Canvas.Top="95"
+                                                     Width="10"
                                                      Height="10"
                                                      Fill="{DynamicResource Token.AccentBrush}"
-                                                     HorizontalAlignment="Center"
-                                                     VerticalAlignment="Center" />
-                                            <Ellipse Width="42"
-                                                     Height="42"
-                                                     Stroke="{DynamicResource Token.AccentMuteBrush}"
-                                                     StrokeThickness="8"
-                                                     HorizontalAlignment="Center"
-                                                     VerticalAlignment="Center" />
-                                            <TextBlock Margin="0,0,0,22"
-                                                       Style="{StaticResource Simple.MonoText}"
-                                                       Text="MTAB"
-                                                       Foreground="{DynamicResource Token.TextAccentBrush}"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Bottom" />
-                                        </Grid>
+                                                     RenderTransformOrigin="0.5,0.5">
+                                                <Ellipse.RenderTransform>
+                                                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                                                </Ellipse.RenderTransform>
+                                                <Ellipse.Triggers>
+                                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                        <BeginStoryboard>
+                                                            <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                                                 From="1"
+                                                                                 To="1.08"
+                                                                                 Duration="0:0:1.2">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <SineEase EasingMode="EaseInOut" />
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                                                 From="1"
+                                                                                 To="1.08"
+                                                                                 Duration="0:0:1.2">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <SineEase EasingMode="EaseInOut" />
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                </Ellipse.Triggers>
+                                            </Ellipse>
+
+                                            <ItemsControl Width="260"
+                                                          Height="200"
+                                                          ItemsSource="{Binding InlineMtabPaths}"
+                                                          IsHitTestVisible="False">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <Canvas />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemContainerStyle>
+                                                    <Style TargetType="ContentPresenter">
+                                                        <Setter Property="Canvas.Left" Value="{Binding NodeLeft}" />
+                                                        <Setter Property="Canvas.Top" Value="{Binding NodeTop}" />
+                                                    </Style>
+                                                </ItemsControl.ItemContainerStyle>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Width="80">
+                                                            <Border Width="32"
+                                                                    Height="32"
+                                                                    HorizontalAlignment="Center"
+                                                                    Background="{DynamicResource Token.BgSurfaceBrush}"
+                                                                    BorderBrush="{DynamicResource Token.AccentBrush}"
+                                                                    BorderThickness="1.5"
+                                                                    CornerRadius="{DynamicResource Token.RadiusLg}">
+                                                                <Path Width="16"
+                                                                      Height="16"
+                                                                      Data="{StaticResource Icon.Folder}"
+                                                                      Stroke="{DynamicResource Token.TextAccentBrush}"
+                                                                      StrokeThickness="1.4"
+                                                                      Stretch="Uniform" />
+                                                            </Border>
+                                                            <Border Margin="0,4,0,0"
+                                                                    Padding="4,2"
+                                                                    Background="{DynamicResource Token.BgSurfaceBrush}"
+                                                                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="{DynamicResource Token.RadiusSm}">
+                                                                <TextBlock Style="{StaticResource Simple.MonoText}"
+                                                                           Text="{Binding Label}"
+                                                                           TextAlignment="Center"
+                                                                           TextTrimming="CharacterEllipsis" />
+                                                            </Border>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Canvas>
                                     </Border>
+                                    <TextBlock Margin="0,7,0,0"
+                                               Style="{StaticResource Simple.MonoText}"
+                                               Text="{Binding InlineMtabPaths.Count, StringFormat={}{0} folders - opens as a tab group}"
+                                               TextAlignment="Center" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button Content="Test open"
+                                                Command="{Binding OpenItemCommand}"
+                                                CommandParameter="{Binding SelectedItem}" />
+                                        <Button Grid.Column="1"
+                                                Margin="6,0,0,0"
+                                                Content="Save folders"
+                                                Style="{StaticResource Simple.PrimaryButton}"
+                                                Command="{Binding SaveInlineMtabCommand}" />
+                                    </Grid>
                                 </StackPanel>
 
                                 <StackPanel Margin="0,0,0,18">
