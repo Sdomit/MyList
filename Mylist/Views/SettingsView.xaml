@@ -199,9 +199,9 @@
             <TabItem Header="General">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Width="720"
+                    <StackPanel MaxWidth="720"
                                 Margin="32,24,32,40"
-                                HorizontalAlignment="Left">
+                                HorizontalAlignment="Stretch">
                         <TextBlock Style="{StaticResource SettingsSectionTitle}" Text="General" />
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="How MyList runs on this machine." />
 
@@ -283,9 +283,9 @@
             <TabItem Header="Appearance">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Width="720"
+                    <StackPanel MaxWidth="720"
                                 Margin="32,24,32,40"
-                                HorizontalAlignment="Left">
+                                HorizontalAlignment="Stretch">
                         <TextBlock Style="{StaticResource SettingsSectionTitle}" Text="Appearance" />
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="Theme, density, and visual scale." />
 
@@ -409,9 +409,9 @@
             <TabItem Header="Hotkeys">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Width="720"
+                    <StackPanel MaxWidth="720"
                                 Margin="32,24,32,40"
-                                HorizontalAlignment="Left">
+                                HorizontalAlignment="Stretch">
                         <TextBlock Style="{StaticResource SettingsSectionTitle}" Text="Hotkeys" />
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="Global shortcuts wired through Windows." />
 
@@ -456,9 +456,9 @@
             <TabItem Header="Data &amp; sync">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Width="720"
+                    <StackPanel MaxWidth="720"
                                 Margin="32,24,32,40"
-                                HorizontalAlignment="Left">
+                                HorizontalAlignment="Stretch">
                         <TextBlock Style="{StaticResource SettingsSectionTitle}" Text="Data &amp; sync" />
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="Export, import, and recover your collections." />
 
@@ -521,9 +521,9 @@
             <TabItem Header="Tools">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Width="720"
+                    <StackPanel MaxWidth="720"
                                 Margin="32,24,32,40"
-                                HorizontalAlignment="Left">
+                                HorizontalAlignment="Stretch">
                         <TextBlock Style="{StaticResource SettingsSectionTitle}" Text="Tools &amp; diagnostics" />
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="Inspect services, repair integration, and manage duplicate entries." />
 
@@ -604,9 +604,9 @@
             <TabItem Header="About">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Width="720"
+                    <StackPanel MaxWidth="720"
                                 Margin="32,24,32,40"
-                                HorizontalAlignment="Left">
+                                HorizontalAlignment="Stretch">
                         <TextBlock Style="{StaticResource SettingsSectionTitle}" Text="About" />
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="MyList, a keyboard-first launcher for Windows." />
 
