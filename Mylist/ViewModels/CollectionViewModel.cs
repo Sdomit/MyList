@@ -220,14 +220,13 @@ public sealed class CollectionViewModel : ViewModelBase
 
     private IEnumerable<CollectionEntryViewModel> BuildSmartEntries(ObservableCollection<ItemModel> allItems)
     {
+        IEnumerable<ItemModel> source;
+
         if (SmartType == SmartCollectionType.Tag && !string.IsNullOrWhiteSpace(SmartValue))
         {
-            return allItems
-                .Where(item => item.Tags.Any(tag => tag.Equals(SmartValue, StringComparison.OrdinalIgnoreCase)))
-                .Select(item => new CollectionEntryViewModel(new CollectionEntryModel { Kind = CollectionEntryKind.Item, ItemId = item.Id }, item));
+            source = allItems.Where(item => item.Tags.Any(tag => tag.Equals(SmartValue, StringComparison.OrdinalIgnoreCase)));
         }
-
-        if (SmartType == SmartCollectionType.Recent)
+        else if (SmartType == SmartCollectionType.Recent)
         {
             var days = 7;
             if (int.TryParse(SmartValue, out var parsed))
@@ -236,13 +235,21 @@ public sealed class CollectionViewModel : ViewModelBase
             }
 
             var cutoff = DateTime.UtcNow.AddDays(-days);
-            return allItems
+            source = allItems
                 .Where(item => item.LastOpenedDate >= cutoff)
-                .OrderByDescending(item => item.LastOpenedDate)
-                .Select(item => new CollectionEntryViewModel(new CollectionEntryModel { Kind = CollectionEntryKind.Item, ItemId = item.Id }, item));
+                .OrderByDescending(item => item.LastOpenedDate);
+        }
+        else
+        {
+            source = allItems;
         }
 
-        return allItems.Select(item => new CollectionEntryViewModel(new CollectionEntryModel { Kind = CollectionEntryKind.Item, ItemId = item.Id }, item));
+        return source.Select((item, i) => new CollectionEntryViewModel(
+            new CollectionEntryModel { Kind = CollectionEntryKind.Item, ItemId = item.Id },
+            item)
+        {
+            ShortcutIndex = i + 1
+        });
     }
 
     public override string ToString()
