@@ -75,33 +75,61 @@
                       StrokeThickness="1.4"
                       Stretch="Uniform"
                       VerticalAlignment="Center" />
-                <TextBox x:Name="QueryBox"
-                         Grid.Column="1"
-                         Height="32"
-                         Margin="10,0"
-                         Padding="0"
-                         Background="{DynamicResource Token.TransparentBrush}"
-                         BorderThickness="0"
-                         FontSize="15"
-                         Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Grid.Column="1"
-                           Margin="10,0"
-                           Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                           FontSize="15"
-                           Text="Search commands..."
-                           VerticalAlignment="Center"
-                           IsHitTestVisible="False">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName=QueryBox}" Value="">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                <!-- Operator chips + search input -->
+                <DockPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
+                    <!-- Active operator chips (type: / health: / tag:) -->
+                    <ItemsControl DockPanel.Dock="Left"
+                                  ItemsSource="{Binding ActiveOperators}"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,6,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="6,2"
+                                        Margin="0,0,4,0"
+                                        BorderThickness="1"
+                                        BorderBrush="{DynamicResource Token.BorderSoftBrush}"
+                                        Background="{DynamicResource Token.AccentSoftBrush}"
+                                        CornerRadius="{DynamicResource Token.RadiusSm}">
+                                    <TextBlock Text="{Binding}"
+                                               FontFamily="{DynamicResource Token.FontMono}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource Token.TextAccentBrush}" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Grid>
+                        <TextBox x:Name="QueryBox"
+                                 Height="32"
+                                 Padding="0"
+                                 Background="{DynamicResource Token.TransparentBrush}"
+                                 BorderThickness="0"
+                                 FontSize="15"
+                                 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                   FontSize="15"
+                                   Text="Search commands..."
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=QueryBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </DockPanel>
                 <Border Grid.Column="2"
                         Padding="6,2"
                         BorderBrush="{DynamicResource Token.BorderHairBrush}"
