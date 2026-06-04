@@ -12,6 +12,8 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip">
     <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
+        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <Style x:Key="ClipboardSectionCard" TargetType="Border" BasedOn="{StaticResource Simple.Card}">
             <Setter Property="Padding" Value="0" />
             <Setter Property="Margin" Value="0,0,0,12" />
@@ -318,7 +320,7 @@
                             <Button Content="{Binding ConfirmButtonText}"
                                     Width="180"
                                     Margin="8,0,0,0"
-                                    Style="{StaticResource PrimaryButton}"
+                                    Style="{StaticResource Simple.PrimaryButton}"
                                     IsEnabled="{Binding CanConfirm}"
                                     Click="OnConfirm" />
                         </StackPanel>

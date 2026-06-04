@@ -206,7 +206,7 @@
     <Thickness x:Key="Token.ThicknessCardPadding">14</Thickness>
     <Thickness x:Key="Token.ThicknessModalPadding">20</Thickness>
     <sys:Double x:Key="Token.Size.TitleBar">38</sys:Double>
-    <sys:Double x:Key="Token.Size.Sidebar">220</sys:Double>
+    <sys:Double x:Key="Token.Size.Sidebar">240</sys:Double>
     <sys:Double x:Key="Token.Size.Preview">320</sys:Double>
     <sys:Double x:Key="Token.Size.StatusBar">26</sys:Double>
     <sys:Double x:Key="Token.Size.NavItem">26</sys:Double>
@@ -216,7 +216,7 @@
     <sys:Double x:Key="Token.Size.ItemIcon">24</sys:Double>
     <sys:Double x:Key="Token.Size.HealthDot">7</sys:Double>
     <GridLength x:Key="Token.Grid.TitleBar">38</GridLength>
-    <GridLength x:Key="Token.Grid.Sidebar">220</GridLength>
+    <GridLength x:Key="Token.Grid.Sidebar">240</GridLength>
     <GridLength x:Key="Token.Grid.Preview">320</GridLength>
     <GridLength x:Key="Token.Grid.StatusBar">26</GridLength>
 

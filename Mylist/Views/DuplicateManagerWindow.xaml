@@ -11,6 +11,8 @@
         FontFamily="{DynamicResource Token.FontUi}"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
+        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <DataTemplate x:Key="DuplicateGroupTemplate">
             <StackPanel>
                 <TextBlock Text="{Binding DisplayPath}"

@@ -11,6 +11,8 @@
         FontFamily="{DynamicResource Token.FontUi}"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
+        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <DataTemplate x:Key="MtabPathRowTemplate">
             <Grid Margin="0,0,0,6">
                 <Grid.ColumnDefinitions>
@@ -338,7 +340,7 @@
                             <Button Content="{Binding ConfirmButtonText}"
                                     Width="120"
                                     Margin="8,0,0,0"
-                                    Style="{StaticResource PrimaryButton}"
+                                    Style="{StaticResource Simple.PrimaryButton}"
                                     Click="OnSave" />
                         </StackPanel>
                     </Grid>
