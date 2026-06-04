@@ -1165,6 +1165,7 @@ public sealed class MainViewModel : ViewModelBase
         SyncCollectionItemIds(model);
 
         var entries = new ObservableCollection<CollectionEntryViewModel>();
+        var shortcutIndex = 0;
         foreach (var entry in model.Entries)
         {
             if (entry.Kind == CollectionEntryKind.Separator)
@@ -1176,7 +1177,11 @@ public sealed class MainViewModel : ViewModelBase
             var item = AllItems.FirstOrDefault(i => i.Id == entry.ItemId);
             if (item is not null)
             {
-                entries.Add(new CollectionEntryViewModel(entry, item));
+                var vm = new CollectionEntryViewModel(entry, item)
+                {
+                    ShortcutIndex = ++shortcutIndex
+                };
+                entries.Add(vm);
             }
         }
 

@@ -39,8 +39,30 @@ public sealed class CommandPaletteViewModel : ViewModelBase
         {
             if (SetProperty(ref _query, value))
             {
+                OnPropertyChanged(nameof(ActiveOperators));
                 Refresh();
             }
+        }
+    }
+
+    // Operator chips extracted from the query (e.g. "type:folder health:ok tag:work")
+    public IReadOnlyList<string> ActiveOperators
+    {
+        get
+        {
+            var chips = new List<string>();
+            foreach (var token in _query.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var lower = token.ToLowerInvariant();
+                if (lower.StartsWith("type:", StringComparison.Ordinal) ||
+                    lower.StartsWith("health:", StringComparison.Ordinal) ||
+                    lower.StartsWith("tag:", StringComparison.Ordinal))
+                {
+                    chips.Add(token);
+                }
+            }
+
+            return chips;
         }
     }
 

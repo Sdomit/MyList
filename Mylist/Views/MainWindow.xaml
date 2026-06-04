@@ -130,8 +130,8 @@
                                     VerticalAlignment="Center">
                             <TextBlock Text="{Binding Name}"
                                        Foreground="{DynamicResource Token.TextPrimaryBrush}"
-                                       FontSize="12.5"
-                                       FontWeight="Normal"
+                                       FontSize="13"
+                                       FontWeight="Medium"
                                        TextTrimming="CharacterEllipsis" />
                             <Grid Margin="0,2,0,0">
                                 <Grid.ColumnDefinitions>
@@ -144,16 +144,29 @@
                                          VerticalAlignment="Center">
                                     <Ellipse.Style>
                                         <Style TargetType="Ellipse">
+                                            <!-- Healthy: #10B981 at 55% -->
                                             <Setter Property="Fill" Value="{DynamicResource Token.StatusOkBrush}" />
+                                            <Setter Property="Opacity" Value="0.55" />
                                             <Style.Triggers>
+                                                <!-- Unchecked: #60A5FA at 40% -->
+                                                <DataTrigger Binding="{Binding HealthState}" Value="Unchecked">
+                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusUnknownBrush}" />
+                                                    <Setter Property="Opacity" Value="0.40" />
+                                                </DataTrigger>
+                                                <!-- Offline: #F59E0B at 70% -->
                                                 <DataTrigger Binding="{Binding HealthState}" Value="Offline">
                                                     <Setter Property="Fill" Value="{DynamicResource Token.StatusWarnBrush}" />
+                                                    <Setter Property="Opacity" Value="0.70" />
                                                 </DataTrigger>
+                                                <!-- Missing: #EF4444 at 75% -->
                                                 <DataTrigger Binding="{Binding HealthState}" Value="Missing">
                                                     <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                    <Setter Property="Opacity" Value="0.75" />
                                                 </DataTrigger>
+                                                <!-- PermissionDenied: #EF4444 at 75% -->
                                                 <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
                                                     <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                    <Setter Property="Opacity" Value="0.75" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -166,10 +179,50 @@
                             </Grid>
                         </StackPanel>
 
-                        <TextBlock Grid.Column="2"
-                                   Style="{StaticResource Simple.MonoText}"
-                                   Text="{Binding HealthState}"
-                                   VerticalAlignment="Center" />
+                        <!-- Kbd chip: hidden, fades in on row hover (120ms) -->
+                        <Border Grid.Column="2"
+                                Padding="5,1"
+                                BorderThickness="1"
+                                VerticalAlignment="Center"
+                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                Background="{DynamicResource Token.BgSurfaceBrush}"
+                                CornerRadius="{DynamicResource Token.RadiusSm}">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Opacity" Value="0" />
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <!-- Collapse entirely when no shortcut label (index > 9) -->
+                                        <DataTrigger Binding="{Binding ShortcutLabel}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsMouseOver,
+                                            RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                         To="1" Duration="0:0:0.12" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                         To="0" Duration="0:0:0.12" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding ShortcutLabel}"
+                                       FontFamily="{DynamicResource Token.FontMono}"
+                                       FontSize="10.5"
+                                       Foreground="{DynamicResource Token.TextAccentBrush}" />
+                        </Border>
                     </Grid>
                     <Border.ContextMenu>
                         <ContextMenu>

@@ -93,7 +93,7 @@ public sealed class InlineMtabPathViewModel : ViewModelBase
         var angle = -Math.PI / 2 + ((number - 1) * 2 * Math.PI / Math.Max(count, 3));
         LineX2 = centerX + radiusX * Math.Cos(angle);
         LineY2 = centerY + radiusY * Math.Sin(angle);
-        NodeLeft = LineX2 - 40;
-        NodeTop = LineY2 - 16;
+        NodeLeft = LineX2 - 16;   // center 32px node on the line endpoint
+        NodeTop  = LineY2 - 16;
     }
 }

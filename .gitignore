@@ -35,6 +35,10 @@ publish/
 project.nuget.cache
 project.assets.json
 
+# Design handoff prototypes (local reference only)
+**/My list (1)/
+**/design_handoff*/
+
 # Logs and OS files
 *.log
 Thumbs.db
