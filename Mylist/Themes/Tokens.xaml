@@ -1,0 +1,244 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- CSS blue palette tokens -->
+    <Color x:Key="Token.Blue50Color">#EFF6FF</Color>
+    <Color x:Key="Token.Blue100Color">#DBEAFE</Color>
+    <Color x:Key="Token.Blue200Color">#BFDBFE</Color>
+    <Color x:Key="Token.Blue300Color">#93C5FD</Color>
+    <Color x:Key="Token.Blue400Color">#60A5FA</Color>
+    <Color x:Key="Token.Blue500Color">#3B82F6</Color>
+    <Color x:Key="Token.Blue600Color">#2563EB</Color>
+    <Color x:Key="Token.Blue700Color">#1D4ED8</Color>
+    <Color x:Key="Token.Blue800Color">#1E40AF</Color>
+
+    <!-- CSS neutral palette tokens -->
+    <Color x:Key="Token.Neutral0Color">#FFFFFF</Color>
+    <Color x:Key="Token.Neutral25Color">#FBFCFD</Color>
+    <Color x:Key="Token.Neutral50Color">#F6F8FB</Color>
+    <Color x:Key="Token.Neutral75Color">#F1F4F8</Color>
+    <Color x:Key="Token.Neutral100Color">#E9EDF3</Color>
+    <Color x:Key="Token.Neutral150Color">#DCE2EA</Color>
+    <Color x:Key="Token.Neutral200Color">#CBD2DC</Color>
+    <Color x:Key="Token.Neutral300Color">#A8B0BD</Color>
+    <Color x:Key="Token.Neutral400Color">#818996</Color>
+    <Color x:Key="Token.Neutral500Color">#5F6772</Color>
+    <Color x:Key="Token.Neutral600Color">#444B55</Color>
+    <Color x:Key="Token.Neutral700Color">#2E343C</Color>
+    <Color x:Key="Token.Neutral800Color">#1F232A</Color>
+    <Color x:Key="Token.Neutral850Color">#16191F</Color>
+    <Color x:Key="Token.Neutral900Color">#0F1217</Color>
+
+    <!-- Dark-first CSS semantic status, accent, background, text, and border tokens -->
+    <Color x:Key="Token.StatusOkColor">#10B981</Color>
+    <Color x:Key="Token.StatusOkBackgroundColor">#1F10B981</Color>
+    <Color x:Key="Token.StatusWarnColor">#F59E0B</Color>
+    <Color x:Key="Token.StatusWarnBackgroundColor">#1FF59E0B</Color>
+    <Color x:Key="Token.StatusBadColor">#EF4444</Color>
+    <Color x:Key="Token.StatusBadBackgroundColor">#1FEF4444</Color>
+    <Color x:Key="Token.StatusUnknownColor">#60A5FA</Color>
+
+    <Color x:Key="Token.AccentColor">#3B82F6</Color>
+    <Color x:Key="Token.AccentHoverColor">#60A5FA</Color>
+    <Color x:Key="Token.AccentSoftColor">#1F3B82F6</Color>
+    <Color x:Key="Token.AccentMuteColor">#383B82F6</Color>
+    <Color x:Key="Token.AccentForegroundColor">#FFFFFF</Color>
+
+    <Color x:Key="Token.BgMicaColor">#1A1D23</Color>
+    <Color x:Key="Token.BgCanvasColor">#14171C</Color>
+    <Color x:Key="Token.BgSurfaceColor">#1F232A</Color>
+    <Color x:Key="Token.BgSubtleColor">#232831</Color>
+    <Color x:Key="Token.BgMutedColor">#2A303A</Color>
+    <Color x:Key="Token.BgHoverColor">#0AFFFFFF</Color>
+    <Color x:Key="Token.BgActiveColor">#12FFFFFF</Color>
+    <Color x:Key="Token.BgInverseColor">#F6F8FB</Color>
+
+    <Color x:Key="Token.TextPrimaryColor">#E8EBF0</Color>
+    <Color x:Key="Token.TextSecondaryColor">#9BA3AE</Color>
+    <Color x:Key="Token.TextTertiaryColor">#6B7380</Color>
+    <Color x:Key="Token.TextDisabledColor">#444B55</Color>
+    <Color x:Key="Token.TextInverseColor">#0F1217</Color>
+    <Color x:Key="Token.TextAccentColor">#3B82F6</Color>
+
+    <Color x:Key="Token.BorderHairColor">#0FFFFFFF</Color>
+    <Color x:Key="Token.BorderSoftColor">#1AFFFFFF</Color>
+    <Color x:Key="Token.BorderStrongColor">#2EFFFFFF</Color>
+    <Color x:Key="Token.BorderAccentColor">#3B82F6</Color>
+
+    <!-- Supporting semantic colors used by the WPF implementation -->
+    <Color x:Key="Token.TransparentColor">#00000000</Color>
+    <Color x:Key="Token.WhiteColor">#FFFFFFFF</Color>
+    <Color x:Key="Token.OverlayColor">#8010141A</Color>
+    <Color x:Key="Token.CloseHoverColor">#E81123</Color>
+    <Color x:Key="Token.TypeFileBackgroundColor">#263B82F6</Color>
+    <Color x:Key="Token.TypeFileForegroundColor">#93C5FD</Color>
+    <Color x:Key="Token.TypeFileBorderColor">#403B82F6</Color>
+    <Color x:Key="Token.TypeFolderBackgroundColor">#26F59E0B</Color>
+    <Color x:Key="Token.TypeFolderForegroundColor">#FCD34D</Color>
+    <Color x:Key="Token.TypeFolderBorderColor">#40F59E0B</Color>
+    <Color x:Key="Token.TypeMtabBackgroundColor">#267C3AED</Color>
+    <Color x:Key="Token.TypeMtabForegroundColor">#C4B5FD</Color>
+    <Color x:Key="Token.TypeMtabBorderColor">#407C3AED</Color>
+    <Color x:Key="Token.TypeClipBackgroundColor">#260D9488</Color>
+    <Color x:Key="Token.TypeClipForegroundColor">#5EEAD4</Color>
+    <Color x:Key="Token.TypeClipBorderColor">#400D9488</Color>
+    <Color x:Key="Token.TypeActionBackgroundColor">#26EF4444</Color>
+    <Color x:Key="Token.TypeActionForegroundColor">#FCA5A5</Color>
+    <Color x:Key="Token.TypeActionBorderColor">#40EF4444</Color>
+
+    <!-- CSS accent palette swaps -->
+    <Color x:Key="Token.AccentAmberColor">#FBBF24</Color>
+    <Color x:Key="Token.AccentAmberHoverColor">#FCD34D</Color>
+    <Color x:Key="Token.AccentAmberSoftColor">#24D97706</Color>
+    <Color x:Key="Token.AccentAmberMuteColor">#3DD97706</Color>
+    <Color x:Key="Token.AccentTealColor">#2DD4BF</Color>
+    <Color x:Key="Token.AccentTealHoverColor">#5EEAD4</Color>
+    <Color x:Key="Token.AccentTealSoftColor">#240D9488</Color>
+    <Color x:Key="Token.AccentTealMuteColor">#3D0D9488</Color>
+    <Color x:Key="Token.AccentVioletColor">#A78BFA</Color>
+    <Color x:Key="Token.AccentVioletHoverColor">#C4B5FD</Color>
+    <Color x:Key="Token.AccentVioletSoftColor">#247C3AED</Color>
+    <Color x:Key="Token.AccentVioletMuteColor">#3D7C3AED</Color>
+
+    <!-- Brushes for every semantic color token -->
+    <SolidColorBrush x:Key="Token.AccentBrush" Color="{DynamicResource Token.AccentColor}" />
+    <SolidColorBrush x:Key="Token.AccentHoverBrush" Color="{DynamicResource Token.AccentHoverColor}" />
+    <SolidColorBrush x:Key="Token.AccentSoftBrush" Color="{DynamicResource Token.AccentSoftColor}" />
+    <SolidColorBrush x:Key="Token.AccentMuteBrush" Color="{DynamicResource Token.AccentMuteColor}" />
+    <SolidColorBrush x:Key="Token.AccentForegroundBrush" Color="{DynamicResource Token.AccentForegroundColor}" />
+    <SolidColorBrush x:Key="Token.BgMicaBrush" Color="{DynamicResource Token.BgMicaColor}" />
+    <SolidColorBrush x:Key="Token.BgCanvasBrush" Color="{DynamicResource Token.BgCanvasColor}" />
+    <SolidColorBrush x:Key="Token.BgSurfaceBrush" Color="{DynamicResource Token.BgSurfaceColor}" />
+    <SolidColorBrush x:Key="Token.BgSubtleBrush" Color="{DynamicResource Token.BgSubtleColor}" />
+    <SolidColorBrush x:Key="Token.BgMutedBrush" Color="{DynamicResource Token.BgMutedColor}" />
+    <SolidColorBrush x:Key="Token.BgHoverBrush" Color="{DynamicResource Token.BgHoverColor}" />
+    <SolidColorBrush x:Key="Token.BgActiveBrush" Color="{DynamicResource Token.BgActiveColor}" />
+    <SolidColorBrush x:Key="Token.BgInverseBrush" Color="{DynamicResource Token.BgInverseColor}" />
+    <SolidColorBrush x:Key="Token.TextPrimaryBrush" Color="{DynamicResource Token.TextPrimaryColor}" />
+    <SolidColorBrush x:Key="Token.TextSecondaryBrush" Color="{DynamicResource Token.TextSecondaryColor}" />
+    <SolidColorBrush x:Key="Token.TextTertiaryBrush" Color="{DynamicResource Token.TextTertiaryColor}" />
+    <SolidColorBrush x:Key="Token.TextDisabledBrush" Color="{DynamicResource Token.TextDisabledColor}" />
+    <SolidColorBrush x:Key="Token.TextInverseBrush" Color="{DynamicResource Token.TextInverseColor}" />
+    <SolidColorBrush x:Key="Token.TextAccentBrush" Color="{DynamicResource Token.TextAccentColor}" />
+    <SolidColorBrush x:Key="Token.BorderHairBrush" Color="{DynamicResource Token.BorderHairColor}" />
+    <SolidColorBrush x:Key="Token.BorderSoftBrush" Color="{DynamicResource Token.BorderSoftColor}" />
+    <SolidColorBrush x:Key="Token.BorderStrongBrush" Color="{DynamicResource Token.BorderStrongColor}" />
+    <SolidColorBrush x:Key="Token.BorderAccentBrush" Color="{DynamicResource Token.BorderAccentColor}" />
+    <SolidColorBrush x:Key="Token.StatusOkBrush" Color="{DynamicResource Token.StatusOkColor}" />
+    <SolidColorBrush x:Key="Token.StatusOkBackgroundBrush" Color="{DynamicResource Token.StatusOkBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.StatusWarnBrush" Color="{DynamicResource Token.StatusWarnColor}" />
+    <SolidColorBrush x:Key="Token.StatusWarnBackgroundBrush" Color="{DynamicResource Token.StatusWarnBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.StatusBadBrush" Color="{DynamicResource Token.StatusBadColor}" />
+    <SolidColorBrush x:Key="Token.StatusBadBackgroundBrush" Color="{DynamicResource Token.StatusBadBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.StatusUnknownBrush" Color="{DynamicResource Token.StatusUnknownColor}" />
+    <SolidColorBrush x:Key="Token.TransparentBrush" Color="{DynamicResource Token.TransparentColor}" />
+    <SolidColorBrush x:Key="Token.WhiteBrush" Color="{DynamicResource Token.WhiteColor}" />
+    <SolidColorBrush x:Key="Token.OverlayBrush" Color="{DynamicResource Token.OverlayColor}" />
+    <SolidColorBrush x:Key="Token.CloseHoverBrush" Color="{DynamicResource Token.CloseHoverColor}" />
+    <SolidColorBrush x:Key="Token.TypeFileBackgroundBrush" Color="{DynamicResource Token.TypeFileBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeFileForegroundBrush" Color="{DynamicResource Token.TypeFileForegroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeFileBorderBrush" Color="{DynamicResource Token.TypeFileBorderColor}" />
+    <SolidColorBrush x:Key="Token.TypeFolderBackgroundBrush" Color="{DynamicResource Token.TypeFolderBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeFolderForegroundBrush" Color="{DynamicResource Token.TypeFolderForegroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeFolderBorderBrush" Color="{DynamicResource Token.TypeFolderBorderColor}" />
+    <SolidColorBrush x:Key="Token.TypeMtabBackgroundBrush" Color="{DynamicResource Token.TypeMtabBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeMtabForegroundBrush" Color="{DynamicResource Token.TypeMtabForegroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeMtabBorderBrush" Color="{DynamicResource Token.TypeMtabBorderColor}" />
+    <SolidColorBrush x:Key="Token.TypeClipBackgroundBrush" Color="{DynamicResource Token.TypeClipBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeClipForegroundBrush" Color="{DynamicResource Token.TypeClipForegroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeClipBorderBrush" Color="{DynamicResource Token.TypeClipBorderColor}" />
+    <SolidColorBrush x:Key="Token.TypeActionBackgroundBrush" Color="{DynamicResource Token.TypeActionBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeActionForegroundBrush" Color="{DynamicResource Token.TypeActionForegroundColor}" />
+    <SolidColorBrush x:Key="Token.TypeActionBorderBrush" Color="{DynamicResource Token.TypeActionBorderColor}" />
+
+    <!-- CSS shadow tokens -->
+    <DropShadowEffect x:Key="Token.ShadowXs" BlurRadius="2" ShadowDepth="1" Opacity="0.30" Color="#000000" />
+    <DropShadowEffect x:Key="Token.ShadowSm" BlurRadius="4" ShadowDepth="1" Opacity="0.40" Color="#000000" />
+    <DropShadowEffect x:Key="Token.ShadowMd" BlurRadius="12" ShadowDepth="3" Opacity="0.45" Color="#000000" />
+    <DropShadowEffect x:Key="Token.ShadowLg" BlurRadius="32" ShadowDepth="8" Opacity="0.55" Color="#000000" />
+    <DropShadowEffect x:Key="Token.ShadowXl" BlurRadius="64" ShadowDepth="16" Opacity="0.65" Color="#000000" />
+    <SolidColorBrush x:Key="Token.ShadowFocusBrush" Color="#663B82F6" />
+
+    <!-- CSS radius tokens -->
+    <CornerRadius x:Key="Token.RadiusXs">3</CornerRadius>
+    <CornerRadius x:Key="Token.RadiusSm">4</CornerRadius>
+    <CornerRadius x:Key="Token.RadiusMd">6</CornerRadius>
+    <CornerRadius x:Key="Token.RadiusLg">8</CornerRadius>
+    <CornerRadius x:Key="Token.RadiusXl">10</CornerRadius>
+    <CornerRadius x:Key="Token.Radius2Xl">14</CornerRadius>
+    <CornerRadius x:Key="Token.Radius3Xl">20</CornerRadius>
+    <CornerRadius x:Key="Token.RadiusFull">9999</CornerRadius>
+
+    <!-- CSS font tokens -->
+    <FontFamily x:Key="Token.FontUi">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Token.FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="Token.FontMono">Cascadia Code, Consolas</FontFamily>
+
+    <!-- CSS easing tokens -->
+    <KeySpline x:Key="Token.EaseStandard">0.4,0 0.2,1</KeySpline>
+    <KeySpline x:Key="Token.EaseDecel">0,0 0.2,1</KeySpline>
+    <KeySpline x:Key="Token.EaseSpring">0.34,1 0.64,1</KeySpline>
+
+    <!-- WPF spacing and component measurements derived from the handoff -->
+    <sys:Double x:Key="Token.Space0">0</sys:Double>
+    <sys:Double x:Key="Token.Space1">1</sys:Double>
+    <sys:Double x:Key="Token.Space2">2</sys:Double>
+    <sys:Double x:Key="Token.Space3">3</sys:Double>
+    <sys:Double x:Key="Token.Space4">4</sys:Double>
+    <sys:Double x:Key="Token.Space5">5</sys:Double>
+    <sys:Double x:Key="Token.Space6">6</sys:Double>
+    <sys:Double x:Key="Token.Space8">8</sys:Double>
+    <sys:Double x:Key="Token.Space10">10</sys:Double>
+    <sys:Double x:Key="Token.Space12">12</sys:Double>
+    <sys:Double x:Key="Token.Space14">14</sys:Double>
+    <sys:Double x:Key="Token.Space16">16</sys:Double>
+    <sys:Double x:Key="Token.Space18">18</sys:Double>
+    <sys:Double x:Key="Token.Space20">20</sys:Double>
+    <sys:Double x:Key="Token.Space24">24</sys:Double>
+    <sys:Double x:Key="Token.Space28">28</sys:Double>
+    <sys:Double x:Key="Token.Space32">32</sys:Double>
+    <sys:Double x:Key="Token.Space36">36</sys:Double>
+    <sys:Double x:Key="Token.Space40">40</sys:Double>
+    <sys:Double x:Key="Token.Space48">48</sys:Double>
+    <Thickness x:Key="Token.ThicknessHairline">1</Thickness>
+    <Thickness x:Key="Token.ThicknessControlPadding">12,0</Thickness>
+    <Thickness x:Key="Token.ThicknessPanePadding">24,18</Thickness>
+    <Thickness x:Key="Token.ThicknessCardPadding">14</Thickness>
+    <Thickness x:Key="Token.ThicknessModalPadding">20</Thickness>
+    <sys:Double x:Key="Token.Size.TitleBar">38</sys:Double>
+    <sys:Double x:Key="Token.Size.Sidebar">220</sys:Double>
+    <sys:Double x:Key="Token.Size.Preview">320</sys:Double>
+    <sys:Double x:Key="Token.Size.StatusBar">26</sys:Double>
+    <sys:Double x:Key="Token.Size.NavItem">26</sys:Double>
+    <sys:Double x:Key="Token.Size.Button">28</sys:Double>
+    <sys:Double x:Key="Token.Size.Input">32</sys:Double>
+    <sys:Double x:Key="Token.Size.IconButton">28</sys:Double>
+    <sys:Double x:Key="Token.Size.ItemIcon">24</sys:Double>
+    <sys:Double x:Key="Token.Size.HealthDot">7</sys:Double>
+
+    <!-- Compatibility aliases for the existing application style layer -->
+    <SolidColorBrush x:Key="AppBackground" Color="{DynamicResource Token.BgMicaColor}" />
+    <SolidColorBrush x:Key="SurfaceBackground" Color="{DynamicResource Token.BgSurfaceColor}" />
+    <SolidColorBrush x:Key="SurfaceElevated" Color="{DynamicResource Token.BgSubtleColor}" />
+    <SolidColorBrush x:Key="Accent" Color="{DynamicResource Token.AccentColor}" />
+    <SolidColorBrush x:Key="AccentSoft" Color="{DynamicResource Token.AccentSoftColor}" />
+    <SolidColorBrush x:Key="TextPrimary" Color="{DynamicResource Token.TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondary" Color="{DynamicResource Token.TextSecondaryColor}" />
+    <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource Token.BorderSoftColor}" />
+    <SolidColorBrush x:Key="ItemHover" Color="{DynamicResource Token.BgHoverColor}" />
+    <SolidColorBrush x:Key="ItemSelected" Color="{DynamicResource Token.AccentSoftColor}" />
+    <SolidColorBrush x:Key="ShadowBrush" Color="#A6000000" />
+    <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource Token.BgSubtleColor}" />
+    <SolidColorBrush x:Key="ControlForeground" Color="{DynamicResource Token.TextPrimaryColor}" />
+    <SolidColorBrush x:Key="ControlBorder" Color="{DynamicResource Token.BorderSoftColor}" />
+    <SolidColorBrush x:Key="ControlHover" Color="{DynamicResource Token.BgHoverColor}" />
+    <SolidColorBrush x:Key="ControlPressed" Color="{DynamicResource Token.BgActiveColor}" />
+    <SolidColorBrush x:Key="ControlDisabled" Color="{DynamicResource Token.TextDisabledColor}" />
+    <SolidColorBrush x:Key="SelectionBackground" Color="{DynamicResource Token.AccentColor}" />
+    <SolidColorBrush x:Key="SelectionForeground" Color="{DynamicResource Token.AccentForegroundColor}" />
+    <SolidColorBrush x:Key="ContentAreaBackground" Color="{DynamicResource Token.BgCanvasColor}" />
+    <SolidColorBrush x:Key="ToolbarBackground" Color="{DynamicResource Token.BgMicaColor}" />
+    <SolidColorBrush x:Key="OverlayBackdrop" Color="{DynamicResource Token.OverlayColor}" />
+    <SolidColorBrush x:Key="ItemStateHoverBrush" Color="{DynamicResource Token.AccentSoftColor}" />
+    <SolidColorBrush x:Key="ItemStatePressBrush" Color="{DynamicResource Token.AccentMuteColor}" />
+</ResourceDictionary>
