@@ -188,11 +188,11 @@
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right">
                 <Button Content="Cancel"
-                        Width="90"
+                        MinWidth="90"
                         Style="{StaticResource Simple.GhostButton}"
                         Command="{Binding CancelCommand}" />
                 <Button Content="Save changes"
-                        Width="112"
+                        MinWidth="112"
                         Margin="8,0,0,0"
                         Style="{StaticResource Simple.PrimaryButton}"
                         Command="{Binding SaveCommand}" />

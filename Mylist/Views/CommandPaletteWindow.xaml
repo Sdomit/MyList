@@ -81,6 +81,7 @@
                     <ItemsControl DockPanel.Dock="Left"
                                   ItemsSource="{Binding ActiveOperators}"
                                   VerticalAlignment="Center"
+                                  MaxWidth="200"
                                   Margin="0,0,6,0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>

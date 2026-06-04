@@ -307,14 +307,16 @@
                                 </Border>
 
                                 <Border Canvas.Left="110"
-                                        Canvas.Top="160"
+                                        Canvas.Top="154"
                                         Padding="6,2"
+                                        MaxWidth="160"
                                         Background="{DynamicResource Token.BgSurfaceBrush}"
                                         BorderBrush="{DynamicResource Token.BorderHairBrush}"
                                         BorderThickness="1"
                                         CornerRadius="{DynamicResource Token.RadiusXs}">
                                     <TextBlock Style="{StaticResource Simple.MonoText}"
-                                               Text="{Binding SummaryText}" />
+                                               Text="{Binding SummaryText}"
+                                               TextTrimming="CharacterEllipsis" />
                                 </Border>
                             </Canvas>
                         </Border>
@@ -364,11 +366,11 @@
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Right">
                             <Button Content="Cancel"
-                                    Width="90"
+                                    MinWidth="90"
                                     Style="{StaticResource Simple.GhostButton}"
                                     Click="OnCancel" />
                             <Button Content="{Binding ConfirmButtonText}"
-                                    Width="120"
+                                    MinWidth="120"
                                     Margin="8,0,0,0"
                                     Style="{StaticResource Simple.PrimaryButton}"
                                     Click="OnSave" />

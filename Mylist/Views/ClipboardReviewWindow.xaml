@@ -308,17 +308,22 @@
                         BorderBrush="{DynamicResource Token.BorderHairBrush}"
                         BorderThickness="0,1,0,0">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
                         <TextBlock Style="{StaticResource Simple.MetaText}"
                                    Text="Only valid rooted paths are applied. Clipboard text and image items are handled immediately."
-                                   VerticalAlignment="Center" />
-                        <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Right">
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   Margin="0,0,12,0" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <Button Content="Cancel"
-                                    Width="88"
+                                    MinWidth="88"
                                     Style="{StaticResource Simple.GhostButton}"
                                     Click="OnCancel" />
                             <Button Content="{Binding ConfirmButtonText}"
-                                    Width="180"
+                                    MinWidth="140"
                                     Margin="8,0,0,0"
                                     Style="{StaticResource Simple.PrimaryButton}"
                                     IsEnabled="{Binding CanConfirm}"
