@@ -836,6 +836,28 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
+    private void OnItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        var container = FindAncestor<ListBoxItem>(e.OriginalSource as DependencyObject);
+        if (container?.DataContext is not CollectionEntryViewModel entry || entry.Item is not ItemModel item)
+        {
+            return;
+        }
+
+        ViewModel.OpenItemCommand.Execute(item);
+        e.Handled = true;
+    }
+
+    private void OnClearSelectionClick(object sender, RoutedEventArgs e)
+    {
+        ViewModel?.SetSelectedItems(Array.Empty<ItemModel>());
+    }
+
     private void OnItemSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ViewModel is null || sender is not ListBox listBox)
