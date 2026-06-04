@@ -1,0 +1,303 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style x:Key="Simple.FocusVisual" TargetType="Control">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Control">
+                    <Border BorderBrush="{DynamicResource Token.AccentBrush}"
+                            BorderThickness="2"
+                            CornerRadius="{DynamicResource Token.RadiusLg}"
+                            Margin="2" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Simple.Button" TargetType="Button">
+        <Setter Property="Height" Value="{DynamicResource Token.Size.Button}" />
+        <Setter Property="MinWidth" Value="{DynamicResource Token.Size.Button}" />
+        <Setter Property="Padding" Value="{DynamicResource Token.ThicknessControlPadding}" />
+        <Setter Property="Background" Value="{DynamicResource Token.BgSubtleBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontFamily" Value="{DynamicResource Token.FontUi}" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Simple.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Chrome"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource Token.RadiusMd}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgMutedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgActiveBrush}" />
+                            <Setter TargetName="Chrome" Property="Opacity" Value="0.9" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Chrome" Property="Opacity" Value="0.5" />
+                            <Setter Property="Foreground" Value="{DynamicResource Token.TextDisabledBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Simple.PrimaryButton" TargetType="Button" BasedOn="{StaticResource Simple.Button}">
+        <Setter Property="Background" Value="{DynamicResource Token.AccentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Token.AccentForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Chrome"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource Token.RadiusMd}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentHoverBrush}" />
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.AccentHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Chrome" Property="Opacity" Value="0.86" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Chrome" Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Simple.GhostButton" TargetType="Button" BasedOn="{StaticResource Simple.Button}">
+        <Setter Property="Background" Value="{DynamicResource Token.TransparentBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.TransparentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextSecondaryBrush}" />
+    </Style>
+
+    <Style x:Key="Simple.IconButton" TargetType="Button" BasedOn="{StaticResource Simple.GhostButton}">
+        <Setter Property="Width" Value="{DynamicResource Token.Size.IconButton}" />
+        <Setter Property="MinWidth" Value="{DynamicResource Token.Size.IconButton}" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style x:Key="Simple.DangerButton" TargetType="Button" BasedOn="{StaticResource Simple.Button}">
+        <Setter Property="Background" Value="{DynamicResource Token.StatusBadBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.StatusBadBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Token.WhiteBrush}" />
+    </Style>
+
+    <Style x:Key="Simple.NavButton" TargetType="Button" BasedOn="{StaticResource Simple.GhostButton}">
+        <Setter Property="Height" Value="{DynamicResource Token.Size.NavItem}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Chrome"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{DynamicResource Token.RadiusMd}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Simple.NavListBoxItem" TargetType="ListBoxItem">
+        <Setter Property="Height" Value="{DynamicResource Token.Size.NavItem}" />
+        <Setter Property="Margin" Value="0,1" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextSecondaryBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Simple.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Grid>
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <Border x:Name="ActiveBar"
+                                Width="2"
+                                Height="14"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Margin="-6,0,0,0"
+                                CornerRadius="{DynamicResource Token.RadiusFull}"
+                                Background="{DynamicResource Token.AccentBrush}"
+                                Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgActiveBrush}" />
+                            <Setter TargetName="ActiveBar" Property="Visibility" Value="Visible" />
+                            <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+                            <Setter Property="FontWeight" Value="Medium" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Simple.ItemListBoxItem" TargetType="ListBoxItem">
+        <Setter Property="Margin" Value="0,1" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Background" Value="{DynamicResource Token.TransparentBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Simple.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Grid>
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <Border x:Name="SelectedBar"
+                                Width="2"
+                                Height="28"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                CornerRadius="{DynamicResource Token.RadiusFull}"
+                                Background="{DynamicResource Token.AccentBrush}"
+                                Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSoftBrush}" />
+                            <Setter TargetName="SelectedBar" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Simple.TextBox" TargetType="TextBox">
+        <Setter Property="Height" Value="{DynamicResource Token.Size.Input}" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSoftBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Token.AccentBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Token.AccentMuteBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Token.FontUi}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource Simple.FocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Chrome"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource Token.RadiusMd}">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.BorderStrongBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Chrome" Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Simple.Pane" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Token.RadiusXl}" />
+    </Style>
+
+    <Style x:Key="Simple.Card" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Token.RadiusLg}" />
+        <Setter Property="Padding" Value="{DynamicResource Token.ThicknessCardPadding}" />
+    </Style>
+
+    <Style x:Key="Simple.SectionLabel" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextTertiaryBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Token.FontMono}" />
+        <Setter Property="FontSize" Value="9.5" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+    </Style>
+
+    <Style x:Key="Simple.PaneTitle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Token.FontDisplay}" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="Simple.MetaText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextSecondaryBrush}" />
+        <Setter Property="FontSize" Value="11.5" />
+    </Style>
+
+    <Style x:Key="Simple.MonoText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextTertiaryBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource Token.FontMono}" />
+        <Setter Property="FontSize" Value="10.5" />
+    </Style>
+</ResourceDictionary>

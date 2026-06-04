@@ -12,6 +12,8 @@ public sealed class ThemeService
 {
     private const int DwmUseImmersiveDarkMode = 20;
     private const int DwmUseImmersiveDarkModeLegacy = 19;
+    private const int DwmSystemBackdropType = 38;
+    private const int DwmBackdropMica = 2;
 
     private static ThemeMode _currentMode = ThemeMode.Light;
     private static bool _windowThemeHandlerRegistered;
@@ -46,7 +48,11 @@ public sealed class ThemeService
         }
 
         var themeDictionary = new ResourceDictionary { Source = new Uri(source, UriKind.Relative) };
-        dictionaries.Insert(0, themeDictionary);
+        var tokenIndex = dictionaries
+            .Select((dictionary, index) => new { dictionary, index })
+            .FirstOrDefault(entry => IsTokenDictionary(entry.dictionary))
+            ?.index ?? -1;
+        dictionaries.Insert(Math.Min(tokenIndex + 1, dictionaries.Count), themeDictionary);
 
         foreach (Window window in app.Windows)
         {
@@ -64,6 +70,13 @@ public sealed class ThemeService
 
         return source.Replace('\\', '/')
             .Contains("Resources/Colors.", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsTokenDictionary(ResourceDictionary dictionary)
+    {
+        var source = dictionary.Source?.OriginalString;
+        return !string.IsNullOrWhiteSpace(source) &&
+               source.Replace('\\', '/').Contains("Themes/Tokens.xaml", StringComparison.OrdinalIgnoreCase);
     }
 
     private static void EnsureWindowThemeHandlerRegistered()
@@ -114,6 +127,8 @@ public sealed class ThemeService
         var useDarkMode = mode == ThemeMode.Dark ? 1 : 0;
         _ = DwmSetWindowAttribute(handle, DwmUseImmersiveDarkMode, ref useDarkMode, sizeof(int));
         _ = DwmSetWindowAttribute(handle, DwmUseImmersiveDarkModeLegacy, ref useDarkMode, sizeof(int));
+        var backdropType = DwmBackdropMica;
+        _ = DwmSetWindowAttribute(handle, DwmSystemBackdropType, ref backdropType, sizeof(int));
     }
 
     [DllImport("dwmapi.dll")]

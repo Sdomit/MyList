@@ -8,12 +8,31 @@ public sealed class CollectionEntryViewModel : ViewModelBase
 {
     private readonly CollectionEntryModel _model;
     private ItemModel? _item;
+    private int _shortcutIndex;
 
     public CollectionEntryViewModel(CollectionEntryModel model, ItemModel? item)
     {
         _model = model;
         UpdateItem(item);
     }
+
+    // 1-based index among item-type entries in the collection (0 = no shortcut)
+    public int ShortcutIndex
+    {
+        get => _shortcutIndex;
+        set
+        {
+            if (SetProperty(ref _shortcutIndex, value))
+            {
+                OnPropertyChanged(nameof(ShortcutLabel));
+            }
+        }
+    }
+
+    // "⌘1"…"⌘9" for indices 1–9, empty string otherwise
+    public string ShortcutLabel => _shortcutIndex >= 1 && _shortcutIndex <= 9
+        ? $"⌘{_shortcutIndex}"
+        : string.Empty;
 
     public CollectionEntryModel Model => _model;
 

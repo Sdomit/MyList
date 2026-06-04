@@ -41,7 +41,17 @@ public sealed class MainViewModel : ViewModelBase
     private SearchQuery _appliedSearchQuery = new();
     private string _searchText = string.Empty;
     private bool _isSettingsOpen;
+    private bool _isClipboardReviewPaneOpen;
+    private bool _isDuplicateManagerPaneOpen;
+    private bool _isAddFormOpen;
+    private bool _isRefreshingClipboardReview;
+    private bool _clipboardHasImmediateAsset;
     private string _clipboardButtonText = "Add Clipboard";
+    private string _clipboardReviewStatusText = "Copy paths, then refresh to review them.";
+    private string _inlineAddValue = string.Empty;
+    private string _inlineMtabStatusText = "Edit folder paths inline, then save.";
+    private CollectionViewModel? _selectedClipboardTargetCollection;
+    private ClipboardImportHistoryEntry? _selectedClipboardHistoryEntry;
     private string _searchStatusText = string.Empty;
     private NetworkCheckService? _networkCheckService;
 
@@ -87,7 +97,14 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         SelectedItems = new ObservableCollection<ItemModel>();
+        ClipboardTargetCollections = new ObservableCollection<CollectionViewModel>();
+        ClipboardWillAddEntries = new ObservableCollection<ClipboardReviewEntry>();
+        ClipboardWillLinkEntries = new ObservableCollection<ClipboardReviewEntry>();
+        ClipboardSkippedEntries = new ObservableCollection<ClipboardReviewEntry>();
+        ClipboardHistoryEntries = new ObservableCollection<ClipboardImportHistoryEntry>();
+        InlineMtabPaths = new ObservableCollection<InlineMtabPathViewModel>();
         Diagnostics = new DiagnosticsViewModel();
+        DuplicateManager = new DuplicateManagerViewModel(this);
 
         Settings = new SettingsViewModel(
             appData.AppSettings,
@@ -98,7 +115,7 @@ public sealed class MainViewModel : ViewModelBase
             ExportDataAsync,
             ImportDataAsync,
             RestoreBackupAsync,
-            OpenDuplicateManager,
+            OpenDuplicateManagerPane,
             ToggleDiagnostics,
             new ExplorerIntegrationService());
         Settings.PropertyChanged += OnSettingsPropertyChanged;
@@ -114,8 +131,22 @@ public sealed class MainViewModel : ViewModelBase
         AddFileCommand = new RelayCommand(AddFileItem);
         AddFolderCommand = new RelayCommand(AddFolderItem);
         AddFromClipboardCommand = new RelayCommand(AddFromClipboard);
+        OpenClipboardReviewPaneCommand = new RelayCommand(OpenClipboardReviewPane);
+        OpenDuplicateManagerPaneCommand = new RelayCommand(OpenDuplicateManagerPane);
+        CloseToolPaneCommand = new RelayCommand(CloseToolPane);
+        RefreshClipboardReviewCommand = new RelayCommand(RefreshClipboardReview);
+        ApplyClipboardReviewCommand = new RelayCommand(ApplyClipboardReviewPane, () => CanApplyClipboardReview);
+        ReapplyClipboardHistoryCommand = new RelayCommand(ReapplyClipboardHistory, () => SelectedClipboardHistoryEntry is not null);
+        OpenInlineAddCommand = new RelayCommand(OpenInlineAdd);
+        CancelInlineAddCommand = new RelayCommand(CancelInlineAdd);
+        SaveInlineAddCommand = new RelayCommand(SaveInlineAdd, () => !string.IsNullOrWhiteSpace(InlineAddValue));
+        AddInlineMtabPathCommand = new RelayCommand(AddInlineMtabPath);
+        RemoveInlineMtabPathCommand = new RelayCommand<InlineMtabPathViewModel?>(RemoveInlineMtabPath);
+        SaveInlineMtabCommand = new RelayCommand(SaveInlineMtab, () => SelectedItem?.IsMtab == true);
+        ReloadInlineMtabCommand = new RelayCommand(() => LoadInlineMtabDraft(SelectedItem), () => SelectedItem?.IsMtab == true);
         NewActionCommand = new RelayCommand(OpenNewActionDialog);
         NewMtabCommand = new RelayCommand(OpenNewMtabDialog);
+        CaptureExplorerWindowsAsMtabCommand = new RelayCommand(CaptureExplorerWindowsAsMtab);
         AddSeparatorCommand = new RelayCommand(AddSeparator, CanAddSeparator);
 
         OpenItemCommand = new RelayCommand<ItemModel?>(OpenItem);
@@ -214,6 +245,7 @@ public sealed class MainViewModel : ViewModelBase
         {
             if (SetProperty(ref _selectedCollection, value))
             {
+                CloseToolPane();
                 OnPropertyChanged(nameof(CanOpenAll));
                 ApplySearchToCollection(value);
                 UpdateStatusCounts();
@@ -241,6 +273,7 @@ public sealed class MainViewModel : ViewModelBase
         {
             if (SetProperty(ref _selectedItem, value))
             {
+                LoadInlineMtabDraft(value);
                 CommandManager.InvalidateRequerySuggested();
             }
         }
@@ -249,6 +282,20 @@ public sealed class MainViewModel : ViewModelBase
     public SettingsViewModel Settings { get; }
 
     public ItemEditorViewModel Editor { get; }
+
+    public DuplicateManagerViewModel DuplicateManager { get; }
+
+    public ObservableCollection<CollectionViewModel> ClipboardTargetCollections { get; }
+
+    public ObservableCollection<ClipboardReviewEntry> ClipboardWillAddEntries { get; }
+
+    public ObservableCollection<ClipboardReviewEntry> ClipboardWillLinkEntries { get; }
+
+    public ObservableCollection<ClipboardReviewEntry> ClipboardSkippedEntries { get; }
+
+    public ObservableCollection<ClipboardImportHistoryEntry> ClipboardHistoryEntries { get; }
+
+    public ObservableCollection<InlineMtabPathViewModel> InlineMtabPaths { get; }
 
     public string SearchText
     {
@@ -266,6 +313,85 @@ public sealed class MainViewModel : ViewModelBase
     {
         get => _isSettingsOpen;
         set => SetProperty(ref _isSettingsOpen, value);
+    }
+
+    public bool IsClipboardReviewPaneOpen => _isClipboardReviewPaneOpen;
+
+    public bool IsDuplicateManagerPaneOpen => _isDuplicateManagerPaneOpen;
+
+    public bool IsCollectionPaneVisible => !_isClipboardReviewPaneOpen && !_isDuplicateManagerPaneOpen;
+
+    public bool IsAddFormOpen
+    {
+        get => _isAddFormOpen;
+        private set => SetProperty(ref _isAddFormOpen, value);
+    }
+
+    public string InlineAddValue
+    {
+        get => _inlineAddValue;
+        set
+        {
+            if (SetProperty(ref _inlineAddValue, value))
+            {
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+    }
+
+    public CollectionViewModel? SelectedClipboardTargetCollection
+    {
+        get => _selectedClipboardTargetCollection;
+        set
+        {
+            if (SetProperty(ref _selectedClipboardTargetCollection, value) && !_isRefreshingClipboardReview)
+            {
+                RefreshClipboardReview();
+            }
+        }
+    }
+
+    public ClipboardImportHistoryEntry? SelectedClipboardHistoryEntry
+    {
+        get => _selectedClipboardHistoryEntry;
+        set
+        {
+            if (SetProperty(ref _selectedClipboardHistoryEntry, value))
+            {
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+    }
+
+    public string ClipboardReviewStatusText
+    {
+        get => _clipboardReviewStatusText;
+        private set => SetProperty(ref _clipboardReviewStatusText, value);
+    }
+
+    public int ClipboardApplyCount => ClipboardWillAddEntries.Count + ClipboardWillLinkEntries.Count;
+
+    public bool CanApplyClipboardReview => ClipboardApplyCount > 0 || _clipboardHasImmediateAsset;
+
+    public string ClipboardApplyButtonText => ClipboardApplyCount > 0
+        ? $"Add {ClipboardApplyCount} Item{(ClipboardApplyCount == 1 ? string.Empty : "s")}"
+        : _clipboardHasImmediateAsset
+            ? "Save Clipboard Item"
+            : "No Valid Paths";
+
+    public string ClipboardReviewSummaryText =>
+        $"Will add {ClipboardWillAddEntries.Count}, link {ClipboardWillLinkEntries.Count}, skip {ClipboardSkippedEntries.Count}.";
+
+    public string ClipboardWillAddHeader => $"Will Add ({ClipboardWillAddEntries.Count})";
+
+    public string ClipboardWillLinkHeader => $"Will Link Existing ({ClipboardWillLinkEntries.Count})";
+
+    public string ClipboardSkippedHeader => $"Skipped ({ClipboardSkippedEntries.Count})";
+
+    public string InlineMtabStatusText
+    {
+        get => _inlineMtabStatusText;
+        private set => SetProperty(ref _inlineMtabStatusText, value);
     }
 
     public string ClipboardButtonText
@@ -337,8 +463,22 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand AddFileCommand { get; }
     public ICommand AddFolderCommand { get; }
     public ICommand AddFromClipboardCommand { get; }
+    public ICommand OpenClipboardReviewPaneCommand { get; }
+    public ICommand OpenDuplicateManagerPaneCommand { get; }
+    public ICommand CloseToolPaneCommand { get; }
+    public ICommand RefreshClipboardReviewCommand { get; }
+    public ICommand ApplyClipboardReviewCommand { get; }
+    public ICommand ReapplyClipboardHistoryCommand { get; }
+    public ICommand OpenInlineAddCommand { get; }
+    public ICommand CancelInlineAddCommand { get; }
+    public ICommand SaveInlineAddCommand { get; }
+    public ICommand AddInlineMtabPathCommand { get; }
+    public ICommand RemoveInlineMtabPathCommand { get; }
+    public ICommand SaveInlineMtabCommand { get; }
+    public ICommand ReloadInlineMtabCommand { get; }
     public ICommand NewActionCommand { get; }
     public ICommand NewMtabCommand { get; }
+    public ICommand CaptureExplorerWindowsAsMtabCommand { get; }
     public ICommand AddSeparatorCommand { get; }
     public ICommand OpenItemCommand { get; }
     public ICommand OpenNewWindowCommand { get; }
@@ -637,6 +777,115 @@ public sealed class MainViewModel : ViewModelBase
         AddOrLinkItem(path);
     }
 
+    private void OpenInlineAdd()
+    {
+        CloseToolPane();
+        IsSettingsOpen = false;
+        IsQuickEditOpen = false;
+        IsAddFormOpen = true;
+        StatusText = "Paste or type a rooted path to add it to the current collection.";
+    }
+
+    private void CancelInlineAdd()
+    {
+        InlineAddValue = string.Empty;
+        IsAddFormOpen = false;
+        StatusText = "Add cancelled.";
+    }
+
+    private void SaveInlineAdd()
+    {
+        var value = InlineAddValue.Trim();
+        var outcome = AddOrLinkItem(value);
+        switch (outcome)
+        {
+            case AddPathOutcome.Invalid:
+                StatusText = "Enter a valid rooted file, folder, or UNC path.";
+                return;
+            case AddPathOutcome.AddedNew:
+                StatusText = $"Added '{GetDefaultName(value)}'.";
+                break;
+            case AddPathOutcome.LinkedExisting:
+                StatusText = "Linked the existing item to this collection.";
+                break;
+            default:
+                StatusText = "That item is already in this collection.";
+                break;
+        }
+
+        InlineAddValue = string.Empty;
+        IsAddFormOpen = false;
+    }
+
+    private void AddInlineMtabPath()
+    {
+        if (SelectedItem?.IsMtab != true)
+        {
+            return;
+        }
+
+        InlineMtabPaths.Add(new InlineMtabPathViewModel(string.Empty));
+        UpdateInlineMtabLayout();
+        InlineMtabStatusText = "Enter the new folder path, then save.";
+    }
+
+    private void RemoveInlineMtabPath(InlineMtabPathViewModel? path)
+    {
+        if (path is null)
+        {
+            return;
+        }
+
+        InlineMtabPaths.Remove(path);
+        UpdateInlineMtabLayout();
+        InlineMtabStatusText = "Save to apply the updated folder list.";
+    }
+
+    private void SaveInlineMtab()
+    {
+        if (SelectedItem?.IsMtab != true)
+        {
+            return;
+        }
+
+        if (!UpdateMtabFromPaths(SelectedItem, SelectedItem.Name, InlineMtabPaths.Select(path => path.PathText), out var status))
+        {
+            InlineMtabStatusText = status;
+            StatusText = status;
+            return;
+        }
+
+        LoadInlineMtabDraft(SelectedItem);
+        InlineMtabStatusText = status;
+        StatusText = status;
+    }
+
+    private void LoadInlineMtabDraft(ItemModel? item)
+    {
+        InlineMtabPaths.Clear();
+        if (item?.IsMtab != true)
+        {
+            InlineMtabStatusText = "Edit folder paths inline, then save.";
+            return;
+        }
+
+        foreach (var path in GetMtabFolderPaths(item))
+        {
+            InlineMtabPaths.Add(new InlineMtabPathViewModel(path));
+        }
+
+        UpdateInlineMtabLayout();
+        InlineMtabStatusText = $"{InlineMtabPaths.Count} folders. Edit paths inline, then save.";
+    }
+
+    private void UpdateInlineMtabLayout()
+    {
+        for (var index = 0; index < InlineMtabPaths.Count; index++)
+        {
+            InlineMtabPaths[index].UpdateLayout(index + 1, InlineMtabPaths.Count);
+        }
+    }
+
     public void MergeDuplicateGroup(DuplicateGroup group)
     {
         if (group is null || group.Items.Count < 2)
@@ -734,6 +983,178 @@ public sealed class MainViewModel : ViewModelBase
         RefreshSmartCollections();
     }
 
+    private void OpenClipboardReviewPane()
+    {
+        SetActiveToolPane(showClipboard: true, showDuplicates: false);
+        RefreshClipboardReview();
+    }
+
+    private void OpenDuplicateManagerPane()
+    {
+        DuplicateManager.Refresh();
+        SetActiveToolPane(showClipboard: false, showDuplicates: true);
+        StatusText = $"{DuplicateManager.Groups.Count} duplicate groups found.";
+    }
+
+    private void CloseToolPane()
+    {
+        SetActiveToolPane(showClipboard: false, showDuplicates: false);
+    }
+
+    private void SetActiveToolPane(bool showClipboard, bool showDuplicates)
+    {
+        var changed = SetProperty(ref _isClipboardReviewPaneOpen, showClipboard, nameof(IsClipboardReviewPaneOpen));
+        changed |= SetProperty(ref _isDuplicateManagerPaneOpen, showDuplicates, nameof(IsDuplicateManagerPaneOpen));
+        if (changed)
+        {
+            OnPropertyChanged(nameof(IsCollectionPaneVisible));
+        }
+
+        if (showClipboard || showDuplicates)
+        {
+            IsSettingsOpen = false;
+            IsQuickEditOpen = false;
+            IsAddFormOpen = false;
+            Editor.Close();
+        }
+    }
+
+    private void RefreshClipboardReview()
+    {
+        try
+        {
+            _isRefreshingClipboardReview = true;
+
+            var previousTarget = SelectedClipboardTargetCollection;
+            ClipboardTargetCollections.Clear();
+            foreach (var collection in Collections.Where(collection => !collection.IsSmart))
+            {
+                ClipboardTargetCollections.Add(collection);
+            }
+
+            var target = previousTarget is not null && ClipboardTargetCollections.Contains(previousTarget)
+                ? previousTarget
+                : ResolveTargetCollection();
+            SetProperty(ref _selectedClipboardTargetCollection, target, nameof(SelectedClipboardTargetCollection));
+
+            ClipboardWillAddEntries.Clear();
+            ClipboardWillLinkEntries.Clear();
+            ClipboardSkippedEntries.Clear();
+            _clipboardHasImmediateAsset = false;
+
+            foreach (var entry in BuildClipboardReviewEntriesFromClipboard(target))
+            {
+                if (entry.Status == ClipboardReviewStatus.ValidNew && entry.WillApply)
+                {
+                    ClipboardWillAddEntries.Add(entry);
+                }
+                else if (entry.Status == ClipboardReviewStatus.ValidExisting && entry.WillApply)
+                {
+                    ClipboardWillLinkEntries.Add(entry);
+                }
+                else
+                {
+                    ClipboardSkippedEntries.Add(entry);
+                }
+            }
+
+            ClipboardHistoryEntries.Clear();
+            foreach (var historyEntry in AppData.ClipboardImportHistory.OrderByDescending(entry => entry.TimestampUtc).Take(20))
+            {
+                ClipboardHistoryEntries.Add(historyEntry);
+            }
+
+            if (ClipboardApplyCount == 0)
+            {
+                _clipboardHasImmediateAsset = Clipboard.ContainsImage()
+                    || (Clipboard.ContainsText() && !string.IsNullOrWhiteSpace(Clipboard.GetText()));
+            }
+
+            ClipboardReviewStatusText = ClipboardApplyCount > 0
+                ? "Review the paths below, then add them to the selected collection."
+                : _clipboardHasImmediateAsset
+                    ? "Clipboard text or image is ready to save as an item."
+                    : "No importable content is currently on the clipboard.";
+            NotifyClipboardReviewStateChanged();
+        }
+        catch (Exception ex)
+        {
+            LogService.Instance.Log(ex, "Inline clipboard review failed.");
+            ClipboardReviewStatusText = "Clipboard could not be read. Copy the paths again and refresh.";
+            NotifyClipboardReviewStateChanged();
+        }
+        finally
+        {
+            _isRefreshingClipboardReview = false;
+        }
+    }
+
+    private void ApplyClipboardReviewPane()
+    {
+        if (ClipboardApplyCount == 0 && _clipboardHasImmediateAsset)
+        {
+            var imported = Clipboard.ContainsImage()
+                ? TryAddClipboardImageItem()
+                : Clipboard.ContainsText() && TryAddClipboardTextItem(Clipboard.GetText());
+            RefreshClipboardReview();
+            ClipboardReviewStatusText = imported
+                ? "Saved the clipboard content as an item."
+                : "Clipboard content could not be saved.";
+            StatusText = ClipboardReviewStatusText;
+            return;
+        }
+
+        var entries = ClipboardWillAddEntries
+            .Concat(ClipboardWillLinkEntries)
+            .Concat(ClipboardSkippedEntries)
+            .ToList();
+        var summary = ApplyClipboardReview(entries, SelectedClipboardTargetCollection);
+        if (summary.addedNew + summary.linkedExisting > 0)
+        {
+            AppendClipboardHistory(summary, SelectedClipboardTargetCollection, entries);
+            ShowClipboardFeedback("Copied ✓");
+        }
+
+        RefreshClipboardReview();
+        ClipboardReviewStatusText =
+            $"Added {summary.addedNew}, linked {summary.linkedExisting}, skipped {summary.skippedInvalid + summary.skippedDuplicate}.";
+        StatusText = ClipboardReviewStatusText;
+    }
+
+    private void ReapplyClipboardHistory()
+    {
+        if (SelectedClipboardHistoryEntry is null)
+        {
+            return;
+        }
+
+        var entries = BuildClipboardReviewEntriesFromPaths(
+            SelectedClipboardHistoryEntry.Paths,
+            SelectedClipboardTargetCollection);
+        var summary = ApplyClipboardReview(entries, SelectedClipboardTargetCollection);
+        if (summary.addedNew + summary.linkedExisting > 0)
+        {
+            AppendClipboardHistory(summary, SelectedClipboardTargetCollection, entries);
+        }
+
+        RefreshClipboardReview();
+        ClipboardReviewStatusText =
+            $"History applied: added {summary.addedNew}, linked {summary.linkedExisting}, skipped {summary.skippedInvalid + summary.skippedDuplicate}.";
+        StatusText = ClipboardReviewStatusText;
+    }
+
+    private void NotifyClipboardReviewStateChanged()
+    {
+        OnPropertyChanged(nameof(ClipboardApplyCount));
+        OnPropertyChanged(nameof(CanApplyClipboardReview));
+        OnPropertyChanged(nameof(ClipboardApplyButtonText));
+        OnPropertyChanged(nameof(ClipboardReviewSummaryText));
+        OnPropertyChanged(nameof(ClipboardWillAddHeader));
+        OnPropertyChanged(nameof(ClipboardWillLinkHeader));
+        OnPropertyChanged(nameof(ClipboardSkippedHeader));
+        CommandManager.InvalidateRequerySuggested();
+    }
+
     private ObservableCollection<CollectionEntryViewModel> BuildCollectionEntries(CollectionModel model)
     {
         if (model.IsSmart)
@@ -744,6 +1165,7 @@ public sealed class MainViewModel : ViewModelBase
         SyncCollectionItemIds(model);
 
         var entries = new ObservableCollection<CollectionEntryViewModel>();
+        var shortcutIndex = 0;
         foreach (var entry in model.Entries)
         {
             if (entry.Kind == CollectionEntryKind.Separator)
@@ -755,7 +1177,11 @@ public sealed class MainViewModel : ViewModelBase
             var item = AllItems.FirstOrDefault(i => i.Id == entry.ItemId);
             if (item is not null)
             {
-                entries.Add(new CollectionEntryViewModel(entry, item));
+                var vm = new CollectionEntryViewModel(entry, item)
+                {
+                    ShortcutIndex = ++shortcutIndex
+                };
+                entries.Add(vm);
             }
         }
 
@@ -1545,6 +1971,8 @@ public sealed class MainViewModel : ViewModelBase
     {
         if (!IsSettingsOpen)
         {
+            CloseToolPane();
+            IsAddFormOpen = false;
             Editor.Close();
         }
 
@@ -1715,6 +2143,41 @@ public sealed class MainViewModel : ViewModelBase
         StatusText = status;
     }
 
+    private void CaptureExplorerWindowsAsMtab()
+    {
+        var capturedPaths = _explorerTabAutomationService.CaptureOpenFolderPaths();
+        if (capturedPaths.Count < 2)
+        {
+            MessageBox.Show(
+                "Open at least two Explorer folders before capturing them as an Mtab.",
+                "Capture Explorer Windows",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
+        var editor = new MtabEditorWindow(
+            "Capture Explorer Windows",
+            BuildSuggestedMtabNameFromPaths(capturedPaths),
+            capturedPaths)
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        if (editor.ShowDialog() != true)
+        {
+            return;
+        }
+
+        if (!CreateMtabFromPaths(editor.MtabName, editor.ValidPaths, ResolveTargetCollection(), out var status))
+        {
+            MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        StatusText = status;
+    }
+
     private void OpenNewActionDialog()
     {
         var dialog = new ActionItemWindow("New Action")
@@ -1766,24 +2229,13 @@ public sealed class MainViewModel : ViewModelBase
             return;
         }
 
-        var existingPaths = GetMtabFolderPaths(item);
-        var editor = new MtabEditorWindow("Edit Mtab", item.Name, existingPaths)
-        {
-            Owner = Application.Current.MainWindow
-        };
-
-        if (editor.ShowDialog() != true)
-        {
-            return;
-        }
-
-        if (!UpdateMtabFromPaths(item, editor.MtabName, editor.ValidPaths, out var status))
-        {
-            MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        StatusText = status;
+        CloseToolPane();
+        IsSettingsOpen = false;
+        Editor.Close();
+        SetSelectedItems(new[] { item });
+        LoadInlineMtabDraft(item);
+        InlineMtabStatusText = "Edit folder paths inline, then save.";
+        StatusText = $"Editing Mtab '{item.Name}' in the preview pane.";
     }
 
     private void EditActionItem(ItemModel item)
@@ -3211,7 +3663,7 @@ public sealed class MainViewModel : ViewModelBase
         return (addedNew, linkedExisting, skippedInvalid, skippedDuplicate);
     }
 
-    private List<ClipboardReviewEntry> BuildClipboardReviewEntriesFromClipboard()
+    private List<ClipboardReviewEntry> BuildClipboardReviewEntriesFromClipboard(CollectionViewModel? requestedCollection = null)
     {
         var rawCandidates = new List<string>();
         if (Clipboard.ContainsFileDropList())
@@ -3224,7 +3676,7 @@ public sealed class MainViewModel : ViewModelBase
             rawCandidates.AddRange(PathNormalizationHelper.ExtractClipboardCandidates(Clipboard.GetText()));
         }
 
-        return BuildClipboardReviewEntriesFromPaths(rawCandidates, ResolveTargetCollection());
+        return BuildClipboardReviewEntriesFromPaths(rawCandidates, requestedCollection ?? ResolveTargetCollection());
     }
 
     private bool TryAddClipboardTextItem(string text)
@@ -3920,13 +4372,14 @@ public sealed class MainViewModel : ViewModelBase
         {
             new() { Name = "Add File", Description = "Open file picker and add item", Execute = () => AddFileCommand.Execute(null) },
             new() { Name = "Add Folder", Description = "Open folder picker and add item", Execute = () => AddFolderCommand.Execute(null) },
-            new() { Name = "Add Clipboard", Description = "Review clipboard paths", Execute = () => AddFromClipboardCommand.Execute(null) },
+            new() { Name = "Open Clipboard Inbox", Description = "Review clipboard paths", Execute = OpenClipboardReviewPane },
             new() { Name = "New Action", Description = "Create an internal command, batch, or PowerShell item", Execute = () => NewActionCommand.Execute(null) },
             new() { Name = "Add Separator", Description = "Insert a visual divider in the current collection", Execute = () => AddSeparatorCommand.Execute(null) },
             new() { Name = "New Mtab", Description = "Create explorer multi-tab group", Execute = () => NewMtabCommand.Execute(null) },
+            new() { Name = "Capture Explorer Windows", Description = "Create an Mtab from open Explorer folders", Execute = () => CaptureExplorerWindowsAsMtabCommand.Execute(null) },
             new() { Name = "Open Settings", Description = "Toggle settings drawer", Execute = () => ToggleSettingsCommand.Execute(null) },
             new() { Name = "Open Diagnostics", Description = "Open diagnostics page", Execute = ToggleDiagnostics },
-            new() { Name = "Open Duplicate Manager", Description = "Manage duplicate paths", Execute = OpenDuplicateManager },
+            new() { Name = "Open Duplicate Manager", Description = "Manage duplicate paths", Execute = OpenDuplicateManagerPane },
             new() { Name = "Toggle View", Description = "Switch between grid and list", Execute = () => ToggleViewModeCommand.Execute(null) },
             new() { Name = "Next Collection", Description = "Switch active collection", Execute = () => ToggleCollectionCommand.Execute(null) },
             new() { Name = "Undo", Description = "Undo last action", Execute = () => UndoCommand.Execute(null) },

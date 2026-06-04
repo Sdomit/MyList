@@ -370,6 +370,74 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N)
+        {
+            ViewModel.OpenInlineAddCommand.Execute(null);
+            Dispatcher.BeginInvoke(() =>
+            {
+                InlineAddBox.Focus();
+                Keyboard.Focus(InlineAddBox);
+            });
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.OemComma)
+        {
+            ViewModel.ToggleSettingsCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key == Key.V)
+        {
+            ViewModel.OpenClipboardReviewPaneCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D)
+        {
+            ViewModel.OpenDuplicateManagerPaneCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Alt) && e.Key == Key.M)
+        {
+            ViewModel.CaptureExplorerWindowsAsMtabCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.T)
+        {
+            ViewModel.ToggleThemeCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key == Key.M)
+        {
+            RestoreAndActivate();
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key == Key.Space)
+        {
+            RestoreAndActivate();
+            e.Handled = true;
+            return;
+        }
+
+        if (Keyboard.Modifiers == ModifierKeys.Control && TryGetItemShortcutIndex(e.Key, out var shortcutIndex))
+        {
+            OpenItemByShortcutIndex(shortcutIndex);
+            e.Handled = true;
+            return;
+        }
+
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Z)
         {
             if (ViewModel.UndoCommand.CanExecute(null))
@@ -401,6 +469,20 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (e.Key == Key.Escape && (ViewModel.IsClipboardReviewPaneOpen || ViewModel.IsDuplicateManagerPaneOpen))
+        {
+            ViewModel.CloseToolPaneCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape && ViewModel.IsAddFormOpen)
+        {
+            ViewModel.CancelInlineAddCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
         if (Keyboard.FocusedElement is TextBox)
         {
             return;
@@ -408,9 +490,9 @@ public partial class MainWindow : Window
 
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
         {
-            if (ViewModel.AddFromClipboardCommand.CanExecute(null))
+            if (ViewModel.OpenClipboardReviewPaneCommand.CanExecute(null))
             {
-                ViewModel.AddFromClipboardCommand.Execute(null);
+                ViewModel.OpenClipboardReviewPaneCommand.Execute(null);
             }
             e.Handled = true;
             return;
@@ -431,6 +513,82 @@ public partial class MainWindow : Window
             ViewModel.OpenItemCommand.Execute(ViewModel.SelectedItem);
             e.Handled = true;
         }
+    }
+
+    private void OnInlineAddOpenClick(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        ViewModel.OpenInlineAddCommand.Execute(null);
+        Dispatcher.BeginInvoke(() =>
+        {
+            InlineAddBox.Focus();
+            Keyboard.Focus(InlineAddBox);
+        });
+    }
+
+    private void OnInlineAddKeyDown(object sender, KeyEventArgs e)
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Enter && ViewModel.SaveInlineAddCommand.CanExecute(null))
+        {
+            ViewModel.SaveInlineAddCommand.Execute(null);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            ViewModel.CancelInlineAddCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
+    private void OpenItemByShortcutIndex(int index)
+    {
+        if (ViewModel?.SelectedCollection is null)
+        {
+            return;
+        }
+
+        var item = ViewModel.SelectedCollection.FilteredEntries
+            .Cast<object>()
+            .OfType<CollectionEntryViewModel>()
+            .Where(entry => !entry.IsSeparator && entry.Item is not null)
+            .Select(entry => entry.Item!)
+            .ElementAtOrDefault(index);
+
+        if (item is null)
+        {
+            return;
+        }
+
+        ViewModel.SetSelectedItems(new[] { item });
+        ViewModel.OpenItemCommand.Execute(item);
+    }
+
+    private static bool TryGetItemShortcutIndex(Key key, out int index)
+    {
+        index = key switch
+        {
+            Key.D1 or Key.NumPad1 => 0,
+            Key.D2 or Key.NumPad2 => 1,
+            Key.D3 or Key.NumPad3 => 2,
+            Key.D4 or Key.NumPad4 => 3,
+            Key.D5 or Key.NumPad5 => 4,
+            Key.D6 or Key.NumPad6 => 5,
+            Key.D7 or Key.NumPad7 => 6,
+            Key.D8 or Key.NumPad8 => 7,
+            Key.D9 or Key.NumPad9 => 8,
+            _ => -1
+        };
+
+        return index >= 0;
     }
 
     private void OnWindowPreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -834,6 +992,28 @@ public partial class MainWindow : Window
 
         ViewModel.OpenItemCommand.Execute(item);
         e.Handled = true;
+    }
+
+    private void OnItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        var container = FindAncestor<ListBoxItem>(e.OriginalSource as DependencyObject);
+        if (container?.DataContext is not CollectionEntryViewModel entry || entry.Item is not ItemModel item)
+        {
+            return;
+        }
+
+        ViewModel.OpenItemCommand.Execute(item);
+        e.Handled = true;
+    }
+
+    private void OnClearSelectionClick(object sender, RoutedEventArgs e)
+    {
+        ViewModel?.SetSelectedItems(Array.Empty<ItemModel>());
     }
 
     private void OnItemSelectionChanged(object sender, SelectionChangedEventArgs e)
