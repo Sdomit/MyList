@@ -2,35 +2,192 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Command Palette"
-        Width="620"
-        Height="420"
-        WindowStyle="ToolWindow"
+        Width="640"
+        Height="520"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="{DynamicResource Token.TransparentBrush}"
+        Foreground="{DynamicResource Token.TextPrimaryBrush}"
+        FontFamily="{DynamicResource Token.FontUi}"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         KeyDown="OnWindowKeyDown">
-    <Grid Margin="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <Geometry x:Key="PaletteSearchIcon">M9,1 A8,8 0 1 0 9,17 A8,8 0 1 0 9,1 M15,15 L21,21</Geometry>
+        <Geometry x:Key="PaletteCommandIcon">M2,4 L14,4 L14,14 L2,14 Z M5,1 L11,1 M5,8 L11,8 M5,11 L9,11</Geometry>
 
-        <TextBox x:Name="QueryBox"
-                 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
-                 MinHeight="34" />
+        <Style x:Key="PaletteRowStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="10,7" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="{DynamicResource Token.TransparentBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource Simple.FocusVisual}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSoftBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
-        <ListBox x:Name="CommandList"
-                 Grid.Row="1"
-                 Margin="0,10,0,0"
-                 ItemsSource="{Binding FilteredEntries}"
-                 SelectedItem="{Binding SelectedEntry}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Margin="0,2">
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource TextSecondary}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </Grid>
+    <Border Background="{DynamicResource Token.BgSurfaceBrush}"
+            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+            BorderThickness="1"
+            CornerRadius="{DynamicResource Token.Radius2Xl}"
+            Effect="{DynamicResource Token.ShadowXl}"
+            ClipToBounds="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Margin="18,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="18" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Path Width="16"
+                      Height="16"
+                      Data="{StaticResource PaletteSearchIcon}"
+                      Stroke="{DynamicResource Token.TextTertiaryBrush}"
+                      StrokeThickness="1.4"
+                      Stretch="Uniform"
+                      VerticalAlignment="Center" />
+                <TextBox x:Name="QueryBox"
+                         Grid.Column="1"
+                         Height="32"
+                         Margin="10,0"
+                         Padding="0"
+                         Background="{DynamicResource Token.TransparentBrush}"
+                         BorderThickness="0"
+                         FontSize="15"
+                         Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Grid.Column="1"
+                           Margin="10,0"
+                           Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                           FontSize="15"
+                           Text="Search commands..."
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=QueryBox}" Value="">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <Border Grid.Column="2"
+                        Padding="6,2"
+                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{DynamicResource Token.RadiusXs}"
+                        VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource Simple.MonoText}" Text="Esc" />
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="1"
+                    Height="1"
+                    Background="{DynamicResource Token.BorderHairBrush}" />
+
+            <Grid Grid.Row="2">
+                <TextBlock Margin="18,12,18,4"
+                           Style="{StaticResource Simple.SectionLabel}"
+                           Text="COMMANDS"
+                           VerticalAlignment="Top" />
+                <ListBox x:Name="CommandList"
+                         Margin="8,32,8,8"
+                         ItemsSource="{Binding FilteredEntries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         ItemContainerStyle="{StaticResource PaletteRowStyle}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Width="26"
+                                        Height="26"
+                                        Background="{DynamicResource Token.BgSubtleBrush}"
+                                        CornerRadius="{DynamicResource Token.RadiusMd}">
+                                    <Path Width="13"
+                                          Height="13"
+                                          Data="{StaticResource PaletteCommandIcon}"
+                                          Stroke="{DynamicResource Token.TextSecondaryBrush}"
+                                          StrokeThickness="1.2"
+                                          Stretch="Uniform" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="12,0,12,0">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="13"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource Token.TextPrimaryBrush}" />
+                                    <TextBlock Margin="0,2,0,0"
+                                               Style="{StaticResource Simple.MetaText}"
+                                               Text="{Binding Description}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <Border Grid.Column="2"
+                                        Padding="5,1"
+                                        Background="{DynamicResource Token.BgSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="{DynamicResource Token.RadiusXs}"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Simple.MonoText}" Text="Enter" FontSize="10" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <Border Grid.Row="3"
+                    Padding="18,10"
+                    Background="{DynamicResource Token.BgMicaBrush}"
+                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderThickness="0,1,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Simple.MonoText}" Text="Up / Down" />
+                    <TextBlock Margin="6,0,16,0"
+                               Style="{StaticResource Simple.MetaText}"
+                               Text="navigate" />
+                    <TextBlock Style="{StaticResource Simple.MonoText}" Text="Enter" />
+                    <TextBlock Margin="6,0,16,0"
+                               Style="{StaticResource Simple.MetaText}"
+                               Text="run" />
+                    <TextBlock Style="{StaticResource Simple.MonoText}" Text="Esc" />
+                    <TextBlock Margin="6,0,0,0"
+                               Style="{StaticResource Simple.MetaText}"
+                               Text="close" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>
