@@ -1,4 +1,5 @@
 using System;
+using MyList.Services;
 
 namespace MyList.ViewModels;
 
@@ -90,10 +91,10 @@ public sealed class InlineMtabPathViewModel : ViewModelBase
         const double radiusY = 62;
 
         Number = number;
-        var angle = -Math.PI / 2 + ((number - 1) * 2 * Math.PI / Math.Max(count, 3));
-        LineX2 = centerX + radiusX * Math.Cos(angle);
-        LineY2 = centerY + radiusY * Math.Sin(angle);
-        NodeLeft = LineX2 - 16;   // center 32px node on the line endpoint
-        NodeTop  = LineY2 - 16;
+        var (x, y) = OrbitLayoutService.ComputePoint(number - 1, Math.Max(count, 3), centerX, centerY, radiusX, radiusY);
+        LineX2 = x;
+        LineY2 = y;
+        NodeLeft = LineX2 - 16;
+        NodeTop = LineY2 - 16;
     }
 }

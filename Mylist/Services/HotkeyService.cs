@@ -17,6 +17,8 @@ public sealed class HotkeyService : IDisposable
     private HwndSource? _source;
     private int _currentId = 1000;
     private Window? _window;
+    private readonly List<int> _primaryHotkeyIds = new();
+    private readonly List<(HotkeySettings Settings, Action Callback)> _persistentSecondaryHotkeys = new();
 
     public void Initialize(Window window, MainViewModel viewModel)
     {
@@ -36,8 +38,27 @@ public sealed class HotkeyService : IDisposable
             return;
         }
 
-        UnregisterAll();
+        UnregisterPrimary();
         RegisterHotkeyWithFallback(settings, () => BringWindowToFront(_window));
+        ReregisterSecondaryHotkeys();
+    }
+
+    public void RegisterSecondaryHotkey(HotkeySettings settings, Action callback)
+    {
+        _persistentSecondaryHotkeys.Add((settings, callback));
+        var result = RegisterHotkey(settings, callback);
+        if (!result.success)
+        {
+            _log.Log($"Failed to register secondary hotkey {settings} (Win32: {result.errorCode}).");
+        }
+    }
+
+    private void ReregisterSecondaryHotkeys()
+    {
+        foreach (var (settings, callback) in _persistentSecondaryHotkeys)
+        {
+            RegisterHotkey(settings, callback);
+        }
     }
 
     private void RegisterHotkeyWithFallback(HotkeySettings settings, Action callback)
@@ -97,6 +118,7 @@ public sealed class HotkeyService : IDisposable
         if (RegisterHotKey(source.Handle, id, modifiers, key))
         {
             _callbacks[id] = callback;
+            _primaryHotkeyIds.Add(id);
             return (true, 0);
         }
 
@@ -163,6 +185,24 @@ public sealed class HotkeyService : IDisposable
         window.Focus();
     }
 
+    private void UnregisterPrimary()
+    {
+        var source = _source;
+        if (source is null)
+        {
+            return;
+        }
+
+        foreach (var id in _primaryHotkeyIds)
+        {
+            UnregisterHotKey(source.Handle, id);
+            _callbacks.Remove(id);
+        }
+
+        _primaryHotkeyIds.Clear();
+        RuntimeStatus.HotkeyRegistered = false;
+    }
+
     private void UnregisterAll()
     {
         var source = _source;
@@ -176,6 +216,7 @@ public sealed class HotkeyService : IDisposable
             UnregisterHotKey(source.Handle, id);
         }
         _callbacks.Clear();
+        _primaryHotkeyIds.Clear();
         RuntimeStatus.HotkeyRegistered = false;
     }
 
