@@ -171,7 +171,7 @@
                                     <StackPanel>
                                         <TextBlock Text="Simple variant"
                                                    Foreground="{DynamicResource Token.TextAccentBrush}"
-                                                   FontSize="11.5"
+                                                   FontSize="{DynamicResource Token.TextXs}"
                                                    FontWeight="Medium" />
                                         <TextBlock Margin="0,3,0,0"
                                                    Style="{StaticResource Simple.MonoText}"
