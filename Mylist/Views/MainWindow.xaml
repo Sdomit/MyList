@@ -81,6 +81,7 @@
                             <ColumnDefinition Width="28" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Border x:Name="IconChrome"
@@ -138,40 +139,43 @@
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Ellipse Width="{DynamicResource Token.Size.HealthDot}"
-                                         Height="{DynamicResource Token.Size.HealthDot}"
-                                         Margin="0,0,6,0"
-                                         VerticalAlignment="Center">
-                                    <Ellipse.Style>
-                                        <Style TargetType="Ellipse">
-                                            <!-- Healthy: #10B981 at 55% -->
-                                            <Setter Property="Fill" Value="{DynamicResource Token.StatusOkBrush}" />
-                                            <Setter Property="Opacity" Value="0.55" />
-                                            <Style.Triggers>
-                                                <!-- Unchecked: #60A5FA at 40% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="Unchecked">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusUnknownBrush}" />
-                                                    <Setter Property="Opacity" Value="0.40" />
-                                                </DataTrigger>
-                                                <!-- Offline: #F59E0B at 70% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="Offline">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusWarnBrush}" />
-                                                    <Setter Property="Opacity" Value="0.70" />
-                                                </DataTrigger>
-                                                <!-- Missing: #EF4444 at 75% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="Missing">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
-                                                    <Setter Property="Opacity" Value="0.75" />
-                                                </DataTrigger>
-                                                <!-- PermissionDenied: #EF4444 at 75% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
-                                                    <Setter Property="Opacity" Value="0.75" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Ellipse.Style>
-                                </Ellipse>
+                                <Grid Width="14"
+                                      Height="14"
+                                      Margin="0,0,6,0"
+                                      VerticalAlignment="Center">
+                                    <Ellipse Width="12"
+                                             Height="12"
+                                             Stroke="{DynamicResource Token.BorderHairBrush}"
+                                             StrokeThickness="1.5" />
+                                    <Ellipse Width="12"
+                                             Height="12"
+                                             StrokeThickness="1.5"
+                                             StrokeDashArray="{Binding HealthDashArray}"
+                                             RenderTransformOrigin="0.5,0.5">
+                                        <Ellipse.RenderTransform>
+                                            <RotateTransform Angle="-90" />
+                                        </Ellipse.RenderTransform>
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Stroke" Value="{DynamicResource Token.StatusOkBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HealthState}" Value="Unchecked">
+                                                        <Setter Property="Stroke" Value="{DynamicResource Token.StatusUnknownBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding HealthState}" Value="Offline">
+                                                        <Setter Property="Stroke" Value="{DynamicResource Token.StatusWarnBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding HealthState}" Value="Missing">
+                                                        <Setter Property="Stroke" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
+                                                        <Setter Property="Stroke" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                </Grid>
                                 <TextBlock Grid.Column="1"
                                            Style="{StaticResource Simple.MonoText}"
                                            Text="{Binding DisplayPath}"
@@ -179,8 +183,32 @@
                             </Grid>
                         </StackPanel>
 
+                        <!-- Sparkline: 14-day access trajectory, dim until row hover -->
+                        <Polyline Grid.Column="2"
+                                  Width="60"
+                                  Height="16"
+                                  Margin="0,0,8,0"
+                                  VerticalAlignment="Center"
+                                  Points="{Binding TrajectoryPoints}"
+                                  Stroke="{DynamicResource Token.AccentBrush}"
+                                  StrokeThickness="1.5"
+                                  StrokeLineJoin="Round"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round">
+                            <Polyline.Style>
+                                <Style TargetType="Polyline">
+                                    <Setter Property="Opacity" Value="0.45" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                            <Setter Property="Opacity" Value="0.85" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Polyline.Style>
+                        </Polyline>
+
                         <!-- Kbd chip: hidden, fades in on row hover (120ms) -->
-                        <Border Grid.Column="2"
+                        <Border Grid.Column="3"
                                 Padding="5,1"
                                 BorderThickness="1"
                                 VerticalAlignment="Center"
@@ -1209,6 +1237,35 @@
                                                        FontWeight="Medium"
                                                        VerticalAlignment="Center" />
                                         </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,18">
+                                    <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="TRAJECTORY" Margin="0,0,0,8" />
+                                    <Border Padding="10,8"
+                                            Background="{DynamicResource Token.BgSubtleBrush}"
+                                            CornerRadius="{DynamicResource Token.RadiusMd}">
+                                        <ItemsControl ItemsSource="{Binding SelectedItem.TrajectoryBars}" Height="52">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal"
+                                                                HorizontalAlignment="Stretch"
+                                                                VerticalAlignment="Bottom" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Rectangle Width="6"
+                                                               Margin="1,0"
+                                                               VerticalAlignment="Bottom"
+                                                               Height="{Binding Height}"
+                                                               RadiusX="2"
+                                                               RadiusY="2"
+                                                               Fill="{DynamicResource Token.AccentBrush}"
+                                                               Opacity="{Binding Opacity}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </Border>
                                 </StackPanel>
 

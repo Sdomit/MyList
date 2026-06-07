@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json.Serialization;
+using System.Windows;
 using System.Windows.Media;
 using MyList.Helpers;
 
@@ -117,8 +120,17 @@ public sealed class ItemModel : ObservableObject
     public DateTime LastOpenedDate
     {
         get => _lastOpenedDate;
-        set => SetProperty(ref _lastOpenedDate, value);
+        set
+        {
+            if (SetProperty(ref _lastOpenedDate, value))
+            {
+                RecordHistoryEntry(value);
+                RaiseTrajectoryChanged();
+            }
+        }
     }
+
+    public List<DateTime> OpenedHistory { get; set; } = new();
 
     public ItemHealthState HealthState
     {
@@ -128,8 +140,131 @@ public sealed class ItemModel : ObservableObject
             if (SetProperty(ref _healthState, value))
             {
                 OnPropertyChanged(nameof(IsOffline));
+                OnPropertyChanged(nameof(HealthScore));
+                OnPropertyChanged(nameof(HealthDashArray));
             }
         }
+    }
+
+    [JsonIgnore]
+    public double HealthScore => HealthState switch
+    {
+        ItemHealthState.Healthy => 0.95,
+        ItemHealthState.Unchecked => 0.50,
+        ItemHealthState.Offline => 0.30,
+        ItemHealthState.Missing => 0.15,
+        ItemHealthState.PermissionDenied => 0.15,
+        _ => 0.50,
+    };
+
+    [JsonIgnore]
+    public string HealthDashArray
+    {
+        get
+        {
+            const double circumference = Math.PI * 12.0;
+            var arc = circumference * Math.Clamp(HealthScore, 0.0, 1.0);
+            return string.Create(CultureInfo.InvariantCulture, $"{arc:F2},{circumference:F2}");
+        }
+    }
+
+    [JsonIgnore]
+    public PointCollection TrajectoryPoints
+    {
+        get
+        {
+            var buckets = ComputeDailyBuckets(14);
+            var max = Math.Max(buckets.Max(), 1);
+            const double width = 60.0;
+            const double height = 16.0;
+            const double topPadding = 2.0;
+            const double drawHeight = height - 4.0;
+            var points = new PointCollection(buckets.Length);
+            var stepDenominator = Math.Max(buckets.Length - 1, 1);
+            for (var i = 0; i < buckets.Length; i++)
+            {
+                var x = i * (width / stepDenominator);
+                var y = topPadding + drawHeight - (buckets[i] / (double)max) * drawHeight;
+                points.Add(new System.Windows.Point(x, y));
+            }
+
+            return points;
+        }
+    }
+
+    [JsonIgnore]
+    public IReadOnlyList<TrajectoryBar> TrajectoryBars
+    {
+        get
+        {
+            var buckets = ComputeDailyBuckets(20);
+            var max = Math.Max(buckets.Max(), 1);
+            var bars = new List<TrajectoryBar>(buckets.Length);
+            for (var i = 0; i < buckets.Length; i++)
+            {
+                var ratio = buckets[i] / (double)max;
+                var bucketHeight = 4 + ratio * 44;
+                var recencyOpacity = 0.30 + 0.70 * (i / (double)Math.Max(buckets.Length - 1, 1));
+                bars.Add(new TrajectoryBar(bucketHeight, recencyOpacity));
+            }
+
+            return bars;
+        }
+    }
+
+    private void RecordHistoryEntry(DateTime value)
+    {
+        if (value == default)
+        {
+            return;
+        }
+
+        if (OpenedHistory.Count > 0 && Math.Abs((OpenedHistory[^1] - value).TotalSeconds) < 1)
+        {
+            return;
+        }
+
+        OpenedHistory.Add(value);
+        const int historyCap = 200;
+        if (OpenedHistory.Count > historyCap)
+        {
+            OpenedHistory.RemoveRange(0, OpenedHistory.Count - historyCap);
+        }
+    }
+
+    private void RaiseTrajectoryChanged()
+    {
+        OnPropertyChanged(nameof(TrajectoryPoints));
+        OnPropertyChanged(nameof(TrajectoryBars));
+        OnPropertyChanged(nameof(OpenedHistory));
+    }
+
+    private int[] ComputeDailyBuckets(int days)
+    {
+        var buckets = new int[days];
+        if (OpenedHistory.Count == 0)
+        {
+            return buckets;
+        }
+
+        var todayUtc = DateTime.UtcNow.Date;
+        var oldestBucketDate = todayUtc.AddDays(-(days - 1));
+        foreach (var entry in OpenedHistory)
+        {
+            var entryDate = entry.ToUniversalTime().Date;
+            if (entryDate < oldestBucketDate || entryDate > todayUtc)
+            {
+                continue;
+            }
+
+            var bucketIndex = (int)(entryDate - oldestBucketDate).TotalDays;
+            if (bucketIndex >= 0 && bucketIndex < buckets.Length)
+            {
+                buckets[bucketIndex]++;
+            }
+        }
+
+        return buckets;
     }
 
     public bool IsOffline
