@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Dark Teal - semantic overrides for Themes/Tokens.xaml -->
+    <Color x:Key="Token.AccentColor">#2DD4BF</Color>
+    <Color x:Key="Token.AccentHoverColor">#14B8A6</Color>
+    <Color x:Key="Token.AccentActiveColor">#0D9488</Color>
+    <Color x:Key="Token.AccentSubtleColor">#1A2DD4BF</Color>
+    <Color x:Key="Token.AccentMutedColor">#2E2DD4BF</Color>
+    <Color x:Key="Token.AccentForegroundColor">#0F2826</Color>
+    <Color x:Key="Token.BgCanvasColor">#061412</Color>
+    <Color x:Key="Token.BgSurfaceColor">#0D2020</Color>
+    <Color x:Key="Token.BgSubtleColor">#142E2C</Color>
+    <Color x:Key="Token.BgMutedColor">#1E4040</Color>
+    <Color x:Key="Token.BgInverseColor">#CCFBF1</Color>
+    <Color x:Key="Token.TextPrimaryColor">#E8FAFA</Color>
+    <Color x:Key="Token.TextSecondaryColor">#7ED8D0</Color>
+    <Color x:Key="Token.TextTertiaryColor">#3A8080</Color>
+    <Color x:Key="Token.TextDisabledColor">#2EFFFFFF</Color>
+    <Color x:Key="Token.TextInverseColor">#0F2826</Color>
+    <Color x:Key="Token.TextAccentColor">#5EEAD4</Color>
+    <Color x:Key="Token.BorderSubtleColor">#0FFFFFFF</Color>
+    <Color x:Key="Token.BorderDefaultColor">#19FFFFFF</Color>
+    <Color x:Key="Token.BorderStrongColor">#2EFFFFFF</Color>
+    <Color x:Key="Token.BorderAccentColor">#2DD4BF</Color>
+    <Color x:Key="Token.StatusSuccessColor">#6EE7B7</Color>
+    <Color x:Key="Token.StatusSuccessBackgroundColor">#1F059669</Color>
+    <Color x:Key="Token.StatusSuccessBorderColor">#38059669</Color>
+    <Color x:Key="Token.StatusWarningColor">#FCD34D</Color>
+    <Color x:Key="Token.StatusWarningBackgroundColor">#1FD97706</Color>
+    <Color x:Key="Token.StatusWarningBorderColor">#38D97706</Color>
+    <Color x:Key="Token.StatusDangerColor">#FDA4AF</Color>
+    <Color x:Key="Token.StatusDangerBackgroundColor">#1FE11D48</Color>
+    <Color x:Key="Token.StatusDangerBorderColor">#38E11D48</Color>
+    <Color x:Key="Token.StatusInfoColor">#93C5FD</Color>
+    <Color x:Key="Token.StatusInfoBackgroundColor">#1F0284C7</Color>
+    <Color x:Key="Token.StatusInfoBorderColor">#380284C7</Color>
+</ResourceDictionary>

@@ -32,10 +32,13 @@
     <!-- Dark-first CSS semantic status, accent, background, text, and border tokens -->
     <Color x:Key="Token.StatusSuccessColor">#10B981</Color>
     <Color x:Key="Token.StatusSuccessBackgroundColor">#1F10B981</Color>
+    <Color x:Key="Token.StatusSuccessBorderColor">#3810B981</Color>
     <Color x:Key="Token.StatusWarningColor">#F59E0B</Color>
     <Color x:Key="Token.StatusWarningBackgroundColor">#1FF59E0B</Color>
+    <Color x:Key="Token.StatusWarningBorderColor">#38F59E0B</Color>
     <Color x:Key="Token.StatusDangerColor">#EF4444</Color>
     <Color x:Key="Token.StatusDangerBackgroundColor">#1FEF4444</Color>
+    <Color x:Key="Token.StatusDangerBorderColor">#38EF4444</Color>
     <Color x:Key="Token.StatusInfoColor">#0EA5E9</Color>
     <Color x:Key="Token.StatusInfoBackgroundColor">#1F0EA5E9</Color>
     <Color x:Key="Token.StatusInfoBorderColor">#400EA5E9</Color>
@@ -43,6 +46,7 @@
 
     <Color x:Key="Token.AccentColor">#3B82F6</Color>
     <Color x:Key="Token.AccentHoverColor">#60A5FA</Color>
+    <Color x:Key="Token.AccentActiveColor">#2563EB</Color>
     <Color x:Key="Token.AccentSubtleColor">#1F3B82F6</Color>
     <Color x:Key="Token.AccentMutedColor">#383B82F6</Color>
     <Color x:Key="Token.AccentForegroundColor">#FFFFFF</Color>
@@ -106,6 +110,7 @@
     <!-- Brushes for every semantic color token -->
     <SolidColorBrush x:Key="Token.AccentBrush" Color="{DynamicResource Token.AccentColor}" />
     <SolidColorBrush x:Key="Token.AccentHoverBrush" Color="{DynamicResource Token.AccentHoverColor}" />
+    <SolidColorBrush x:Key="Token.AccentActiveBrush" Color="{DynamicResource Token.AccentActiveColor}" />
     <SolidColorBrush x:Key="Token.AccentSubtleBrush" Color="{DynamicResource Token.AccentSubtleColor}" />
     <SolidColorBrush x:Key="Token.AccentMutedBrush" Color="{DynamicResource Token.AccentMutedColor}" />
     <SolidColorBrush x:Key="Token.AccentForegroundBrush" Color="{DynamicResource Token.AccentForegroundColor}" />
@@ -129,10 +134,13 @@
     <SolidColorBrush x:Key="Token.BorderAccentBrush" Color="{DynamicResource Token.BorderAccentColor}" />
     <SolidColorBrush x:Key="Token.StatusSuccessBrush" Color="{DynamicResource Token.StatusSuccessColor}" />
     <SolidColorBrush x:Key="Token.StatusSuccessBackgroundBrush" Color="{DynamicResource Token.StatusSuccessBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.StatusSuccessBorderBrush" Color="{DynamicResource Token.StatusSuccessBorderColor}" />
     <SolidColorBrush x:Key="Token.StatusWarningBrush" Color="{DynamicResource Token.StatusWarningColor}" />
     <SolidColorBrush x:Key="Token.StatusWarningBackgroundBrush" Color="{DynamicResource Token.StatusWarningBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.StatusWarningBorderBrush" Color="{DynamicResource Token.StatusWarningBorderColor}" />
     <SolidColorBrush x:Key="Token.StatusDangerBrush" Color="{DynamicResource Token.StatusDangerColor}" />
     <SolidColorBrush x:Key="Token.StatusDangerBackgroundBrush" Color="{DynamicResource Token.StatusDangerBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.StatusDangerBorderBrush" Color="{DynamicResource Token.StatusDangerBorderColor}" />
     <SolidColorBrush x:Key="Token.StatusInfoBrush" Color="{DynamicResource Token.StatusInfoColor}" />
     <SolidColorBrush x:Key="Token.StatusInfoBackgroundBrush" Color="{DynamicResource Token.StatusInfoBackgroundColor}" />
     <SolidColorBrush x:Key="Token.StatusInfoBorderBrush" Color="{DynamicResource Token.StatusInfoBorderColor}" />

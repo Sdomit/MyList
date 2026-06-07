@@ -111,7 +111,7 @@ public partial class App : Application
             appData.AppSettings.Theme = _systemThemeService.GetCurrentTheme();
         }
 
-        _themeService.ApplyTheme(appData.AppSettings.Theme);
+        _themeService.ApplyTheme(appData.AppSettings.Theme, appData.AppSettings.Accent);
         var explorerIntegrationService = new ExplorerIntegrationService();
         var explorerIntegrationStatus = explorerIntegrationService.GetStatus();
         RuntimeStatus.ExplorerMenuInstalled = explorerIntegrationStatus.IsInstalled;

@@ -16,6 +16,7 @@ public sealed class ThemeService
     private const int DwmBackdropMica = 2;
 
     private static ThemeMode _currentMode = ThemeMode.Light;
+    private static AccentPalette _currentAccent = AccentPalette.Blue;
     private static bool _windowThemeHandlerRegistered;
 
     public ThemeService()
@@ -23,7 +24,7 @@ public sealed class ThemeService
         EnsureWindowThemeHandlerRegistered();
     }
 
-    public void ApplyTheme(ThemeMode mode)
+    public void ApplyTheme(ThemeMode mode, AccentPalette accent)
     {
         var app = Application.Current;
         if (app is null)
@@ -32,10 +33,9 @@ public sealed class ThemeService
         }
 
         _currentMode = mode;
+        _currentAccent = accent;
 
-        var source = mode == ThemeMode.Dark
-            ? "Resources/Colors.Dark.xaml"
-            : "Resources/Colors.Light.xaml";
+        var source = $"Resources/Colors.{mode}.{accent}.xaml";
 
         var dictionaries = app.Resources.MergedDictionaries;
         var existingThemeDictionaries = dictionaries

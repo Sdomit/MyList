@@ -4622,6 +4622,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         target.FollowSystemTheme = source.FollowSystemTheme;
         target.Theme = source.Theme;
+        target.Accent = source.Accent;
         target.ViewMode = source.ViewMode;
         target.LayoutMode = source.LayoutMode;
         target.CollectionsLayout = source.CollectionsLayout;

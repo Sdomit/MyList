@@ -324,6 +324,65 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Accent" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Pick one of eight Forma accent palettes." />
+                                </StackPanel>
+                                <ListBox Grid.Column="1"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         ItemsSource="{Binding AccentPalettes}"
+                                         SelectedItem="{Binding Accent, Mode=TwoWay}"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Margin" Value="3,0" />
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Cursor" Value="Hand" />
+                                            <Setter Property="ToolTip" Value="{Binding}" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                        <Border x:Name="Ring"
+                                                                Width="28" Height="28"
+                                                                CornerRadius="14"
+                                                                BorderThickness="2"
+                                                                BorderBrush="Transparent"
+                                                                Padding="2">
+                                                            <Ellipse Fill="{Binding Converter={StaticResource AccentPaletteToBrushConverter}}" />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsSelected" Value="True">
+                                                                <Setter TargetName="Ring" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Ring" Property="BorderBrush" Value="{DynamicResource Token.BorderStrongBrush}" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="220" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
