@@ -19,7 +19,7 @@
         <Setter Property="Padding" Value="{DynamicResource Token.ThicknessControlPadding}" />
         <Setter Property="Background" Value="{DynamicResource Token.BgSubtleBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FontFamily" Value="{DynamicResource Token.FontUi}" />
         <Setter Property="FontSize" Value="12.5" />
@@ -100,8 +100,8 @@
     </Style>
 
     <Style x:Key="Simple.DangerButton" TargetType="Button" BasedOn="{StaticResource Simple.Button}">
-        <Setter Property="Background" Value="{DynamicResource Token.StatusBadBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.StatusBadBrush}" />
+        <Setter Property="Background" Value="{DynamicResource Token.StatusDangerBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.StatusDangerBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource Token.WhiteBrush}" />
     </Style>
 
@@ -212,7 +212,7 @@
                             <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSoftBrush}" />
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
                             <Setter TargetName="SelectedBar" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -226,10 +226,10 @@
         <Setter Property="Padding" Value="10,0" />
         <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderDefaultBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CaretBrush" Value="{DynamicResource Token.AccentBrush}" />
-        <Setter Property="SelectionBrush" Value="{DynamicResource Token.AccentMuteBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Token.AccentMutedBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource Token.FontUi}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -262,14 +262,14 @@
 
     <Style x:Key="Simple.Pane" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="CornerRadius" Value="{DynamicResource Token.RadiusXl}" />
     </Style>
 
     <Style x:Key="Simple.Card" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="{DynamicResource Token.RadiusLg}" />
         <Setter Property="Padding" Value="{DynamicResource Token.ThicknessCardPadding}" />

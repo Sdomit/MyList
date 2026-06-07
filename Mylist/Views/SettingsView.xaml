@@ -74,7 +74,7 @@
 
         <Style x:Key="SettingsRow" TargetType="Border">
             <Setter Property="Padding" Value="0,14" />
-            <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
         </Style>
 
@@ -134,7 +134,7 @@
     </UserControl.Resources>
 
     <Border Background="{DynamicResource Token.BgSurfaceBrush}"
-            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1,0,0,0"
             CornerRadius="10,10,0,0">
         <TabControl Background="{DynamicResource Token.BgSurfaceBrush}"
@@ -149,7 +149,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,1,0">
                             <Grid Margin="8,18,8,18">
                                 <Grid.RowDefinitions>
@@ -164,8 +164,8 @@
                                 <Border Grid.Row="2"
                                         Margin="6,14,6,0"
                                         Padding="10"
-                                        Background="{DynamicResource Token.AccentSoftBrush}"
-                                        BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                        Background="{DynamicResource Token.AccentSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                         BorderThickness="1"
                                         CornerRadius="{DynamicResource Token.RadiusMd}">
                                     <StackPanel>
@@ -440,8 +440,8 @@
 
                         <Border Margin="0,18,0,0"
                                 Padding="12"
-                                Background="{DynamicResource Token.AccentSoftBrush}"
-                                BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                Background="{DynamicResource Token.AccentSubtleBrush}"
+                                BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusMd}">
                             <TextBlock Foreground="{DynamicResource Token.TextSecondaryBrush}"

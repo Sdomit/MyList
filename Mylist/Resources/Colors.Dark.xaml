@@ -3,8 +3,8 @@
     <!-- Dark semantic overrides for Themes/Tokens.xaml -->
     <Color x:Key="Token.AccentColor">#3B82F6</Color>
     <Color x:Key="Token.AccentHoverColor">#60A5FA</Color>
-    <Color x:Key="Token.AccentSoftColor">#1F3B82F6</Color>
-    <Color x:Key="Token.AccentMuteColor">#383B82F6</Color>
+    <Color x:Key="Token.AccentSubtleColor">#1F3B82F6</Color>
+    <Color x:Key="Token.AccentMutedColor">#383B82F6</Color>
     <Color x:Key="Token.AccentForegroundColor">#FFFFFF</Color>
     <Color x:Key="Token.BgMicaColor">#1A1D23</Color>
     <Color x:Key="Token.BgCanvasColor">#14171C</Color>
@@ -20,11 +20,11 @@
     <Color x:Key="Token.TextDisabledColor">#444B55</Color>
     <Color x:Key="Token.TextInverseColor">#0F1217</Color>
     <Color x:Key="Token.TextAccentColor">#3B82F6</Color>
-    <Color x:Key="Token.BorderHairColor">#0FFFFFFF</Color>
-    <Color x:Key="Token.BorderSoftColor">#1AFFFFFF</Color>
+    <Color x:Key="Token.BorderSubtleColor">#0FFFFFFF</Color>
+    <Color x:Key="Token.BorderDefaultColor">#1AFFFFFF</Color>
     <Color x:Key="Token.BorderStrongColor">#2EFFFFFF</Color>
     <Color x:Key="Token.BorderAccentColor">#3B82F6</Color>
-    <Color x:Key="Token.StatusOkBackgroundColor">#1F10B981</Color>
-    <Color x:Key="Token.StatusWarnBackgroundColor">#1FF59E0B</Color>
-    <Color x:Key="Token.StatusBadBackgroundColor">#1FEF4444</Color>
+    <Color x:Key="Token.StatusSuccessBackgroundColor">#1F10B981</Color>
+    <Color x:Key="Token.StatusWarningBackgroundColor">#1FF59E0B</Color>
+    <Color x:Key="Token.StatusDangerBackgroundColor">#1FEF4444</Color>
 </ResourceDictionary>

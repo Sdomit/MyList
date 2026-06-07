@@ -39,7 +39,7 @@
                                 <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSoftBrush}" />
+                                <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -49,7 +49,7 @@
     </Window.Resources>
 
     <Border Background="{DynamicResource Token.BgSurfaceBrush}"
-            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1"
             CornerRadius="{DynamicResource Token.Radius2Xl}"
             Effect="{DynamicResource Token.ShadowXl}"
@@ -93,8 +93,8 @@
                                 <Border Padding="6,2"
                                         Margin="0,0,4,0"
                                         BorderThickness="1"
-                                        BorderBrush="{DynamicResource Token.BorderSoftBrush}"
-                                        Background="{DynamicResource Token.AccentSoftBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
+                                        Background="{DynamicResource Token.AccentSubtleBrush}"
                                         CornerRadius="{DynamicResource Token.RadiusSm}">
                                     <TextBlock Text="{Binding}"
                                                FontFamily="{DynamicResource Token.FontMono}"
@@ -133,7 +133,7 @@
                 </DockPanel>
                 <Border Grid.Column="2"
                         Padding="6,2"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="1"
                         CornerRadius="{DynamicResource Token.RadiusXs}"
                         VerticalAlignment="Center">
@@ -143,7 +143,7 @@
 
             <Border Grid.Row="1"
                     Height="1"
-                    Background="{DynamicResource Token.BorderHairBrush}" />
+                    Background="{DynamicResource Token.BorderSubtleBrush}" />
 
             <Grid Grid.Row="2">
                 <TextBlock Margin="18,12,18,4"
@@ -187,7 +187,7 @@
                                 <Border Grid.Column="2"
                                         Padding="5,1"
                                         Background="{DynamicResource Token.BgSubtleBrush}"
-                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                         BorderThickness="1"
                                         CornerRadius="{DynamicResource Token.RadiusXs}"
                                         VerticalAlignment="Center">
@@ -202,7 +202,7 @@
             <Border Grid.Row="3"
                     Padding="18,10"
                     Background="{DynamicResource Token.BgMicaBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="0,1,0,0">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Style="{StaticResource Simple.MonoText}" Text="Up / Down" />

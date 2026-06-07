@@ -52,7 +52,7 @@
                 <Border Grid.Column="2"
                         Padding="6,2"
                         Background="{DynamicResource Token.BgSubtleBrush}"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="1"
                         CornerRadius="{DynamicResource Token.RadiusXs}"
                         VerticalAlignment="Center">
@@ -73,7 +73,7 @@
             </Grid.RowDefinitions>
 
             <Border Padding="20,16"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -118,7 +118,7 @@
                         </Grid.RowDefinitions>
                         <Border Padding="10,9"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,0,1">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="DUPLICATE GROUPS" />
@@ -145,7 +145,7 @@
                         </Grid.RowDefinitions>
                         <Border Padding="12,10"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,0,1">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="SELECTED GROUP" />
@@ -159,7 +159,7 @@
                         </Border>
                         <Border Grid.Row="1"
                                 Padding="12,9"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,0,1">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -191,7 +191,7 @@
             <Border Grid.Row="2"
                     Padding="16,10"
                     Background="{DynamicResource Token.BgMicaBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="0,1,0,0">
                 <TextBlock Style="{StaticResource Simple.MetaText}"
                            Text="Merging preserves the selected survivor and rewires collection and Mtab references." />

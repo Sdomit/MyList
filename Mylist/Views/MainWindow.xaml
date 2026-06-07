@@ -145,7 +145,7 @@
                                     <Ellipse.Style>
                                         <Style TargetType="Ellipse">
                                             <!-- Healthy: #10B981 at 55% -->
-                                            <Setter Property="Fill" Value="{DynamicResource Token.StatusOkBrush}" />
+                                            <Setter Property="Fill" Value="{DynamicResource Token.StatusSuccessBrush}" />
                                             <Setter Property="Opacity" Value="0.55" />
                                             <Style.Triggers>
                                                 <!-- Unchecked: #60A5FA at 40% -->
@@ -155,17 +155,17 @@
                                                 </DataTrigger>
                                                 <!-- Offline: #F59E0B at 70% -->
                                                 <DataTrigger Binding="{Binding HealthState}" Value="Offline">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusWarnBrush}" />
+                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusWarningBrush}" />
                                                     <Setter Property="Opacity" Value="0.70" />
                                                 </DataTrigger>
                                                 <!-- Missing: #EF4444 at 75% -->
                                                 <DataTrigger Binding="{Binding HealthState}" Value="Missing">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusDangerBrush}" />
                                                     <Setter Property="Opacity" Value="0.75" />
                                                 </DataTrigger>
                                                 <!-- PermissionDenied: #EF4444 at 75% -->
                                                 <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusDangerBrush}" />
                                                     <Setter Property="Opacity" Value="0.75" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -184,7 +184,7 @@
                                 Padding="5,1"
                                 BorderThickness="1"
                                 VerticalAlignment="Center"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 Background="{DynamicResource Token.BgSurfaceBrush}"
                                 CornerRadius="{DynamicResource Token.RadiusSm}">
                             <Border.Style>
@@ -280,7 +280,7 @@
                         Visibility="Collapsed"
                         Padding="0,8">
                     <Border Height="1"
-                            Background="{DynamicResource Token.BorderHairBrush}" />
+                            Background="{DynamicResource Token.BorderSubtleBrush}" />
                 </Border>
             </Grid>
             <DataTemplate.Triggers>
@@ -349,7 +349,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
                     CornerRadius="{DynamicResource Token.RadiusMd}">
                 <Grid Margin="10,0,7,0">
@@ -395,7 +395,7 @@
                     <Border Grid.Column="2"
                             Padding="5,1"
                             Background="{DynamicResource Token.BgSubtleBrush}"
-                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                             BorderThickness="1"
                             CornerRadius="{DynamicResource Token.RadiusXs}"
                             VerticalAlignment="Center">
@@ -547,7 +547,7 @@
                 <Border Grid.Row="1"
                         Margin="6,8,4,0"
                         Padding="6,8,0,2"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="0,1,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -599,7 +599,7 @@
                     </Grid.RowDefinitions>
 
                     <Border Padding="24,18,24,12"
-                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                             BorderThickness="0,0,0,1">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -641,7 +641,7 @@
                                 Height="34"
                                 HorizontalContentAlignment="Stretch"
                                 Style="{StaticResource Simple.GhostButton}"
-                                BorderBrush="{DynamicResource Token.BorderSoftBrush}"
+                                BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
                                 BorderThickness="1"
                                 Visibility="{Binding IsAddFormOpen, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                 Click="OnInlineAddOpenClick">
@@ -657,7 +657,7 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSoftBrush}" />
+                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
                                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
@@ -700,7 +700,7 @@
                         <Border Margin="16,10,16,6"
                                 Padding="8"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusMd}"
                                 Visibility="{Binding IsAddFormOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -749,7 +749,7 @@
                                 Margin="16,0,16,6"
                                 Padding="10"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Visibility="{Binding IsQuickEditOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -773,7 +773,7 @@
                         <Border Grid.Row="2"
                                 Margin="16,0,16,6"
                                 Padding="8"
-                                Background="{DynamicResource Token.AccentSoftBrush}"
+                                Background="{DynamicResource Token.AccentSubtleBrush}"
                                 CornerRadius="{DynamicResource Token.RadiusMd}"
                                 Visibility="{Binding IsBulkToolbarVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <ScrollViewer HorizontalScrollBarVisibility="Auto"
@@ -856,7 +856,7 @@
                         </Grid.RowDefinitions>
 
                         <Border Padding="18,16,18,12"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,0,1">
                             <StackPanel>
                                 <Grid>
@@ -950,7 +950,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <Border Width="20"
                                                             Height="20"
-                                                            Background="{DynamicResource Token.AccentSoftBrush}"
+                                                            Background="{DynamicResource Token.AccentSubtleBrush}"
                                                             CornerRadius="{DynamicResource Token.RadiusSm}">
                                                         <TextBlock Text="{Binding Number}"
                                                                    Foreground="{DynamicResource Token.TextAccentBrush}"
@@ -963,7 +963,7 @@
                                                             Margin="6,0,0,0"
                                                             Padding="6,3"
                                                             Background="{DynamicResource Token.BgSubtleBrush}"
-                                                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                                             BorderThickness="1"
                                                             CornerRadius="{DynamicResource Token.RadiusMd}">
                                                         <TextBox Padding="2"
@@ -1011,7 +1011,7 @@
                                                Text="PREVIEW" />
                                     <Border Height="210"
                                             Background="{DynamicResource Token.BgSubtleBrush}"
-                                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                             BorderThickness="1"
                                             CornerRadius="{DynamicResource Token.RadiusMd}">
                                         <Canvas Width="260"
@@ -1112,7 +1112,7 @@
                                                             <Border Margin="0,4,0,0"
                                                                     Padding="4,2"
                                                                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                                                                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                                                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                                                     BorderThickness="1"
                                                                     CornerRadius="{DynamicResource Token.RadiusSm}">
                                                                 <TextBlock Style="{StaticResource Simple.MonoText}"
@@ -1189,16 +1189,16 @@
                                                      VerticalAlignment="Center">
                                                 <Ellipse.Style>
                                                     <Style TargetType="Ellipse">
-                                                        <Setter Property="Fill" Value="{DynamicResource Token.StatusOkBrush}" />
+                                                        <Setter Property="Fill" Value="{DynamicResource Token.StatusSuccessBrush}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding SelectedItem.HealthState}" Value="Offline">
-                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusWarnBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusWarningBrush}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding SelectedItem.HealthState}" Value="Missing">
-                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusDangerBrush}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding SelectedItem.HealthState}" Value="PermissionDenied">
-                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusDangerBrush}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -1224,8 +1224,8 @@
                                             <DataTemplate>
                                                 <Border Margin="0,0,5,5"
                                                         Padding="6,2"
-                                                        Background="{DynamicResource Token.AccentSoftBrush}"
-                                                        BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                                        Background="{DynamicResource Token.AccentSubtleBrush}"
+                                                        BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                                         BorderThickness="1"
                                                         CornerRadius="{DynamicResource Token.RadiusXs}">
                                                     <TextBlock Style="{StaticResource Simple.MonoText}"
@@ -1255,7 +1255,7 @@
         <!-- Status bar -->
         <Border Grid.Row="2"
                 Background="{DynamicResource Token.BgMicaBrush}"
-                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                 BorderThickness="0,1,0,0">
             <Grid Margin="14,0">
                 <Grid.ColumnDefinitions>
@@ -1265,11 +1265,11 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusOkBrush}" Margin="0,0,6,0" />
+                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusSuccessBrush}" Margin="0,0,6,0" />
                     <TextBlock Style="{StaticResource Simple.MonoText}" Text="{Binding VisibleItemCount, StringFormat=Visible: {0}}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
-                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusWarnBrush}" Margin="0,0,6,0" />
+                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusWarningBrush}" Margin="0,0,6,0" />
                     <TextBlock Style="{StaticResource Simple.MonoText}" Text="{Binding OfflineItemCount, StringFormat=Issues: {0}}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
@@ -1323,7 +1323,7 @@
                     Margin="0,12,12,12"
                     HorizontalAlignment="Right"
                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
                     CornerRadius="{DynamicResource Token.Radius2Xl}"
                     Effect="{DynamicResource Token.ShadowLg}">
@@ -1340,7 +1340,7 @@
                 VerticalAlignment="Bottom"
                 Margin="0,0,0,54"
                 Background="{DynamicResource Token.BgSurfaceBrush}"
-                BorderBrush="{DynamicResource Token.BorderSoftBrush}"
+                BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
                 BorderThickness="1"
                 CornerRadius="{DynamicResource Token.Radius2Xl}"
                 Padding="14,8">

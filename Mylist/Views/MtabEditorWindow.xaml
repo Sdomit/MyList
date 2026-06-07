@@ -21,7 +21,7 @@
                 </Grid.ColumnDefinitions>
                 <Border Width="20"
                         Height="20"
-                        Background="{DynamicResource Token.AccentSoftBrush}"
+                        Background="{DynamicResource Token.AccentSubtleBrush}"
                         CornerRadius="{DynamicResource Token.RadiusSm}"
                         VerticalAlignment="Top"
                         Margin="0,6,0,0">
@@ -49,7 +49,7 @@
             <Border Margin="0,0,0,6"
                     Padding="9,7"
                     Background="{DynamicResource Token.BgSubtleBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
                     CornerRadius="{DynamicResource Token.RadiusMd}">
                 <Grid>
@@ -70,7 +70,7 @@
                     <Border Grid.Column="1"
                             Margin="8,0,0,0"
                             Padding="6,2"
-                            Background="{DynamicResource Token.AccentSoftBrush}"
+                            Background="{DynamicResource Token.AccentSubtleBrush}"
                             CornerRadius="{DynamicResource Token.RadiusXs}"
                             VerticalAlignment="Center">
                         <TextBlock FontFamily="{DynamicResource Token.FontMono}"
@@ -85,7 +85,7 @@
 
     <Grid Margin="12">
         <Border Background="{DynamicResource Token.BgSurfaceBrush}"
-                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                 BorderThickness="1"
                 CornerRadius="{DynamicResource Token.Radius2Xl}"
                 Effect="{DynamicResource Token.ShadowLg}">
@@ -97,7 +97,7 @@
                 </Grid.RowDefinitions>
 
                 <Border Padding="22,18,20,14"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="0,0,0,1">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -112,8 +112,8 @@
                         </StackPanel>
                         <Border Grid.Column="1"
                                 Padding="7,3"
-                                Background="{DynamicResource Token.AccentSoftBrush}"
-                                BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                Background="{DynamicResource Token.AccentSubtleBrush}"
+                                BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusXs}"
                                 VerticalAlignment="Top">
@@ -154,7 +154,7 @@
                                 </Grid.RowDefinitions>
                                 <Border Padding="12,10"
                                         Background="{DynamicResource Token.BgSubtleBrush}"
-                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                         BorderThickness="0,0,0,1">
                                     <Grid>
                                         <StackPanel>
@@ -166,7 +166,7 @@
                                         <Border HorizontalAlignment="Right"
                                                 Padding="6,2"
                                                 Background="{DynamicResource Token.BgSurfaceBrush}"
-                                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                                 BorderThickness="1"
                                                 CornerRadius="{DynamicResource Token.RadiusXs}"
                                                 VerticalAlignment="Center">
@@ -200,7 +200,7 @@
 
                         <Border Grid.Row="1"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusMd}"
                                 ClipToBounds="True">
@@ -260,7 +260,7 @@
                                          Canvas.Top="85"
                                          Width="24"
                                          Height="24"
-                                         Stroke="{DynamicResource Token.AccentMuteBrush}"
+                                         Stroke="{DynamicResource Token.AccentMutedBrush}"
                                          StrokeThickness="5" />
 
                                 <Border Canvas.Left="127"
@@ -311,7 +311,7 @@
                                         Padding="6,2"
                                         MaxWidth="160"
                                         Background="{DynamicResource Token.BgSurfaceBrush}"
-                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                         BorderThickness="1"
                                         CornerRadius="{DynamicResource Token.RadiusXs}">
                                     <TextBlock Style="{StaticResource Simple.MonoText}"
@@ -331,7 +331,7 @@
                                 </Grid.RowDefinitions>
                                 <Border Padding="12,10"
                                         Background="{DynamicResource Token.BgSubtleBrush}"
-                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                         BorderThickness="0,0,0,1">
                                     <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="VALIDATION" />
                                 </Border>
@@ -356,7 +356,7 @@
                 <Border Grid.Row="2"
                         Padding="20,12"
                         Background="{DynamicResource Token.BgMicaBrush}"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="0,1,0,0">
                     <Grid>
                         <TextBlock Style="{StaticResource Simple.MetaText}"

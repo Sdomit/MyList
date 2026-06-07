@@ -24,7 +24,7 @@
                 <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                     <Ellipse Width="6"
                              Height="6"
-                             Fill="{DynamicResource Token.StatusWarnBrush}"
+                             Fill="{DynamicResource Token.StatusWarningBrush}"
                              Margin="0,0,6,0"
                              VerticalAlignment="Center" />
                     <TextBlock Style="{StaticResource Simple.MonoText}"
@@ -67,7 +67,7 @@
                 <Border Grid.Column="2"
                         Padding="6,2"
                         Background="{DynamicResource Token.BgSubtleBrush}"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="1"
                         CornerRadius="{DynamicResource Token.RadiusXs}"
                         VerticalAlignment="Center">
@@ -79,7 +79,7 @@
 
     <Grid Margin="12">
         <Border Background="{DynamicResource Token.BgSurfaceBrush}"
-                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                 BorderThickness="1"
                 CornerRadius="{DynamicResource Token.Radius2Xl}"
                 Effect="{DynamicResource Token.ShadowLg}">
@@ -91,7 +91,7 @@
                 </Grid.RowDefinitions>
 
                 <Border Padding="24,18,20,14"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="0,0,0,1">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -144,7 +144,7 @@
                             </Grid.RowDefinitions>
                             <Border Padding="12,10"
                                     Background="{DynamicResource Token.BgSubtleBrush}"
-                                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                     BorderThickness="0,0,0,1">
                                 <StackPanel>
                                     <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="DUPLICATE GROUPS" />
@@ -175,7 +175,7 @@
 
                             <Border Padding="14,12"
                                     Background="{DynamicResource Token.BgSubtleBrush}"
-                                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                     BorderThickness="0,0,0,1">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -194,10 +194,10 @@
                                     </StackPanel>
                                     <Border Grid.Column="1"
                                             Padding="7,3"
-                                            Background="{DynamicResource Token.StatusWarnBackgroundBrush}"
+                                            Background="{DynamicResource Token.StatusWarningBackgroundBrush}"
                                             CornerRadius="{DynamicResource Token.RadiusXs}"
                                             VerticalAlignment="Center">
-                                        <TextBlock Foreground="{DynamicResource Token.StatusWarnBrush}"
+                                        <TextBlock Foreground="{DynamicResource Token.StatusWarningBrush}"
                                                    FontFamily="{DynamicResource Token.FontMono}"
                                                    FontSize="10.5"
                                                    Text="{Binding SelectedGroup.Items.Count, StringFormat={}{0} COPIES}" />
@@ -207,7 +207,7 @@
 
                             <Border Grid.Row="1"
                                     Padding="14,10"
-                                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                     BorderThickness="0,0,0,1">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -240,7 +240,7 @@
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                         <Setter Property="Padding" Value="0" />
                                         <Setter Property="Margin" Value="0" />
-                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
                                         <Setter Property="BorderThickness" Value="0,0,0,1" />
                                         <Setter Property="Template">
                                             <Setter.Value>
@@ -262,7 +262,7 @@
                 <Border Grid.Row="2"
                         Padding="20,12"
                         Background="{DynamicResource Token.BgMicaBrush}"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="0,1,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
