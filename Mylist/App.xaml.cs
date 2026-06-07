@@ -36,6 +36,8 @@ public partial class App : Application
     private ClipboardAssetService? _clipboardAssetService;
     private MainWindow? _mainWindow;
     private AppCommandPayload? _startupCommandPayload;
+    private MiniLauncherWindow? _miniLauncherWindow;
+    private LauncherService? _launcherService;
 
     private MainViewModel? _mainViewModel;
 
@@ -73,6 +75,7 @@ public partial class App : Application
         _systemThemeService = new SystemThemeService();
         var iconService = new IconService(_clipboardAssetService);
         var launcherService = new LauncherService();
+        _launcherService = launcherService;
         var managedActionRunnerService = new ManagedActionRunnerService();
         var explorerTabAutomationService = new ExplorerTabAutomationService();
 
@@ -166,7 +169,17 @@ public partial class App : Application
             };
         }
 
-        _mainWindow.SourceInitialized += (_, _) => _hotkeyService.Initialize(_mainWindow, _mainViewModel);
+        _mainWindow.SourceInitialized += (_, _) =>
+        {
+            _hotkeyService.Initialize(_mainWindow, _mainViewModel);
+            _hotkeyService.RegisterSecondaryHotkey(
+                new HotkeySettings
+                {
+                    Modifiers = HotkeyModifiers.Control | HotkeyModifiers.Alt,
+                    Key = System.Windows.Input.Key.Space
+                },
+                () => Dispatcher.Invoke(ShowMiniLauncher));
+        };
         _mainWindow.Show();
         _mainWindow.RestoreAndActivate();
 
@@ -185,6 +198,26 @@ public partial class App : Application
         _trayService?.Dispose();
         _hotkeyService?.Dispose();
         _systemThemeService?.Dispose();
+        _miniLauncherWindow?.Close();
+    }
+
+    private void ShowMiniLauncher()
+    {
+        if (_mainViewModel is null || _launcherService is null)
+        {
+            return;
+        }
+
+        if (_miniLauncherWindow is null)
+        {
+            var viewModel = new MiniLauncherViewModel(
+                () => _mainViewModel.AllItems,
+                _launcherService,
+                () => _miniLauncherWindow?.Hide());
+            _miniLauncherWindow = new MiniLauncherWindow(viewModel);
+        }
+
+        _miniLauncherWindow.Summon();
     }
 
     private async Task HandleIncomingAppCommandAsync(AppCommandPayload payload)
