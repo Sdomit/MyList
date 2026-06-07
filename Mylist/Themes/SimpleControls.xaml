@@ -22,7 +22,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FontFamily" Value="{DynamicResource Token.FontUi}" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="{DynamicResource Token.TextSm}" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource Simple.FocusVisual}" />
@@ -60,6 +60,7 @@
         <Setter Property="Background" Value="{DynamicResource Token.AccentBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource Token.AccentForegroundBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Token.TextBase}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -109,7 +110,7 @@
         <Setter Property="Height" Value="{DynamicResource Token.Size.NavItem}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Padding" Value="10,0" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="{DynamicResource Token.TextSm}" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="Template">
             <Setter.Value>

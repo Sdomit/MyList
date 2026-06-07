@@ -34,7 +34,7 @@
                 </Border>
                 <StackPanel Grid.Column="1" Margin="6,0,0,0">
                     <TextBox FontFamily="{DynamicResource Token.FontMono}"
-                             FontSize="11.5"
+                             FontSize="{DynamicResource Token.TextXs}"
                              Text="{Binding PathText, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Margin="2,3,0,0"
                                FontSize="10.5"
@@ -59,7 +59,7 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel>
                         <TextBlock Text="{Binding Label}"
-                                   FontSize="11.5"
+                                   FontSize="{DynamicResource Token.TextXs}"
                                    FontWeight="Medium" />
                         <TextBlock Margin="0,3,0,0"
                                    Style="{StaticResource Simple.MonoText}"

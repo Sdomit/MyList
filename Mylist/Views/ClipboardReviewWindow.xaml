@@ -32,7 +32,7 @@
                          VerticalAlignment="Center" />
                 <StackPanel Grid.Column="1" Margin="10,0,0,0">
                     <TextBlock FontFamily="{DynamicResource Token.FontMono}"
-                               FontSize="11.5"
+                               FontSize="{DynamicResource Token.TextXs}"
                                Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                Text="{Binding DisplayPath}"
                                TextTrimming="CharacterEllipsis"
@@ -58,7 +58,7 @@
                          VerticalAlignment="Center" />
                 <StackPanel Grid.Column="1" Margin="10,0,0,0">
                     <TextBlock FontFamily="{DynamicResource Token.FontMono}"
-                               FontSize="11.5"
+                               FontSize="{DynamicResource Token.TextXs}"
                                Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                Text="{Binding DisplayPath}"
                                TextTrimming="CharacterEllipsis"

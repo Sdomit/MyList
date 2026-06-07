@@ -17,7 +17,7 @@
             <StackPanel>
                 <TextBlock Text="{Binding DisplayPath}"
                            FontFamily="{DynamicResource Token.FontMono}"
-                           FontSize="11.5"
+                           FontSize="{DynamicResource Token.TextXs}"
                            Foreground="{DynamicResource Token.TextPrimaryBrush}"
                            TextTrimming="CharacterEllipsis"
                            ToolTip="{Binding DisplayPath}" />
@@ -186,7 +186,7 @@
                                         <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="SELECTED GROUP" />
                                         <TextBlock Margin="0,5,16,0"
                                                    FontFamily="{DynamicResource Token.FontMono}"
-                                                   FontSize="11.5"
+                                                   FontSize="{DynamicResource Token.TextXs}"
                                                    Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                                    Text="{Binding SelectedGroup.DisplayPath}"
                                                    TextTrimming="CharacterEllipsis"
