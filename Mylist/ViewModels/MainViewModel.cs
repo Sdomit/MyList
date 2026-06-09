@@ -4049,43 +4049,7 @@ public sealed class MainViewModel : ViewModelBase
     }
 
     private static ContentKind ClassifyClipboardKind(string? rawInput, string? normalizedPath)
-    {
-        var input = (rawInput ?? string.Empty).Trim();
-        if (input.StartsWith("shell:", StringComparison.OrdinalIgnoreCase)
-            || input.StartsWith("cmd:", StringComparison.OrdinalIgnoreCase)
-            || input.StartsWith("run:", StringComparison.OrdinalIgnoreCase))
-        {
-            return ContentKind.Action;
-        }
-
-        if (Uri.TryCreate(input, UriKind.Absolute, out var uri)
-            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
-        {
-            return ContentKind.Mtab;
-        }
-
-        var candidate = string.IsNullOrWhiteSpace(normalizedPath) ? input : normalizedPath;
-        if (string.IsNullOrWhiteSpace(candidate))
-        {
-            return ContentKind.Clip;
-        }
-
-        try
-        {
-            if (Directory.Exists(candidate)) return ContentKind.Folder;
-        }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
-
-        try
-        {
-            if (File.Exists(candidate)) return ContentKind.File;
-        }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
-
-        return ContentKind.Clip;
-    }
+        => ClipboardKindClassifier.Classify(rawInput, normalizedPath, FileSystemProbe.Default);
 
     private AddPathOutcome AddOrLinkItem(string? path, CollectionViewModel? requestedCollection = null, bool suppressRefreshAndSave = false)
     {
