@@ -153,6 +153,7 @@ public sealed class MainViewModel : ViewModelBase
         AddSeparatorCommand = new RelayCommand(AddSeparator, CanAddSeparator);
 
         OpenItemCommand = new RelayCommand<ItemModel?>(OpenItem);
+        OpenIndexedItemCommand = new RelayCommand<object?>(OpenIndexedItem);
         OpenNewWindowCommand = new RelayCommand<ItemModel?>(OpenInNewWindow);
         OpenInTerminalCommand = new RelayCommand<ItemModel?>(OpenInTerminal);
         CopyPathCommand = new RelayCommand<ItemModel?>(CopyPath);
@@ -491,6 +492,7 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand CaptureExplorerWindowsAsMtabCommand { get; }
     public ICommand AddSeparatorCommand { get; }
     public ICommand OpenItemCommand { get; }
+    public ICommand OpenIndexedItemCommand { get; }
     public ICommand OpenNewWindowCommand { get; }
     public ICommand OpenInTerminalCommand { get; }
     public ICommand CopyPathCommand { get; }
@@ -1036,6 +1038,36 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         Settings.PendingSectionAnchor = "Appearance";
+    }
+
+    private void OpenIndexedItem(object? parameter)
+    {
+        if (parameter is null)
+        {
+            return;
+        }
+
+        if (!int.TryParse(parameter.ToString(), out var oneBasedIndex) || oneBasedIndex < 1 || oneBasedIndex > 9)
+        {
+            return;
+        }
+
+        var collection = SelectedCollection;
+        if (collection is null)
+        {
+            return;
+        }
+
+        var item = collection.FilteredEntries
+            .Cast<CollectionEntryViewModel>()
+            .Where(entry => !entry.IsSeparator && entry.Item is not null)
+            .Skip(oneBasedIndex - 1)
+            .FirstOrDefault()?.Item;
+
+        if (item is not null)
+        {
+            OpenItemCommand.Execute(item);
+        }
     }
 
     public void ToggleDiagnostics()
