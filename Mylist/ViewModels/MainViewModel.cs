@@ -97,6 +97,9 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         SelectedItems = new ObservableCollection<ItemModel>();
+        PinnedItems = new ObservableCollection<ItemModel>();
+        RecentItems = new ObservableCollection<ItemModel>();
+        TrendingItems = new ObservableCollection<ItemModel>();
         ClipboardTargetCollections = new ObservableCollection<CollectionViewModel>();
         ClipboardWillAddEntries = new ObservableCollection<ClipboardReviewEntry>();
         ClipboardWillLinkEntries = new ObservableCollection<ClipboardReviewEntry>();
@@ -159,6 +162,7 @@ public sealed class MainViewModel : ViewModelBase
         EditItemCommand = new RelayCommand<ItemModel?>(EditItem);
         EditMtabCommand = new RelayCommand<ItemModel?>(EditMtab, item => item?.IsMtab == true);
         RetryHealthCheckCommand = new AsyncRelayCommand<ItemModel?>(RetryHealthCheckAsync);
+        TogglePinCommand = new RelayCommand<ItemModel?>(TogglePin);
 
         OpenAllCommand = new RelayCommand<CollectionViewModel?>(OpenAllItems);
         ToggleViewModeCommand = new RelayCommand(ToggleViewMode);
@@ -235,6 +239,12 @@ public sealed class MainViewModel : ViewModelBase
     public ObservableCollection<CollectionViewModel> Collections { get; }
 
     public ObservableCollection<ItemModel> SelectedItems { get; }
+
+    public ObservableCollection<ItemModel> PinnedItems { get; }
+
+    public ObservableCollection<ItemModel> RecentItems { get; }
+
+    public ObservableCollection<ItemModel> TrendingItems { get; }
 
     public DiagnosticsViewModel Diagnostics { get; }
 
@@ -490,6 +500,7 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand EditItemCommand { get; }
     public ICommand EditMtabCommand { get; }
     public ICommand RetryHealthCheckCommand { get; }
+    public ICommand TogglePinCommand { get; }
     public ICommand OpenAllCommand { get; }
     public ICommand ToggleViewModeCommand { get; }
     public ICommand ToggleCollectionCommand { get; }
@@ -566,6 +577,56 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         UpdateStatusCounts();
+        RefreshConstellation();
+    }
+
+    private void RefreshConstellation()
+    {
+        const int cap = 5;
+
+        var pinned = AllItems
+            .Where(i => i.IsPinned)
+            .OrderByDescending(i => i.PinnedAtUtc ?? DateTime.MinValue)
+            .Take(cap)
+            .ToList();
+        var pinnedSet = new HashSet<Guid>(pinned.Select(i => i.Id));
+
+        var recent = AllItems
+            .Where(i => !pinnedSet.Contains(i.Id) && i.LastOpenedDate != default)
+            .OrderByDescending(i => i.LastOpenedDate)
+            .Take(cap)
+            .ToList();
+
+        var trending = AllItems
+            .Where(i => !pinnedSet.Contains(i.Id) && i.TrendDelta != 0)
+            .OrderByDescending(i => Math.Abs(i.TrendDelta))
+            .Take(cap)
+            .ToList();
+
+        ReplaceAll(PinnedItems, pinned);
+        ReplaceAll(RecentItems, recent);
+        ReplaceAll(TrendingItems, trending);
+    }
+
+    private static void ReplaceAll(ObservableCollection<ItemModel> target, IList<ItemModel> source)
+    {
+        target.Clear();
+        for (var i = 0; i < source.Count; i++)
+        {
+            target.Add(source[i]);
+        }
+    }
+
+    private void TogglePin(ItemModel? item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        item.IsPinned = !item.IsPinned;
+        RefreshSmartCollections();
+        QueueSave();
     }
 
     public void MoveItem(CollectionViewModel collection, ItemModel item, int newIndex)
@@ -945,13 +1006,35 @@ public sealed class MainViewModel : ViewModelBase
 
     public void ShowCommandPalette()
     {
-        var entries = BuildCommandPaletteEntries();
-        var palette = new CommandPaletteWindow(entries)
+        var commands = BuildCommandRows();
+        var settings = BuildSettingsRows();
+        var palette = new CommandPaletteWindow(this, commands, settings)
         {
             Owner = Application.Current.MainWindow
         };
 
         palette.ShowDialog();
+    }
+
+    public void ReloadData()
+    {
+        RefreshAllIcons();
+        RefreshSmartCollections();
+        StatusText = "Refreshed";
+    }
+
+    public void QuitApplication()
+    {
+        Application.Current.Shutdown();
+    }
+
+    public void SwitchAccent()
+    {
+        // TODO PR#12: jump to Settings → Appearance via SettingsRow anchor scroll.
+        if (!IsSettingsOpen)
+        {
+            ToggleSettingsCommand.Execute(null);
+        }
     }
 
     public void ToggleDiagnostics()
@@ -3850,7 +3933,8 @@ public sealed class MainViewModel : ViewModelBase
                     RawInput = rawCandidate,
                     Status = ClipboardReviewStatus.Invalid,
                     WillApply = false,
-                    Reason = ValidationStatusToReason(validationStatus)
+                    Reason = ValidationStatusToReason(validationStatus),
+                    Kind = ClassifyClipboardKind(rawCandidate, null),
                 });
                 continue;
             }
@@ -3864,7 +3948,8 @@ public sealed class MainViewModel : ViewModelBase
                     PathKey = pathKey,
                     Status = ClipboardReviewStatus.DuplicateInClipboard,
                     WillApply = false,
-                    Reason = "Duplicate in clipboard payload."
+                    Reason = "Duplicate in clipboard payload.",
+                    Kind = ClassifyClipboardKind(rawCandidate, normalizedPath),
                 });
                 continue;
             }
@@ -3881,7 +3966,8 @@ public sealed class MainViewModel : ViewModelBase
                     WillApply = !alreadyInCollection,
                     Reason = alreadyInCollection
                         ? "Already linked to selected collection."
-                        : "Already exists globally; will link."
+                        : "Already exists globally; will link.",
+                    Kind = ClassifyClipboardKind(rawCandidate, normalizedPath),
                 });
                 continue;
             }
@@ -3893,11 +3979,51 @@ public sealed class MainViewModel : ViewModelBase
                 PathKey = pathKey,
                 Status = ClipboardReviewStatus.ValidNew,
                 WillApply = true,
-                Reason = "Valid path."
+                Reason = "Valid path.",
+                Kind = ClassifyClipboardKind(rawCandidate, normalizedPath),
             });
         }
 
         return entries;
+    }
+
+    private static ContentKind ClassifyClipboardKind(string? rawInput, string? normalizedPath)
+    {
+        var input = (rawInput ?? string.Empty).Trim();
+        if (input.StartsWith("shell:", StringComparison.OrdinalIgnoreCase)
+            || input.StartsWith("cmd:", StringComparison.OrdinalIgnoreCase)
+            || input.StartsWith("run:", StringComparison.OrdinalIgnoreCase))
+        {
+            return ContentKind.Action;
+        }
+
+        if (Uri.TryCreate(input, UriKind.Absolute, out var uri)
+            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+        {
+            return ContentKind.Mtab;
+        }
+
+        var candidate = string.IsNullOrWhiteSpace(normalizedPath) ? input : normalizedPath;
+        if (string.IsNullOrWhiteSpace(candidate))
+        {
+            return ContentKind.Clip;
+        }
+
+        try
+        {
+            if (Directory.Exists(candidate)) return ContentKind.Folder;
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
+        try
+        {
+            if (File.Exists(candidate)) return ContentKind.File;
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+
+        return ContentKind.Clip;
     }
 
     private AddPathOutcome AddOrLinkItem(string? path, CollectionViewModel? requestedCollection = null, bool suppressRefreshAndSave = false)
@@ -4366,25 +4492,148 @@ public sealed class MainViewModel : ViewModelBase
         QueueSave();
     }
 
-    private IReadOnlyList<CommandPaletteEntry> BuildCommandPaletteEntries()
+    private IReadOnlyList<CommandRow> BuildCommandRows()
     {
-        return new List<CommandPaletteEntry>
+        var bindings = Application.Current.MainWindow?.InputBindings;
+        string? ShortcutFor(System.Windows.Input.ICommand command) =>
+            KeyGestureFormatter.FromInputBindings(bindings, command);
+
+        return new List<CommandRow>
         {
-            new() { Name = "Add File", Description = "Open file picker and add item", Execute = () => AddFileCommand.Execute(null) },
-            new() { Name = "Add Folder", Description = "Open folder picker and add item", Execute = () => AddFolderCommand.Execute(null) },
-            new() { Name = "Open Clipboard Inbox", Description = "Review clipboard paths", Execute = OpenClipboardReviewPane },
-            new() { Name = "New Action", Description = "Create an internal command, batch, or PowerShell item", Execute = () => NewActionCommand.Execute(null) },
-            new() { Name = "Add Separator", Description = "Insert a visual divider in the current collection", Execute = () => AddSeparatorCommand.Execute(null) },
-            new() { Name = "New Mtab", Description = "Create explorer multi-tab group", Execute = () => NewMtabCommand.Execute(null) },
-            new() { Name = "Capture Explorer Windows", Description = "Create an Mtab from open Explorer folders", Execute = () => CaptureExplorerWindowsAsMtabCommand.Execute(null) },
-            new() { Name = "Open Settings", Description = "Toggle settings drawer", Execute = () => ToggleSettingsCommand.Execute(null) },
-            new() { Name = "Open Diagnostics", Description = "Open diagnostics page", Execute = ToggleDiagnostics },
-            new() { Name = "Open Duplicate Manager", Description = "Manage duplicate paths", Execute = OpenDuplicateManagerPane },
-            new() { Name = "Toggle View", Description = "Switch between grid and list", Execute = () => ToggleViewModeCommand.Execute(null) },
-            new() { Name = "Next Collection", Description = "Switch active collection", Execute = () => ToggleCollectionCommand.Execute(null) },
-            new() { Name = "Undo", Description = "Undo last action", Execute = () => UndoCommand.Execute(null) },
-            new() { Name = "Redo", Description = "Redo last action", Execute = () => RedoCommand.Execute(null) },
-            new() { Name = "Open All", Description = "Open all items in collection", Execute = () => OpenAllCommand.Execute(SelectedCollection) }
+            new()
+            {
+                Title = "New item",
+                Subtitle = "Add a file, folder, or action",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Plus,
+                Shortcut = ShortcutFor(OpenInlineAddCommand),
+                ExecuteAction = () => OpenInlineAddCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Add file",
+                Subtitle = "Open file picker and add item",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.FilePlus,
+                ExecuteAction = () => AddFileCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "New action",
+                Subtitle = "Create a command, batch, or PowerShell item",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Zap,
+                ExecuteAction = () => NewActionCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Toggle view",
+                Subtitle = "Switch between list and grid",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.LayoutGrid,
+                ExecuteAction = () => ToggleViewModeCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Capture clipboard now",
+                Subtitle = "Snapshot clipboard contents into an item",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.ClipboardCheck,
+                ExecuteAction = () => AddFromClipboardCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Undo",
+                Subtitle = "Undo last action",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Undo2,
+                Shortcut = "Ctrl+Z",
+                ExecuteAction = () => UndoCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Redo",
+                Subtitle = "Redo last action",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Redo2,
+                Shortcut = "Ctrl+Y",
+                ExecuteAction = () => RedoCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Toggle dark mode",
+                Subtitle = "Switch between light and dark theme",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Moon,
+                KeepPaletteOpen = true,
+                ExecuteAction = () => ToggleThemeCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Switch accent…",
+                Subtitle = "Choose an accent color",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Palette,
+                ExecuteAction = SwitchAccent,
+            },
+            new()
+            {
+                Title = "Open clipboard inbox",
+                Subtitle = "Review clipboard paths",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Clipboard,
+                Shortcut = ShortcutFor(OpenClipboardReviewPaneCommand),
+                ExecuteAction = OpenClipboardReviewPane,
+            },
+            new()
+            {
+                Title = "Open duplicate manager",
+                Subtitle = "Manage duplicate paths",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Layers,
+                Shortcut = ShortcutFor(OpenDuplicateManagerPaneCommand),
+                ExecuteAction = OpenDuplicateManagerPane,
+            },
+            new()
+            {
+                Title = "Capture Explorer windows as mtab",
+                Subtitle = "Create an Mtab from open Explorer folders",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Folders,
+                ExecuteAction = () => CaptureExplorerWindowsAsMtabCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Open settings",
+                Subtitle = "Toggle settings drawer",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.Settings,
+                ExecuteAction = () => ToggleSettingsCommand.Execute(null),
+            },
+            new()
+            {
+                Title = "Reload data",
+                Subtitle = "Refresh icons and derived collections",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.RefreshCw,
+                ExecuteAction = ReloadData,
+            },
+            new()
+            {
+                Title = "Quit MyList",
+                Subtitle = "Exit the application",
+                LucideKind = MahApps.Metro.IconPacks.PackIconLucideKind.LogOut,
+                ExecuteAction = QuitApplication,
+            },
+        };
+    }
+
+    private IReadOnlyList<SettingsRow> BuildSettingsRows()
+    {
+        // TODO PR#12: wire anchor scroll. For now each row opens the Settings drawer.
+        void OpenSettings()
+        {
+            if (!IsSettingsOpen)
+            {
+                ToggleSettingsCommand.Execute(null);
+            }
+        }
+
+        return new List<SettingsRow>
+        {
+            new() { Title = "Appearance", Subtitle = "Theme, accent, density", AnchorKey = "Appearance", ExecuteAction = OpenSettings },
+            new() { Title = "Hotkeys", Subtitle = "Global shortcuts", AnchorKey = "Hotkeys", ExecuteAction = OpenSettings },
+            new() { Title = "Density", Subtitle = "UI compactness", AnchorKey = "Density", ExecuteAction = OpenSettings },
+            new() { Title = "Startup", Subtitle = "Launch on boot, always on top", AnchorKey = "Startup", ExecuteAction = OpenSettings },
+            new() { Title = "Diagnostics", Subtitle = "Runtime info and logs", AnchorKey = "Diagnostics", ExecuteAction = ToggleDiagnostics },
+            new() { Title = "Storage", Subtitle = "Local store, backups, import/export", AnchorKey = "Storage", ExecuteAction = OpenSettings },
+            new() { Title = "About", Subtitle = "MyList version and credits", AnchorKey = "About", ExecuteAction = OpenSettings },
         };
     }
 
@@ -4622,6 +4871,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         target.FollowSystemTheme = source.FollowSystemTheme;
         target.Theme = source.Theme;
+        target.Accent = source.Accent;
         target.ViewMode = source.ViewMode;
         target.LayoutMode = source.LayoutMode;
         target.CollectionsLayout = source.CollectionsLayout;

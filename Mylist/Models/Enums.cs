@@ -56,6 +56,18 @@ public enum ThemeMode
     Dark
 }
 
+public enum AccentPalette
+{
+    Amber,
+    Blue,
+    Green,
+    Violet,
+    Teal,
+    Terracotta,
+    Crimson,
+    Slate
+}
+
 public enum WindowDockEdge
 {
     Left,

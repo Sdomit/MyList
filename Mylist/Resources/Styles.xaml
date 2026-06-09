@@ -22,7 +22,7 @@
         <Setter Property="Padding" Value="{DynamicResource DensityButtonPadding}" />
         <Setter Property="Background" Value="{DynamicResource SurfaceElevated}" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderDefaultBrush}" />
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -85,7 +85,7 @@
     </Style>
 
     <Style x:Key="HeaderPrimaryActionButton" TargetType="Button" BasedOn="{StaticResource HeaderActionButton}">
-        <Setter Property="Background" Value="{DynamicResource AccentSoft}" />
+        <Setter Property="Background" Value="{DynamicResource AccentSubtle}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
     </Style>
 
@@ -184,7 +184,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="Background" Value="{DynamicResource SurfaceElevated}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderDefaultBrush}" />
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -251,7 +251,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSoftBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderDefaultBrush}" />
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -387,19 +387,19 @@
                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Accent}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource AccentSoft}" />
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource AccentSubtle}" />
                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Accent}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Accent}" />
                         </Trigger>
                         <DataTrigger Binding="{Binding IsTabDragTarget}" Value="True">
-                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource AccentSoft}" />
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource AccentSubtle}" />
                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Accent}" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsTabDropBlocked}" Value="True">
-                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.StatusWarnBackgroundBrush}" />
-                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.StatusWarnBrush}" />
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.StatusWarningBackgroundBrush}" />
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.StatusWarningBrush}" />
                             <Setter TargetName="Chrome" Property="Opacity" Value="0.82" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsTabInsertionBefore}" Value="True">

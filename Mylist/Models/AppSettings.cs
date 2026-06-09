@@ -6,6 +6,7 @@ public sealed class AppSettings
 {
     public bool FollowSystemTheme { get; set; } = true;
     public ThemeMode Theme { get; set; } = ThemeMode.Light;
+    public AccentPalette Accent { get; set; } = AccentPalette.Blue;
     public ViewMode ViewMode { get; set; } = ViewMode.Grid;
     public LayoutMode LayoutMode { get; set; } = LayoutMode.Resizable;
     public CollectionsLayout CollectionsLayout { get; set; } = CollectionsLayout.Tabs;

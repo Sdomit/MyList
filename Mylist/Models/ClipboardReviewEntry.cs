@@ -16,6 +16,7 @@ public sealed class ClipboardReviewEntry
     public bool WillApply { get; init; }
     public string Reason { get; init; } = string.Empty;
     public string PathKey { get; init; } = string.Empty;
+    public ContentKind Kind { get; init; } = ContentKind.Clip;
 
     public string DisplayPath => string.IsNullOrWhiteSpace(Path) ? RawInput : Path;
 }

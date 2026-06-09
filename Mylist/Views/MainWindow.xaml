@@ -3,6 +3,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:MyList.Converters"
+        xmlns:helpers="clr-namespace:MyList.Helpers"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:views="clr-namespace:MyList.Views"
         Title="MyList"
         Icon="pack://siteoforigin:,,,/desktops.png"
@@ -34,18 +36,35 @@
     <Window.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
         <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
-        <Geometry x:Key="Icon.Search">M9,1 A8,8 0 1 0 9,17 A8,8 0 1 0 9,1 M15,15 L21,21</Geometry>
-        <Geometry x:Key="Icon.Plus">M8,1 L8,15 M1,8 L15,8</Geometry>
-        <Geometry x:Key="Icon.Folder">M1,4 L6,4 L8,6 L17,6 L17,15 L1,15 Z</Geometry>
-        <Geometry x:Key="Icon.Settings">M8,1 L9.5,3.2 L12,3 L13,5.5 L15,7 L13,9.5 L13.2,12 L10.7,13 L8,15 L5.3,13 L2.8,13.2 L2,10.7 L0,8 L2,5.3 L1.8,2.8 L4.3,2 L6,0 Z M8,5 A3,3 0 1 0 8,11 A3,3 0 1 0 8,5</Geometry>
-        <Geometry x:Key="Icon.Copy">M5,1 L16,1 L16,12 L5,12 Z M1,5 L4,5 L4,13 L12,13 L12,16 L1,16 Z</Geometry>
-        <Geometry x:Key="Icon.Layers">M1,5 L9,1 L17,5 L9,9 Z M1,9 L9,13 L17,9 M1,13 L9,17 L17,13</Geometry>
-        <Geometry x:Key="Icon.More">M2,8 A1.5,1.5 0 1 0 2,8.1 M8,8 A1.5,1.5 0 1 0 8,8.1 M14,8 A1.5,1.5 0 1 0 14,8.1</Geometry>
-        <Geometry x:Key="Icon.Open">M2,3 L7,3 M11,3 L16,3 L16,16 L3,16 L3,8 M9,1 L16,1 L16,8 M16,1 L7,10</Geometry>
-        <Geometry x:Key="Icon.Edit">M2,13 L2,16 L5,16 L15,6 L12,3 Z M10,5 L13,8</Geometry>
-        <Geometry x:Key="Icon.Back">M14,2 L4,8 L14,14 M4,8 L17,8</Geometry>
-        <Geometry x:Key="Icon.Close">M2,2 L14,14 M14,2 L2,14</Geometry>
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Invert="True" />
+        <helpers:IntPlusOneConverter x:Key="IntPlusOneConverter" />
+        <helpers:PercentToDashArrayConverter x:Key="PercentToDashArrayConverter" />
+        <helpers:HealthStateToBrushConverter x:Key="HealthStateToBrushConverter" />
+        <helpers:HealthStateToIsDashedConverter x:Key="HealthStateToIsDashedConverter" />
+        <helpers:TrajectoryBarTooltipConverter x:Key="TrajectoryBarTooltipConverter" />
+        <helpers:TrendDeltaToHealthBrushConverter x:Key="TrendDeltaToHealthBrushConverter" />
+        <helpers:TrendDeltaToLucideKindConverter x:Key="TrendDeltaToLucideKindConverter" />
+
+        <Style x:Key="Constellation.Row" TargetType="Button" BasedOn="{StaticResource Simple.GhostButton}">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="Constellation.Eyebrow" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource Token.FontMono}" />
+            <Setter Property="FontSize" Value="{StaticResource Token.TextXs}" />
+            <Setter Property="FontWeight" Value="{StaticResource Token.WeightMedium}" />
+            <Setter Property="Foreground" Value="{DynamicResource Token.TextTertiaryBrush}" />
+            <Setter Property="Margin" Value="12,0,12,8" />
+        </Style>
+
+        <Style x:Key="Constellation.SubEyebrow" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="{StaticResource Token.TextSm}" />
+            <Setter Property="Foreground" Value="{DynamicResource Token.TextSecondaryBrush}" />
+            <Setter Property="Margin" Value="12,0,12,4" />
+        </Style>
 
         <DataTemplate x:Key="CollectionTemplate">
             <Grid>
@@ -54,13 +73,11 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Path Width="13"
-                      Height="13"
-                      Data="{StaticResource Icon.Folder}"
-                      Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                      StrokeThickness="1.4"
-                      Stretch="Uniform"
-                      VerticalAlignment="Center" />
+                <iconPacks:PackIconLucide Kind="Folder"
+                                          Width="13"
+                                          Height="13"
+                                          Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                          VerticalAlignment="Center" />
                 <TextBlock Grid.Column="1"
                            Margin="9,0,8,0"
                            Text="{Binding Name}"
@@ -81,49 +98,79 @@
                             <ColumnDefinition Width="28" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Border x:Name="IconChrome"
-                                Width="24"
-                                Height="24"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                BorderThickness="1"
-                                CornerRadius="5">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="{DynamicResource Token.TypeFileBackgroundBrush}" />
-                                    <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeFileBorderBrush}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                            <Setter Property="Background" Value="{DynamicResource Token.TypeFolderBackgroundBrush}" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeFolderBorderBrush}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsMtab}" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource Token.TypeMtabBackgroundBrush}" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeMtabBorderBrush}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsClipboardText}" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource Token.TypeClipBackgroundBrush}" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeClipBorderBrush}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsClipboardImage}" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource Token.TypeClipBackgroundBrush}" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeClipBorderBrush}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsActionItem}" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource Token.TypeActionBackgroundBrush}" />
-                                            <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeActionBorderBrush}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                            <Image Width="16"
-                                   Height="16"
-                                   Source="{Binding Icon}"
-                                   Stretch="Uniform"
-                                   RenderOptions.BitmapScalingMode="HighQuality" />
-                        </Border>
+                        <!-- Icon cell: 24x24 stack of health-track + score arc + type-colored glyph (HANDOFF §3.3) -->
+                        <Grid Width="24"
+                              Height="24"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center">
+                            <Ellipse Width="22"
+                                     Height="22"
+                                     Stroke="{DynamicResource Token.BgHoverBrush}"
+                                     StrokeThickness="1.5"
+                                     SnapsToDevicePixels="False" />
+                            <Ellipse x:Name="HealthArc"
+                                     Width="22"
+                                     Height="22"
+                                     Stroke="{Binding HealthState, Converter={StaticResource HealthStateToBrushConverter}}"
+                                     StrokeThickness="1.5"
+                                     StrokeDashCap="Round"
+                                     RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <RotateTransform Angle="-90" />
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="StrokeDashArray" Value="{Binding HealthScore, Converter={StaticResource PercentToDashArrayConverter}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HealthState, Converter={StaticResource HealthStateToIsDashedConverter}}" Value="True">
+                                                <Setter Property="StrokeDashArray" Value="4 3" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <Border Width="14"
+                                    Height="14"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource Token.RadiusSm}">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{DynamicResource Token.TypeFileBackgroundBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeFileBorderBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                <Setter Property="Background" Value="{DynamicResource Token.TypeFolderBackgroundBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeFolderBorderBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsMtab}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource Token.TypeMtabBackgroundBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeMtabBorderBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsClipboardText}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource Token.TypeClipBackgroundBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeClipBorderBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsClipboardImage}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource Token.TypeClipBackgroundBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeClipBorderBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsActionItem}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource Token.TypeActionBackgroundBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeActionBorderBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <Image Width="10"
+                                       Height="10"
+                                       Source="{Binding Icon}"
+                                       Stretch="Uniform"
+                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                            </Border>
+                        </Grid>
 
                         <StackPanel Grid.Column="1"
                                     Margin="12,0,12,0"
@@ -133,96 +180,86 @@
                                        FontSize="13"
                                        FontWeight="Medium"
                                        TextTrimming="CharacterEllipsis" />
-                            <Grid Margin="0,2,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Ellipse Width="{DynamicResource Token.Size.HealthDot}"
-                                         Height="{DynamicResource Token.Size.HealthDot}"
-                                         Margin="0,0,6,0"
-                                         VerticalAlignment="Center">
-                                    <Ellipse.Style>
-                                        <Style TargetType="Ellipse">
-                                            <!-- Healthy: #10B981 at 55% -->
-                                            <Setter Property="Fill" Value="{DynamicResource Token.StatusOkBrush}" />
-                                            <Setter Property="Opacity" Value="0.55" />
-                                            <Style.Triggers>
-                                                <!-- Unchecked: #60A5FA at 40% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="Unchecked">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusUnknownBrush}" />
-                                                    <Setter Property="Opacity" Value="0.40" />
-                                                </DataTrigger>
-                                                <!-- Offline: #F59E0B at 70% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="Offline">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusWarnBrush}" />
-                                                    <Setter Property="Opacity" Value="0.70" />
-                                                </DataTrigger>
-                                                <!-- Missing: #EF4444 at 75% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="Missing">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
-                                                    <Setter Property="Opacity" Value="0.75" />
-                                                </DataTrigger>
-                                                <!-- PermissionDenied: #EF4444 at 75% -->
-                                                <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
-                                                    <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
-                                                    <Setter Property="Opacity" Value="0.75" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Ellipse.Style>
-                                </Ellipse>
-                                <TextBlock Grid.Column="1"
-                                           Style="{StaticResource Simple.MonoText}"
-                                           Text="{Binding DisplayPath}"
-                                           TextTrimming="CharacterEllipsis" />
-                            </Grid>
+                            <TextBlock Margin="0,2,0,0"
+                                       Style="{StaticResource Simple.MonoText}"
+                                       Text="{Binding DisplayPath}"
+                                       TextTrimming="CharacterEllipsis" />
                         </StackPanel>
 
-                        <!-- Kbd chip: hidden, fades in on row hover (120ms) -->
-                        <Border Grid.Column="2"
-                                Padding="5,1"
-                                BorderThickness="1"
-                                VerticalAlignment="Center"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
-                                Background="{DynamicResource Token.BgSurfaceBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusSm}">
-                            <Border.Style>
-                                <Style TargetType="Border">
+                        <!-- Sparkline: 14-day access trajectory polyline (HANDOFF §3.2) -->
+                        <Polyline Grid.Column="2"
+                                  Width="60"
+                                  Height="16"
+                                  Margin="0,0,8,0"
+                                  VerticalAlignment="Center"
+                                  Points="{Binding TrajectoryPoints}"
+                                  Stroke="{DynamicResource Token.AccentBrush}"
+                                  StrokeThickness="1.5"
+                                  StrokeLineJoin="Round"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  Opacity="0.7" />
+
+                        <!-- Kbd chip: hidden, fades in on row hover or selection (120ms, EaseStandard).
+                             Chrome via Chip.Kbd (Themes/Chips.xaml); fade + visibility stay here. -->
+                        <ContentControl x:Name="KbdChip"
+                                        Grid.Column="3"
+                                        Margin="0,0,8,0"
+                                        Visibility="{Binding Path=(ItemsControl.AlternationIndex),
+                                                             RelativeSource={RelativeSource AncestorType=ListBoxItem},
+                                                             Converter={StaticResource IntPlusOneConverter}}">
+                            <ContentControl.Style>
+                                <Style TargetType="ContentControl" BasedOn="{StaticResource Chip.Kbd}">
                                     <Setter Property="Opacity" Value="0" />
-                                    <Setter Property="Visibility" Value="Visible" />
                                     <Style.Triggers>
-                                        <!-- Collapse entirely when no shortcut label (index > 9) -->
-                                        <DataTrigger Binding="{Binding ShortcutLabel}" Value="">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsMouseOver,
-                                            RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                                             <DataTrigger.EnterActions>
                                                 <BeginStoryboard>
                                                     <Storyboard>
-                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                         To="1" Duration="0:0:0.12" />
+                                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Duration="0:0:0.12">
+                                                            <SplineDoubleKeyFrame KeyTime="0:0:0.12" Value="1" KeySpline="{StaticResource Token.EaseStandard}" />
+                                                        </DoubleAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </DataTrigger.EnterActions>
                                             <DataTrigger.ExitActions>
                                                 <BeginStoryboard>
                                                     <Storyboard>
-                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                         To="0" Duration="0:0:0.12" />
+                                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Duration="0:0:0.12">
+                                                            <SplineDoubleKeyFrame KeyTime="0:0:0.12" Value="0" KeySpline="{StaticResource Token.EaseStandard}" />
+                                                        </DoubleAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </DataTrigger.ExitActions>
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Duration="0:0:0.12">
+                                                            <SplineDoubleKeyFrame KeyTime="0:0:0.12" Value="1" KeySpline="{StaticResource Token.EaseStandard}" />
+                                                        </DoubleAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity" Duration="0:0:0.12">
+                                                            <SplineDoubleKeyFrame KeyTime="0:0:0.12" Value="0" KeySpline="{StaticResource Token.EaseStandard}" />
+                                                        </DoubleAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderDefaultBrush}" />
+                                        </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Border.Style>
-                            <TextBlock Text="{Binding ShortcutLabel}"
-                                       FontFamily="{DynamicResource Token.FontMono}"
-                                       FontSize="10.5"
-                                       Foreground="{DynamicResource Token.TextAccentBrush}" />
-                        </Border>
+                            </ContentControl.Style>
+                            <TextBlock><Run Text="⌘" /><Run Text="{Binding Path=(ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource IntPlusOneConverter}, Mode=OneWay}" /></TextBlock>
+                        </ContentControl>
                     </Grid>
                     <Border.ContextMenu>
                         <ContextMenu>
@@ -235,6 +272,20 @@
                             <MenuItem Header="Open in Terminal here"
                                       Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenInTerminalCommand}"
                                       CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <Separator />
+                            <MenuItem Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.TogglePinCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Header" Value="Pin to Constellation" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Item.IsPinned, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+                                                <Setter Property="Header" Value="Unpin from Constellation" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
                             <Separator />
                             <MenuItem Header="Copy"
                                       Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.CopyPathCommand}"
@@ -280,7 +331,7 @@
                         Visibility="Collapsed"
                         Padding="0,8">
                     <Border Height="1"
-                            Background="{DynamicResource Token.BorderHairBrush}" />
+                            Background="{DynamicResource Token.BorderSubtleBrush}" />
                 </Border>
             </Grid>
             <DataTemplate.Triggers>
@@ -330,6 +381,7 @@
                         Height="16"
                         Background="{DynamicResource Token.AccentBrush}"
                         CornerRadius="{DynamicResource Token.RadiusSm}">
+                    <!-- Brand badge — intentional inline geometry; no Lucide equivalent. -->
                     <Path Data="M3,4 L8,12 L13,4 M3,12 L13,12"
                           Stroke="{DynamicResource Token.AccentForegroundBrush}"
                           StrokeThickness="1.5"
@@ -349,7 +401,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
                     CornerRadius="{DynamicResource Token.RadiusMd}">
                 <Grid Margin="10,0,7,0">
@@ -358,13 +410,11 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <Path Width="13"
-                          Height="13"
-                          Data="{StaticResource Icon.Search}"
-                          Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                          StrokeThickness="1.3"
-                          Stretch="Uniform"
-                          VerticalAlignment="Center" />
+                    <iconPacks:PackIconLucide Kind="Search"
+                                              Width="13"
+                                              Height="13"
+                                              Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                              VerticalAlignment="Center" />
                     <TextBox x:Name="SearchBox"
                              Grid.Column="1"
                              Height="24"
@@ -395,7 +445,7 @@
                     <Border Grid.Column="2"
                             Padding="5,1"
                             Background="{DynamicResource Token.BgSubtleBrush}"
-                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                             BorderThickness="1"
                             CornerRadius="{DynamicResource Token.RadiusXs}"
                             VerticalAlignment="Center">
@@ -464,12 +514,10 @@
                                     Padding="0"
                                     Style="{StaticResource Simple.GhostButton}"
                                     Command="{Binding AddCollectionCommand}">
-                                <Path Width="10"
-                                      Height="10"
-                                      Data="{StaticResource Icon.Plus}"
-                                      Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                                      StrokeThickness="1.5"
-                                      Stretch="Uniform" />
+                                <iconPacks:PackIconLucide Kind="Plus"
+                                                          Width="10"
+                                                          Height="10"
+                                                          Foreground="{DynamicResource Token.TextTertiaryBrush}" />
                             </Button>
                         </Grid>
 
@@ -513,12 +561,10 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" MaxWidth="110" />
                                 </Grid.ColumnDefinitions>
-                                <Path Width="13"
-                                      Height="13"
-                                      Data="{StaticResource Icon.Copy}"
-                                      Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                                      StrokeThickness="1.3"
-                                      Stretch="Uniform" />
+                                <iconPacks:PackIconLucide Kind="Clipboard"
+                                                          Width="13"
+                                                          Height="13"
+                                                          Foreground="{DynamicResource Token.TextTertiaryBrush}" />
                                 <TextBlock Grid.Column="1" Margin="9,0,6,0" Text="Clipboard" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Grid.Column="2" Style="{StaticResource Simple.MonoText}" Text="Ctrl+Shift+V" TextTrimming="CharacterEllipsis" />
                             </Grid>
@@ -531,23 +577,179 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Path Width="13"
-                                      Height="13"
-                                      Data="{StaticResource Icon.Layers}"
-                                      Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                                      StrokeThickness="1.3"
-                                      Stretch="Uniform" />
+                                <iconPacks:PackIconLucide Kind="Layers"
+                                                          Width="13"
+                                                          Height="13"
+                                                          Foreground="{DynamicResource Token.TextTertiaryBrush}" />
                                 <TextBlock Grid.Column="1" Margin="9,0,0,0" Text="Duplicates" />
                                 <TextBlock Grid.Column="2" Style="{StaticResource Simple.MonoText}" Text="Ctrl+D" />
                             </Grid>
                         </Button>
+
+                        <!-- Constellation group (HANDOFF §4) -->
+                        <Border Height="1"
+                                Margin="12,12"
+                                Background="{DynamicResource Token.BorderSubtleBrush}" />
+
+                        <TextBlock Text="CONSTELLATION"
+                                   Style="{StaticResource Constellation.Eyebrow}" />
+
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PinnedItems.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="Pinned" Style="{StaticResource Constellation.SubEyebrow}" />
+                            <ItemsControl ItemsSource="{Binding PinnedItems}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource Constellation.Row}"
+                                                Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                                                CommandParameter="{Binding}">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Open"
+                                                              Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                                    <MenuItem Header="Unpin"
+                                                              Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.TogglePinCommand}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="14" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <iconPacks:PackIconLucide Kind="Pin"
+                                                                          Width="14"
+                                                                          Height="14"
+                                                                          VerticalAlignment="Center"
+                                                                          Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                                                <TextBlock Grid.Column="1"
+                                                           Margin="9,0,0,0"
+                                                           Text="{Binding Name}"
+                                                           FontSize="{StaticResource Token.TextSm}"
+                                                           Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RecentItems.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="Recent" Style="{StaticResource Constellation.SubEyebrow}" />
+                            <ItemsControl ItemsSource="{Binding RecentItems}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource Constellation.Row}"
+                                                Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                                                CommandParameter="{Binding}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="14" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <iconPacks:PackIconLucide Kind="Clock"
+                                                                          Width="14"
+                                                                          Height="14"
+                                                                          VerticalAlignment="Center"
+                                                                          Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                                                <TextBlock Grid.Column="1"
+                                                           Margin="9,0,0,0"
+                                                           Text="{Binding Name}"
+                                                           FontSize="{StaticResource Token.TextSm}"
+                                                           Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,8,0,0">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding TrendingItems.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="Trending" Style="{StaticResource Constellation.SubEyebrow}" />
+                            <ItemsControl ItemsSource="{Binding TrendingItems}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource Constellation.Row}"
+                                                Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                                                CommandParameter="{Binding}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="14" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <iconPacks:PackIconLucide Kind="TrendingUp"
+                                                                          Width="14"
+                                                                          Height="14"
+                                                                          VerticalAlignment="Center"
+                                                                          Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                                                <TextBlock Grid.Column="1"
+                                                           Margin="9,0,6,0"
+                                                           Text="{Binding Name}"
+                                                           FontSize="{StaticResource Token.TextSm}"
+                                                           Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           VerticalAlignment="Center" />
+                                                <Border Grid.Column="2"
+                                                        Width="20"
+                                                        Height="16"
+                                                        CornerRadius="{StaticResource Token.RadiusXs}"
+                                                        Background="{Binding TrendDelta, Converter={StaticResource TrendDeltaToHealthBrushConverter}}"
+                                                        VerticalAlignment="Center">
+                                                    <iconPacks:PackIconLucide Kind="{Binding TrendDelta, Converter={StaticResource TrendDeltaToLucideKindConverter}}"
+                                                                              Width="10"
+                                                                              Height="10"
+                                                                              Foreground="{DynamicResource Token.WhiteBrush}"
+                                                                              HorizontalAlignment="Center"
+                                                                              VerticalAlignment="Center" />
+                                                </Border>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
 
                 <Border Grid.Row="1"
                         Margin="6,8,4,0"
                         Padding="6,8,0,2"
-                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="0,1,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -567,7 +769,7 @@
                                        VerticalAlignment="Center" />
                         </Border>
                         <StackPanel Grid.Column="1" Margin="8,0,4,0">
-                            <TextBlock Text="MyList" FontSize="11.5" />
+                            <TextBlock Text="MyList" FontSize="{DynamicResource Token.TextXs}" />
                             <TextBlock Style="{StaticResource Simple.MonoText}"
                                        Text="{Binding AllItems.Count, StringFormat={}{0} items}" />
                         </StackPanel>
@@ -575,12 +777,10 @@
                                 Style="{StaticResource Simple.IconButton}"
                                 Command="{Binding ToggleSettingsCommand}"
                                 ToolTip="Settings">
-                            <Path Width="13"
-                                  Height="13"
-                                  Data="{StaticResource Icon.Settings}"
-                                  Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                                  StrokeThickness="1.1"
-                                  Stretch="Uniform" />
+                            <iconPacks:PackIconLucide Kind="Settings"
+                                                      Width="13"
+                                                      Height="13"
+                                                      Foreground="{DynamicResource Token.TextTertiaryBrush}" />
                         </Button>
                     </Grid>
                 </Border>
@@ -599,7 +799,7 @@
                     </Grid.RowDefinitions>
 
                     <Border Padding="24,18,24,12"
-                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                             BorderThickness="0,0,0,1">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -641,7 +841,7 @@
                                 Height="34"
                                 HorizontalContentAlignment="Stretch"
                                 Style="{StaticResource Simple.GhostButton}"
-                                BorderBrush="{DynamicResource Token.BorderSoftBrush}"
+                                BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
                                 BorderThickness="1"
                                 Visibility="{Binding IsAddFormOpen, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                 Click="OnInlineAddOpenClick">
@@ -657,7 +857,7 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSoftBrush}" />
+                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
                                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
@@ -679,12 +879,10 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Path Width="11"
-                                      Height="11"
-                                      Data="{StaticResource Icon.Plus}"
-                                      Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                                      StrokeThickness="1.5"
-                                      Stretch="Uniform" />
+                                <iconPacks:PackIconLucide Kind="Plus"
+                                                          Width="11"
+                                                          Height="11"
+                                                          Foreground="{DynamicResource Token.TextTertiaryBrush}" />
                                 <TextBlock Grid.Column="1"
                                            Margin="8,0,0,0"
                                            Foreground="{DynamicResource Token.TextTertiaryBrush}"
@@ -700,7 +898,7 @@
                         <Border Margin="16,10,16,6"
                                 Padding="8"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusMd}"
                                 Visibility="{Binding IsAddFormOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -749,7 +947,7 @@
                                 Margin="16,0,16,6"
                                 Padding="10"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Visibility="{Binding IsQuickEditOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -773,7 +971,7 @@
                         <Border Grid.Row="2"
                                 Margin="16,0,16,6"
                                 Padding="8"
-                                Background="{DynamicResource Token.AccentSoftBrush}"
+                                Background="{DynamicResource Token.AccentSubtleBrush}"
                                 CornerRadius="{DynamicResource Token.RadiusMd}"
                                 Visibility="{Binding IsBulkToolbarVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <ScrollViewer HorizontalScrollBarVisibility="Auto"
@@ -800,6 +998,7 @@
                                      SelectionChanged="OnItemSelectionChanged"
                                      ItemContainerStyle="{StaticResource Simple.ItemListBoxItem}"
                                      ItemTemplate="{StaticResource ListItemTemplate}"
+                                     AlternationCount="9999"
                                      MouseDoubleClick="OnItemMouseDoubleClick"
                                      PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
                                      PreviewMouseMove="OnItemPreviewMouseMove"
@@ -811,7 +1010,7 @@
                                         MaxWidth="300"
                                         Visibility="{Binding SelectedCollection.FilteredEntries.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <TextBlock Text="Nothing here yet"
-                                           FontSize="14"
+                                           FontSize="{DynamicResource Token.TextBase}"
                                            FontWeight="Medium"
                                            TextAlignment="Center" />
                                 <TextBlock Margin="0,5,0,14"
@@ -856,7 +1055,7 @@
                         </Grid.RowDefinitions>
 
                         <Border Padding="18,16,18,12"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,0,1">
                             <StackPanel>
                                 <Grid>
@@ -864,12 +1063,10 @@
                                     <Button HorizontalAlignment="Right"
                                             Style="{StaticResource Simple.IconButton}"
                                             Click="OnClearSelectionClick">
-                                        <Path Width="11"
-                                              Height="11"
-                                              Data="{StaticResource Icon.Close}"
-                                              Stroke="{DynamicResource Token.TextTertiaryBrush}"
-                                              StrokeThickness="1.4"
-                                              Stretch="Uniform" />
+                                        <iconPacks:PackIconLucide Kind="X"
+                                                                  Width="11"
+                                                                  Height="11"
+                                                                  Foreground="{DynamicResource Token.TextTertiaryBrush}" />
                                     </Button>
                                 </Grid>
                                 <TextBlock Margin="0,8,0,0"
@@ -885,12 +1082,10 @@
                                             Command="{Binding OpenItemCommand}"
                                             CommandParameter="{Binding SelectedItem}">
                                         <StackPanel Orientation="Horizontal">
-                                            <Path Width="11"
-                                                  Height="11"
-                                                  Data="{StaticResource Icon.Open}"
-                                                  Stroke="{DynamicResource Token.AccentForegroundBrush}"
-                                                  StrokeThickness="1.3"
-                                                  Stretch="Uniform" />
+                                            <iconPacks:PackIconLucide Kind="ExternalLink"
+                                                                      Width="11"
+                                                                      Height="11"
+                                                                      Foreground="{DynamicResource Token.AccentForegroundBrush}" />
                                             <TextBlock Margin="6,0,0,0" Text="Open" Foreground="{DynamicResource Token.AccentForegroundBrush}" />
                                         </StackPanel>
                                     </Button>
@@ -898,12 +1093,10 @@
                                             Command="{Binding EditItemCommand}"
                                             CommandParameter="{Binding SelectedItem}">
                                         <StackPanel Orientation="Horizontal">
-                                            <Path Width="11"
-                                                  Height="11"
-                                                  Data="{StaticResource Icon.Edit}"
-                                                  Stroke="{DynamicResource Token.TextPrimaryBrush}"
-                                                  StrokeThickness="1.3"
-                                                  Stretch="Uniform" />
+                                            <iconPacks:PackIconLucide Kind="Pencil"
+                                                                      Width="11"
+                                                                      Height="11"
+                                                                      Foreground="{DynamicResource Token.TextPrimaryBrush}" />
                                             <TextBlock Margin="6,0,0,0" Text="Edit" />
                                         </StackPanel>
                                     </Button>
@@ -912,12 +1105,10 @@
                                             Command="{Binding CopyPathCommand}"
                                             CommandParameter="{Binding SelectedItem}"
                                             ToolTip="Copy">
-                                        <Path Width="12"
-                                              Height="12"
-                                              Data="{StaticResource Icon.Copy}"
-                                              Stroke="{DynamicResource Token.TextSecondaryBrush}"
-                                              StrokeThickness="1.3"
-                                              Stretch="Uniform" />
+                                        <iconPacks:PackIconLucide Kind="Copy"
+                                                                  Width="12"
+                                                                  Height="12"
+                                                                  Foreground="{DynamicResource Token.TextSecondaryBrush}" />
                                     </Button>
                                 </StackPanel>
                             </StackPanel>
@@ -950,7 +1141,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <Border Width="20"
                                                             Height="20"
-                                                            Background="{DynamicResource Token.AccentSoftBrush}"
+                                                            Background="{DynamicResource Token.AccentSubtleBrush}"
                                                             CornerRadius="{DynamicResource Token.RadiusSm}">
                                                         <TextBlock Text="{Binding Number}"
                                                                    Foreground="{DynamicResource Token.TextAccentBrush}"
@@ -963,7 +1154,7 @@
                                                             Margin="6,0,0,0"
                                                             Padding="6,3"
                                                             Background="{DynamicResource Token.BgSubtleBrush}"
-                                                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                                             BorderThickness="1"
                                                             CornerRadius="{DynamicResource Token.RadiusMd}">
                                                         <TextBox Padding="2"
@@ -1011,7 +1202,7 @@
                                                Text="PREVIEW" />
                                     <Border Height="210"
                                             Background="{DynamicResource Token.BgSubtleBrush}"
-                                            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                             BorderThickness="1"
                                             CornerRadius="{DynamicResource Token.RadiusMd}">
                                         <Canvas Width="260"
@@ -1102,17 +1293,15 @@
                                                                     BorderBrush="{DynamicResource Token.AccentBrush}"
                                                                     BorderThickness="1.5"
                                                                     CornerRadius="{DynamicResource Token.RadiusLg}">
-                                                                <Path Width="16"
-                                                                      Height="16"
-                                                                      Data="{StaticResource Icon.Folder}"
-                                                                      Stroke="{DynamicResource Token.TextAccentBrush}"
-                                                                      StrokeThickness="1.4"
-                                                                      Stretch="Uniform" />
+                                                                <iconPacks:PackIconLucide Kind="Folder"
+                                                                                          Width="16"
+                                                                                          Height="16"
+                                                                                          Foreground="{DynamicResource Token.TextAccentBrush}" />
                                                             </Border>
                                                             <Border Margin="0,4,0,0"
                                                                     Padding="4,2"
                                                                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                                                                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                                                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                                                     BorderThickness="1"
                                                                     CornerRadius="{DynamicResource Token.RadiusSm}">
                                                                 <TextBlock Style="{StaticResource Simple.MonoText}"
@@ -1189,16 +1378,16 @@
                                                      VerticalAlignment="Center">
                                                 <Ellipse.Style>
                                                     <Style TargetType="Ellipse">
-                                                        <Setter Property="Fill" Value="{DynamicResource Token.StatusOkBrush}" />
+                                                        <Setter Property="Fill" Value="{DynamicResource Token.StatusSuccessBrush}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding SelectedItem.HealthState}" Value="Offline">
-                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusWarnBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusWarningBrush}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding SelectedItem.HealthState}" Value="Missing">
-                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusDangerBrush}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding SelectedItem.HealthState}" Value="PermissionDenied">
-                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusBadBrush}" />
+                                                                <Setter Property="Fill" Value="{DynamicResource Token.StatusDangerBrush}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -1209,6 +1398,67 @@
                                                        FontWeight="Medium"
                                                        VerticalAlignment="Center" />
                                         </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,18">
+                                    <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="TRAJECTORY" Margin="0,0,0,8" />
+                                    <Border Padding="10,8"
+                                            Background="{DynamicResource Token.BgSubtleBrush}"
+                                            CornerRadius="{DynamicResource Token.RadiusMd}"
+                                            SnapsToDevicePixels="True"
+                                            UseLayoutRounding="True">
+                                        <Grid Height="52">
+                                            <ItemsControl ItemsSource="{Binding SelectedItem.TrajectoryBars}"
+                                                          HorizontalAlignment="Center">
+                                                <ItemsControl.Style>
+                                                    <Style TargetType="ItemsControl">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding SelectedItem.OpenedHistory.Count}" Value="0">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ItemsControl.Style>
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    VerticalAlignment="Bottom" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Rectangle Width="6"
+                                                                   Margin="1,0"
+                                                                   VerticalAlignment="Bottom"
+                                                                   Height="{Binding Height}"
+                                                                   RadiusX="2"
+                                                                   RadiusY="2"
+                                                                   Fill="{DynamicResource Token.AccentBrush}"
+                                                                   Opacity="{Binding Opacity}"
+                                                                   SnapsToDevicePixels="True"
+                                                                   ToolTip="{Binding Converter={StaticResource TrajectoryBarTooltipConverter}}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <TextBlock Text="No access history yet"
+                                                       Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                                       FontSize="{StaticResource Token.TextXs}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding SelectedItem.OpenedHistory.Count}" Value="0">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
                                     </Border>
                                 </StackPanel>
 
@@ -1224,8 +1474,8 @@
                                             <DataTemplate>
                                                 <Border Margin="0,0,5,5"
                                                         Padding="6,2"
-                                                        Background="{DynamicResource Token.AccentSoftBrush}"
-                                                        BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                                        Background="{DynamicResource Token.AccentSubtleBrush}"
+                                                        BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                                         BorderThickness="1"
                                                         CornerRadius="{DynamicResource Token.RadiusXs}">
                                                     <TextBlock Style="{StaticResource Simple.MonoText}"
@@ -1255,7 +1505,7 @@
         <!-- Status bar -->
         <Border Grid.Row="2"
                 Background="{DynamicResource Token.BgMicaBrush}"
-                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                 BorderThickness="0,1,0,0">
             <Grid Margin="14,0">
                 <Grid.ColumnDefinitions>
@@ -1265,11 +1515,11 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusOkBrush}" Margin="0,0,6,0" />
+                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusSuccessBrush}" Margin="0,0,6,0" />
                     <TextBlock Style="{StaticResource Simple.MonoText}" Text="{Binding VisibleItemCount, StringFormat=Visible: {0}}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
-                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusWarnBrush}" Margin="0,0,6,0" />
+                    <Ellipse Width="6" Height="6" Fill="{DynamicResource Token.StatusWarningBrush}" Margin="0,0,6,0" />
                     <TextBlock Style="{StaticResource Simple.MonoText}" Text="{Binding OfflineItemCount, StringFormat=Issues: {0}}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="14,0,0,0" VerticalAlignment="Center">
@@ -1299,12 +1549,10 @@
                         HorizontalAlignment="Left"
                         Command="{Binding CloseSettingsCommand}">
                     <StackPanel Orientation="Horizontal">
-                        <Path Width="13"
-                              Height="13"
-                              Data="{StaticResource Icon.Back}"
-                              Stroke="{DynamicResource Token.TextSecondaryBrush}"
-                              StrokeThickness="1.4"
-                              Stretch="Uniform" />
+                        <iconPacks:PackIconLucide Kind="ArrowLeft"
+                                                  Width="13"
+                                                  Height="13"
+                                                  Foreground="{DynamicResource Token.TextSecondaryBrush}" />
                         <TextBlock Margin="8,0,0,0" Text="Back to MyList" />
                     </StackPanel>
                 </Button>
@@ -1323,7 +1571,7 @@
                     Margin="0,12,12,12"
                     HorizontalAlignment="Right"
                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
                     CornerRadius="{DynamicResource Token.Radius2Xl}"
                     Effect="{DynamicResource Token.ShadowLg}">
@@ -1340,7 +1588,7 @@
                 VerticalAlignment="Bottom"
                 Margin="0,0,0,54"
                 Background="{DynamicResource Token.BgSurfaceBrush}"
-                BorderBrush="{DynamicResource Token.BorderSoftBrush}"
+                BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
                 BorderThickness="1"
                 CornerRadius="{DynamicResource Token.Radius2Xl}"
                 Padding="14,8">

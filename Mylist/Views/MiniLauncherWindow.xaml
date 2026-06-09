@@ -1,0 +1,116 @@
+<Window x:Class="MyList.Views.MiniLauncherWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:MyList.ViewModels"
+        Title="MyList Mini Launcher"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        Topmost="True"
+        WindowStartupLocation="CenterScreen"
+        Deactivated="OnDeactivated">
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}" />
+    </Window.InputBindings>
+    <Border Width="280" Height="280"
+            Background="{DynamicResource Token.BgSurfaceBrush}"
+            BorderBrush="{DynamicResource Token.BorderSoftBrush}"
+            BorderThickness="1"
+            CornerRadius="{StaticResource Token.Radius2Xl}"
+            Padding="0">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="32" ShadowDepth="8" Color="#000000" Opacity="0.55" />
+        </Border.Effect>
+        <Grid>
+            <ItemsControl ItemsSource="{Binding OrbitNodes}" IsHitTestVisible="False">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas Width="280" Height="280" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:MiniLauncherOrbitNodeViewModel}">
+                        <Line X1="140" Y1="140"
+                              X2="{Binding LineX2}" Y2="{Binding LineY2}"
+                              Stroke="{DynamicResource Token.AccentBrush}"
+                              StrokeThickness="1"
+                              StrokeDashArray="3,3"
+                              Opacity="0.4" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Ellipse Width="56" Height="56"
+                     Stroke="{DynamicResource Token.AccentBrush}"
+                     StrokeThickness="2"
+                     Fill="{DynamicResource Token.BgSubtleBrush}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center" />
+            <TextBlock Text="{Binding CenterLabel}"
+                       Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                       FontFamily="{DynamicResource Token.FontUi}"
+                       FontSize="11"
+                       FontWeight="Medium"
+                       TextTrimming="CharacterEllipsis"
+                       TextAlignment="Center"
+                       MaxWidth="48"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+
+            <ItemsControl ItemsSource="{Binding OrbitNodes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas Width="280" Height="280" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding NodeLeft}" />
+                        <Setter Property="Canvas.Top" Value="{Binding NodeTop}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:MiniLauncherOrbitNodeViewModel}">
+                        <Button Command="{Binding ActivateCommand}"
+                                Width="32" Height="32"
+                                BorderThickness="0"
+                                Background="Transparent"
+                                Padding="0"
+                                Cursor="Hand"
+                                ToolTip="{Binding Label}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="Chrome"
+                                            Background="{DynamicResource Token.BgSubtleBrush}"
+                                            BorderBrush="{DynamicResource Token.BorderSoftBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="16">
+                                        <TextBlock Text="{Binding Label}"
+                                                   Foreground="{DynamicResource Token.TextSecondaryBrush}"
+                                                   FontFamily="{DynamicResource Token.FontUi}"
+                                                   FontSize="10"
+                                                   FontWeight="Medium"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextAlignment="Center"
+                                                   Margin="2"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentBrush}" />
+                                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Border>
+</Window>

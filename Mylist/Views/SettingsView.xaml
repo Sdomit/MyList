@@ -74,7 +74,7 @@
 
         <Style x:Key="SettingsRow" TargetType="Border">
             <Setter Property="Padding" Value="0,14" />
-            <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderHairBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
         </Style>
 
@@ -134,7 +134,7 @@
     </UserControl.Resources>
 
     <Border Background="{DynamicResource Token.BgSurfaceBrush}"
-            BorderBrush="{DynamicResource Token.BorderHairBrush}"
+            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1,0,0,0"
             CornerRadius="10,10,0,0">
         <TabControl Background="{DynamicResource Token.BgSurfaceBrush}"
@@ -149,7 +149,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,1,0">
                             <Grid Margin="8,18,8,18">
                                 <Grid.RowDefinitions>
@@ -164,14 +164,14 @@
                                 <Border Grid.Row="2"
                                         Margin="6,14,6,0"
                                         Padding="10"
-                                        Background="{DynamicResource Token.AccentSoftBrush}"
-                                        BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                        Background="{DynamicResource Token.AccentSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                         BorderThickness="1"
                                         CornerRadius="{DynamicResource Token.RadiusMd}">
                                     <StackPanel>
                                         <TextBlock Text="Simple variant"
                                                    Foreground="{DynamicResource Token.TextAccentBrush}"
-                                                   FontSize="11.5"
+                                                   FontSize="{DynamicResource Token.TextXs}"
                                                    FontWeight="Medium" />
                                         <TextBlock Margin="0,3,0,0"
                                                    Style="{StaticResource Simple.MonoText}"
@@ -324,6 +324,65 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Accent" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Pick one of eight Forma accent palettes." />
+                                </StackPanel>
+                                <ListBox Grid.Column="1"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         ItemsSource="{Binding AccentPalettes}"
+                                         SelectedItem="{Binding Accent, Mode=TwoWay}"
+                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                         ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Margin" Value="3,0" />
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Cursor" Value="Hand" />
+                                            <Setter Property="ToolTip" Value="{Binding}" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                        <Border x:Name="Ring"
+                                                                Width="28" Height="28"
+                                                                CornerRadius="14"
+                                                                BorderThickness="2"
+                                                                BorderBrush="Transparent"
+                                                                Padding="2">
+                                                            <Ellipse Fill="{Binding Converter={StaticResource AccentPaletteToBrushConverter}}" />
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsSelected" Value="True">
+                                                                <Setter TargetName="Ring" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="Ring" Property="BorderBrush" Value="{DynamicResource Token.BorderStrongBrush}" />
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="220" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
@@ -440,8 +499,8 @@
 
                         <Border Margin="0,18,0,0"
                                 Padding="12"
-                                Background="{DynamicResource Token.AccentSoftBrush}"
-                                BorderBrush="{DynamicResource Token.AccentMuteBrush}"
+                                Background="{DynamicResource Token.AccentSubtleBrush}"
+                                BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{DynamicResource Token.RadiusMd}">
                             <TextBlock Foreground="{DynamicResource Token.TextSecondaryBrush}"

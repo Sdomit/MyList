@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using MyList.ViewModels;
 
@@ -9,10 +10,13 @@ public partial class CommandPaletteWindow : Window
 {
     private readonly CommandPaletteViewModel _viewModel;
 
-    public CommandPaletteWindow(IReadOnlyList<CommandPaletteEntry> entries)
+    public CommandPaletteWindow(
+        MainViewModel mainVm,
+        IReadOnlyList<CommandRow> commands,
+        IReadOnlyList<SettingsRow> settings)
     {
         InitializeComponent();
-        _viewModel = new CommandPaletteViewModel(entries);
+        _viewModel = new CommandPaletteViewModel(mainVm, commands, settings);
         DataContext = _viewModel;
         Loaded += (_, _) => QueryBox.Focus();
     }
@@ -27,24 +31,46 @@ public partial class CommandPaletteWindow : Window
 
         if (e.Key == Key.Enter)
         {
-            _viewModel.ExecuteSelected();
-            DialogResult = true;
+            var shouldClose = _viewModel.ExecuteFocused();
+            if (shouldClose)
+            {
+                DialogResult = true;
+            }
+            e.Handled = true;
             return;
         }
 
         if (e.Key == Key.Down)
         {
-            if (CommandList.SelectedIndex < CommandList.Items.Count - 1)
-            {
-                CommandList.SelectedIndex++;
-            }
+            _viewModel.MoveFocus(1);
             e.Handled = true;
         }
         else if (e.Key == Key.Up)
         {
-            if (CommandList.SelectedIndex > 0)
+            _viewModel.MoveFocus(-1);
+            e.Handled = true;
+        }
+    }
+
+    private void OnRowMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.ListBox)
+        {
+            return;
+        }
+
+        var hit = e.OriginalSource as DependencyObject;
+        while (hit is not null and not ListBoxItem)
+        {
+            hit = System.Windows.Media.VisualTreeHelper.GetParent(hit);
+        }
+
+        if (hit is ListBoxItem container && container.DataContext is IPaletteRow row && !row.IsOverflow)
+        {
+            row.Execute();
+            if (!row.KeepPaletteOpen)
             {
-                CommandList.SelectedIndex--;
+                DialogResult = true;
             }
             e.Handled = true;
         }

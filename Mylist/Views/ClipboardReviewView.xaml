@@ -11,13 +11,18 @@
             <Grid Margin="10,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Ellipse Width="7"
                          Height="7"
-                         Fill="{DynamicResource Token.StatusOkBrush}"
+                         Fill="{DynamicResource Token.StatusSuccessBrush}"
                          VerticalAlignment="Center" />
-                <StackPanel Grid.Column="1" Margin="9,0,0,0">
+                <ContentControl Grid.Column="1"
+                                Margin="9,0,0,0"
+                                Style="{StaticResource Chip.Type}"
+                                Tag="{Binding Kind}" />
+                <StackPanel Grid.Column="2" Margin="9,0,0,0">
                     <TextBlock Style="{StaticResource Simple.MonoText}"
                                Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                Text="{Binding DisplayPath}"
@@ -35,20 +40,25 @@
             <Grid Margin="10,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Ellipse Width="7"
                          Height="7"
-                         Fill="{DynamicResource Token.StatusBadBrush}"
+                         Fill="{DynamicResource Token.StatusDangerBrush}"
                          VerticalAlignment="Center" />
-                <StackPanel Grid.Column="1" Margin="9,0,0,0">
+                <ContentControl Grid.Column="1"
+                                Margin="9,0,0,0"
+                                Style="{StaticResource Chip.Type}"
+                                Tag="{Binding Kind}" />
+                <StackPanel Grid.Column="2" Margin="9,0,0,0">
                     <TextBlock Style="{StaticResource Simple.MonoText}"
                                Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                Text="{Binding DisplayPath}"
                                TextTrimming="CharacterEllipsis"
                                ToolTip="{Binding DisplayPath}" />
                     <TextBlock Margin="0,3,0,0"
-                               Foreground="{DynamicResource Token.StatusBadBrush}"
+                               Foreground="{DynamicResource Token.StatusDangerBrush}"
                                FontSize="10.5"
                                Text="{Binding Reason}"
                                TextTrimming="CharacterEllipsis" />
@@ -74,7 +84,7 @@
             </Grid.RowDefinitions>
 
             <Border Padding="20,16"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -126,10 +136,10 @@
                                 </Grid.RowDefinitions>
                                 <Border Padding="10,8"
                                         Background="{DynamicResource Token.BgSubtleBrush}"
-                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                         BorderThickness="0,0,0,1">
                                     <TextBlock Style="{StaticResource Simple.SectionLabel}"
-                                               Foreground="{DynamicResource Token.StatusOkBrush}"
+                                               Foreground="{DynamicResource Token.StatusSuccessBrush}"
                                                Text="{Binding ClipboardWillAddHeader}" />
                                 </Border>
                                 <ListBox Grid.Row="1"
@@ -147,7 +157,7 @@
                                 </Grid.RowDefinitions>
                                 <Border Padding="10,8"
                                         Background="{DynamicResource Token.BgSubtleBrush}"
-                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                         BorderThickness="0,0,0,1">
                                     <TextBlock Style="{StaticResource Simple.SectionLabel}"
                                                Foreground="{DynamicResource Token.AccentBrush}"
@@ -168,10 +178,10 @@
                                 </Grid.RowDefinitions>
                                 <Border Padding="10,8"
                                         Background="{DynamicResource Token.BgSubtleBrush}"
-                                        BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                         BorderThickness="0,0,0,1">
                                     <TextBlock Style="{StaticResource Simple.SectionLabel}"
-                                               Foreground="{DynamicResource Token.StatusBadBrush}"
+                                               Foreground="{DynamicResource Token.StatusDangerBrush}"
                                                Text="{Binding ClipboardSkippedHeader}" />
                                 </Border>
                                 <ListBox Grid.Row="1"
@@ -192,7 +202,7 @@
                         </Grid.RowDefinitions>
                         <Border Padding="10,9"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
-                                BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                 BorderThickness="0,0,0,1">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="HISTORY" />
@@ -234,7 +244,7 @@
             <Border Grid.Row="2"
                     Padding="16,10"
                     Background="{DynamicResource Token.BgMicaBrush}"
-                    BorderBrush="{DynamicResource Token.BorderHairBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="0,1,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions>

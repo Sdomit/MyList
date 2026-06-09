@@ -86,11 +86,28 @@ public sealed class SettingsViewModel : ViewModelBase
                 _settings.Theme = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsDarkMode));
-                _themeService.ApplyTheme(value);
+                _themeService.ApplyTheme(value, _settings.Accent);
                 _queueSave();
             }
         }
     }
+
+    public AccentPalette Accent
+    {
+        get => _settings.Accent;
+        set
+        {
+            if (_settings.Accent != value)
+            {
+                _settings.Accent = value;
+                OnPropertyChanged();
+                _themeService.ApplyTheme(_settings.Theme, value);
+                _queueSave();
+            }
+        }
+    }
+
+    public Array AccentPalettes { get; } = Enum.GetValues<AccentPalette>();
 
     public bool FollowSystemTheme
     {
@@ -321,11 +338,12 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public void ReloadFromSettings()
     {
-        _themeService.ApplyTheme(_settings.Theme);
+        _themeService.ApplyTheme(_settings.Theme, _settings.Accent);
         _densityService.ApplyDensity(_settings.UiDensity);
         RuntimeStatus.DebugMode = _settings.EnableDebugMode;
 
         OnPropertyChanged(nameof(Theme));
+        OnPropertyChanged(nameof(Accent));
         OnPropertyChanged(nameof(FollowSystemTheme));
         OnPropertyChanged(nameof(IsDarkMode));
         OnPropertyChanged(nameof(ViewMode));
