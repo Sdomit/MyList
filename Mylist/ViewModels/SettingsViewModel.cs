@@ -24,6 +24,7 @@ public sealed class SettingsViewModel : ViewModelBase
     private string _debugCopyStatus = string.Empty;
     private string _explorerIntegrationStatusText = "Explorer integration status unknown.";
     private bool _isExplorerIntegrationInstalled;
+    private string? _pendingSectionAnchor;
     public event EventHandler<bool>? FollowSystemThemeChanged;
 
     public SettingsViewModel(
@@ -320,6 +321,12 @@ public sealed class SettingsViewModel : ViewModelBase
     }
 
     public string ItemScalePercentText => $"{Math.Round(ItemScale * 100):0}%";
+
+    public string? PendingSectionAnchor
+    {
+        get => _pendingSectionAnchor;
+        set => SetProperty(ref _pendingSectionAnchor, value);
+    }
 
     public ICommand ExportCommand { get; }
     public ICommand ImportCommand { get; }
