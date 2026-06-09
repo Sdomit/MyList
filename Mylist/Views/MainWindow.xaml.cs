@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using MyList.Helpers;
 using MyList.Models;
 using MyList.Services;
 using MyList.ViewModels;
@@ -75,8 +76,24 @@ public partial class MainWindow : Window
         ApplyLayoutMode(ViewModel.Settings.LayoutMode);
         EnsureWindowVisible();
         RestoreAndActivate();
+        ApplyMicaBackdrop();
         ViewModel.Settings.PropertyChanged -= OnSettingsPropertyChanged;
         ViewModel.Settings.PropertyChanged += OnSettingsPropertyChanged;
+    }
+
+    private void ApplyMicaBackdrop()
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        if (MicaHelper.TryApply(this, ViewModel.Settings.IsDarkMode))
+        {
+            // System backdrop owns the composition; clear the solid fallback brush so
+            // Mica shows through. WPF still composites theme tokens above on child surfaces.
+            Background = System.Windows.Media.Brushes.Transparent;
+        }
     }
 
     private void EnsureWindowVisible()
@@ -178,6 +195,11 @@ public partial class MainWindow : Window
         {
             _autoHideTimer.Stop();
             _autoHidden = false;
+        }
+        else if (e.PropertyName == nameof(SettingsViewModel.IsDarkMode))
+        {
+            // Re-apply Mica's immersive-dark-mode flag so the title bar tracks the theme.
+            ApplyMicaBackdrop();
         }
     }
 
