@@ -1,12 +1,16 @@
 <UserControl x:Class="MyList.Views.ItemEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:MyList.Helpers"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              Background="{DynamicResource Token.TransparentBrush}"
              Foreground="{DynamicResource Token.TextPrimaryBrush}"
              FontFamily="{DynamicResource Token.FontUi}">
     <UserControl.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
         <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
+        <helpers:TerminalProfileToLabelConverter x:Key="TerminalProfileToLabelConverter" />
+        <helpers:TerminalProfileToLucideKindConverter x:Key="TerminalProfileToLucideKindConverter" />
         <Style x:Key="EditorFieldLabel" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Token.TextSecondaryBrush}" />
             <Setter Property="FontSize" Value="11" />
@@ -17,6 +21,19 @@
         <Style x:Key="EditorSectionLabel" TargetType="TextBlock" BasedOn="{StaticResource Simple.SectionLabel}">
             <Setter Property="Margin" Value="0,0,0,10" />
         </Style>
+
+        <DataTemplate x:Key="TerminalProfileSegmentTemplate">
+            <StackPanel Orientation="Horizontal">
+                <iconPacks:PackIconLucide Kind="{Binding Converter={StaticResource TerminalProfileToLucideKindConverter}}"
+                                          Width="14"
+                                          Height="14"
+                                          VerticalAlignment="Center" />
+                <TextBlock Margin="8,0,0,0"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Text="{Binding Converter={StaticResource TerminalProfileToLabelConverter}}" />
+            </StackPanel>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
@@ -122,8 +139,10 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel>
                         <TextBlock Style="{StaticResource EditorFieldLabel}" Text="Terminal profile" />
-                        <ComboBox ItemsSource="{Binding TerminalProfiles}"
-                                  SelectedItem="{Binding TerminalProfile}" />
+                        <ListBox Style="{StaticResource Simple.SegmentedControl}"
+                                 ItemsSource="{Binding TerminalProfiles}"
+                                 SelectedItem="{Binding TerminalProfile}"
+                                 ItemTemplate="{StaticResource TerminalProfileSegmentTemplate}" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" VerticalAlignment="Bottom">
                         <CheckBox Content="Run as administrator"

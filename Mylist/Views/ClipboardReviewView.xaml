@@ -11,13 +11,18 @@
             <Grid Margin="10,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Ellipse Width="7"
                          Height="7"
                          Fill="{DynamicResource Token.StatusSuccessBrush}"
                          VerticalAlignment="Center" />
-                <StackPanel Grid.Column="1" Margin="9,0,0,0">
+                <ContentControl Grid.Column="1"
+                                Margin="9,0,0,0"
+                                Style="{StaticResource Chip.Type}"
+                                Tag="{Binding Kind}" />
+                <StackPanel Grid.Column="2" Margin="9,0,0,0">
                     <TextBlock Style="{StaticResource Simple.MonoText}"
                                Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                Text="{Binding DisplayPath}"
@@ -35,13 +40,18 @@
             <Grid Margin="10,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Ellipse Width="7"
                          Height="7"
                          Fill="{DynamicResource Token.StatusDangerBrush}"
                          VerticalAlignment="Center" />
-                <StackPanel Grid.Column="1" Margin="9,0,0,0">
+                <ContentControl Grid.Column="1"
+                                Margin="9,0,0,0"
+                                Style="{StaticResource Chip.Type}"
+                                Tag="{Binding Kind}" />
+                <StackPanel Grid.Column="2" Margin="9,0,0,0">
                     <TextBlock Style="{StaticResource Simple.MonoText}"
                                Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                Text="{Binding DisplayPath}"

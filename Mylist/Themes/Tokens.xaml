@@ -145,6 +145,16 @@
     <SolidColorBrush x:Key="Token.StatusInfoBackgroundBrush" Color="{DynamicResource Token.StatusInfoBackgroundColor}" />
     <SolidColorBrush x:Key="Token.StatusInfoBorderBrush" Color="{DynamicResource Token.StatusInfoBorderColor}" />
     <SolidColorBrush x:Key="Token.StatusUnknownBrush" Color="{DynamicResource Token.StatusUnknownColor}" />
+    <!-- MyList health/trend tokens (HANDOFF §4 Constellation chips) -->
+    <SolidColorBrush x:Key="Token.MyList.HealthOkBrush" Color="{DynamicResource Token.StatusSuccessColor}" />
+    <SolidColorBrush x:Key="Token.MyList.HealthBadBrush" Color="{DynamicResource Token.StatusDangerColor}" />
+    <SolidColorBrush x:Key="Token.MyList.HealthUnknownBrush" Color="{DynamicResource Token.TextTertiaryColor}" />
+    <!-- MyList type tokens (HANDOFF §4 palette type badges) -->
+    <SolidColorBrush x:Key="Token.MyList.TypeFileBrush" Color="{DynamicResource Token.TypeFileBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.MyList.TypeFolderBrush" Color="{DynamicResource Token.TypeFolderBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.MyList.TypeMtabBrush" Color="{DynamicResource Token.TypeMtabBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.MyList.TypeClipBrush" Color="{DynamicResource Token.TypeClipBackgroundColor}" />
+    <SolidColorBrush x:Key="Token.MyList.TypeActionBrush" Color="{DynamicResource Token.TypeActionBackgroundColor}" />
     <SolidColorBrush x:Key="Token.TransparentBrush" Color="{DynamicResource Token.TransparentColor}" />
     <SolidColorBrush x:Key="Token.WhiteBrush" Color="{DynamicResource Token.WhiteColor}" />
     <SolidColorBrush x:Key="Token.OverlayBrush" Color="{DynamicResource Token.OverlayColor}" />

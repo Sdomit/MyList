@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Windows;
@@ -19,6 +18,8 @@ public sealed class ItemModel : ObservableObject
     private string? _iconPath;
     private bool _useSystemIcon = true;
     private bool _isFavorite;
+    private bool _isPinned;
+    private DateTime? _pinnedAtUtc;
     private DateTime _lastOpenedDate;
     private ItemHealthState _healthState;
     private ImageSource? _icon;
@@ -38,6 +39,9 @@ public sealed class ItemModel : ObservableObject
     private ObservableCollection<string> _mtabPaths = new();
     private string _mtabSearchHint = string.Empty;
     private string? _searchContentCache;
+    private PointCollection? _trajectoryPointsCache;
+    private IReadOnlyList<TrajectoryBar>? _trajectoryBarsCache;
+    private int[]? _last14DayBucketsCache;
 
     public ItemModel()
     {
@@ -115,6 +119,31 @@ public sealed class ItemModel : ObservableObject
         set => SetProperty(ref _isFavorite, value);
     }
 
+    public bool IsPinned
+    {
+        get => _isPinned;
+        set
+        {
+            if (SetProperty(ref _isPinned, value))
+            {
+                if (value && _pinnedAtUtc is null)
+                {
+                    PinnedAtUtc = DateTime.UtcNow;
+                }
+                else if (!value)
+                {
+                    PinnedAtUtc = null;
+                }
+            }
+        }
+    }
+
+    public DateTime? PinnedAtUtc
+    {
+        get => _pinnedAtUtc;
+        set => SetProperty(ref _pinnedAtUtc, value);
+    }
+
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     public DateTime LastOpenedDate
@@ -141,39 +170,44 @@ public sealed class ItemModel : ObservableObject
             {
                 OnPropertyChanged(nameof(IsOffline));
                 OnPropertyChanged(nameof(HealthScore));
-                OnPropertyChanged(nameof(HealthDashArray));
             }
+        }
+    }
+
+    [JsonIgnore]
+    public ContentKind Kind
+    {
+        get
+        {
+            if (_isActionItem) return ContentKind.Action;
+            if (_isMtab) return ContentKind.Mtab;
+            if (_isClipboardText || _isClipboardImage) return ContentKind.Clip;
+            return _type == ItemType.Folder ? ContentKind.Folder : ContentKind.File;
         }
     }
 
     [JsonIgnore]
     public double HealthScore => HealthState switch
     {
-        ItemHealthState.Healthy => 0.95,
-        ItemHealthState.Unchecked => 0.50,
-        ItemHealthState.Offline => 0.30,
-        ItemHealthState.Missing => 0.15,
-        ItemHealthState.PermissionDenied => 0.15,
-        _ => 0.50,
+        ItemHealthState.Healthy => 1.0,
+        ItemHealthState.Offline => 0.6,
+        ItemHealthState.Missing => 0.3,
+        ItemHealthState.PermissionDenied => 0.3,
+        ItemHealthState.Unchecked => 0.5,
+        _ => 0.5,
     };
-
-    [JsonIgnore]
-    public string HealthDashArray
-    {
-        get
-        {
-            const double circumference = Math.PI * 12.0;
-            var arc = circumference * Math.Clamp(HealthScore, 0.0, 1.0);
-            return string.Create(CultureInfo.InvariantCulture, $"{arc:F2},{circumference:F2}");
-        }
-    }
 
     [JsonIgnore]
     public PointCollection TrajectoryPoints
     {
         get
         {
-            var buckets = ComputeDailyBuckets(14);
+            if (_trajectoryPointsCache is not null)
+            {
+                return _trajectoryPointsCache;
+            }
+
+            var buckets = GetLast14DayBuckets();
             var max = Math.Max(buckets.Max(), 1);
             const double width = 60.0;
             const double height = 16.0;
@@ -188,6 +222,8 @@ public sealed class ItemModel : ObservableObject
                 points.Add(new System.Windows.Point(x, y));
             }
 
+            points.Freeze();
+            _trajectoryPointsCache = points;
             return points;
         }
     }
@@ -197,17 +233,28 @@ public sealed class ItemModel : ObservableObject
     {
         get
         {
+            if (_trajectoryBarsCache is not null)
+            {
+                return _trajectoryBarsCache;
+            }
+
             var buckets = ComputeDailyBuckets(20);
             var max = Math.Max(buckets.Max(), 1);
             var bars = new List<TrajectoryBar>(buckets.Length);
+            var lastIndex = buckets.Length - 1;
             for (var i = 0; i < buckets.Length; i++)
             {
                 var ratio = buckets[i] / (double)max;
                 var bucketHeight = 4 + ratio * 44;
-                var recencyOpacity = 0.30 + 0.70 * (i / (double)Math.Max(buckets.Length - 1, 1));
-                bars.Add(new TrajectoryBar(bucketHeight, recencyOpacity));
+                var recencyOpacity = 0.30 + 0.70 * (i / (double)Math.Max(lastIndex, 1));
+                bars.Add(new TrajectoryBar(bucketHeight, recencyOpacity)
+                {
+                    DayOffset = lastIndex - i,
+                    AccessCount = buckets[i],
+                });
             }
 
+            _trajectoryBarsCache = bars;
             return bars;
         }
     }
@@ -234,9 +281,42 @@ public sealed class ItemModel : ObservableObject
 
     private void RaiseTrajectoryChanged()
     {
+        _trajectoryPointsCache = null;
+        _trajectoryBarsCache = null;
+        _last14DayBucketsCache = null;
         OnPropertyChanged(nameof(TrajectoryPoints));
         OnPropertyChanged(nameof(TrajectoryBars));
         OnPropertyChanged(nameof(OpenedHistory));
+        OnPropertyChanged(nameof(TrendDelta));
+    }
+
+    [JsonIgnore]
+    public int TrendDelta
+    {
+        get
+        {
+            var buckets = GetLast14DayBuckets();
+            var last7 = 0;
+            var prior7 = 0;
+            for (var i = 0; i < buckets.Length; i++)
+            {
+                if (i >= buckets.Length - 7)
+                {
+                    last7 += buckets[i];
+                }
+                else
+                {
+                    prior7 += buckets[i];
+                }
+            }
+
+            return last7 - prior7;
+        }
+    }
+
+    private int[] GetLast14DayBuckets()
+    {
+        return _last14DayBucketsCache ??= ComputeDailyBuckets(14);
     }
 
     private int[] ComputeDailyBuckets(int days)

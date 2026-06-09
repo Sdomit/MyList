@@ -40,7 +40,7 @@ Extract `MyList-win-x64.zip` anywhere and run **`MyList.exe`**. Portable — no 
 - 📁 **Many item types** — files, folders, *mtabs* (open several folders as Explorer tabs at once),
   clipboard text, clipboard images, and runnable action items (Command / Batch / PowerShell).
 - ⚙️ **Per-item launch profiles** — arguments, working directory, run-as-admin, and terminal
-  choice (Windows Terminal / PowerShell / cmd).
+  choice (Terminal / PowerShell / cmd).
 - ⌨️ **Global hotkey** to show/hide, with automatic fallback if the combo is taken.
 - 🔔 **System tray** with show/hide, settings, and exit.
 - 🎨 **Theming** — dark, light, or follow-system, plus selectable UI density.
