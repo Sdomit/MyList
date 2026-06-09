@@ -137,7 +137,8 @@
             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1,0,0,0"
             CornerRadius="10,10,0,0">
-        <TabControl Background="{DynamicResource Token.BgSurfaceBrush}"
+        <TabControl x:Name="SettingsTabs"
+                    Background="{DynamicResource Token.BgSurfaceBrush}"
                     BorderThickness="0"
                     TabStripPlacement="Left">
             <TabControl.Template>

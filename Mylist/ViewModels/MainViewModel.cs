@@ -1030,11 +1030,12 @@ public sealed class MainViewModel : ViewModelBase
 
     public void SwitchAccent()
     {
-        // TODO PR#12: jump to Settings → Appearance via SettingsRow anchor scroll.
         if (!IsSettingsOpen)
         {
             ToggleSettingsCommand.Execute(null);
         }
+
+        Settings.PendingSectionAnchor = "Appearance";
     }
 
     public void ToggleDiagnostics()
@@ -4616,24 +4617,25 @@ public sealed class MainViewModel : ViewModelBase
 
     private IReadOnlyList<SettingsRow> BuildSettingsRows()
     {
-        // TODO PR#12: wire anchor scroll. For now each row opens the Settings drawer.
-        void OpenSettings()
+        void OpenSettingsAt(string anchor)
         {
             if (!IsSettingsOpen)
             {
                 ToggleSettingsCommand.Execute(null);
             }
+
+            Settings.PendingSectionAnchor = anchor;
         }
 
         return new List<SettingsRow>
         {
-            new() { Title = "Appearance", Subtitle = "Theme, accent, density", AnchorKey = "Appearance", ExecuteAction = OpenSettings },
-            new() { Title = "Hotkeys", Subtitle = "Global shortcuts", AnchorKey = "Hotkeys", ExecuteAction = OpenSettings },
-            new() { Title = "Density", Subtitle = "UI compactness", AnchorKey = "Density", ExecuteAction = OpenSettings },
-            new() { Title = "Startup", Subtitle = "Launch on boot, always on top", AnchorKey = "Startup", ExecuteAction = OpenSettings },
+            new() { Title = "Appearance", Subtitle = "Theme, accent, density", AnchorKey = "Appearance", ExecuteAction = () => OpenSettingsAt("Appearance") },
+            new() { Title = "Hotkeys", Subtitle = "Global shortcuts", AnchorKey = "Hotkeys", ExecuteAction = () => OpenSettingsAt("Hotkeys") },
+            new() { Title = "Density", Subtitle = "UI compactness", AnchorKey = "Density", ExecuteAction = () => OpenSettingsAt("Density") },
+            new() { Title = "Startup", Subtitle = "Launch on boot, always on top", AnchorKey = "Startup", ExecuteAction = () => OpenSettingsAt("Startup") },
             new() { Title = "Diagnostics", Subtitle = "Runtime info and logs", AnchorKey = "Diagnostics", ExecuteAction = ToggleDiagnostics },
-            new() { Title = "Storage", Subtitle = "Local store, backups, import/export", AnchorKey = "Storage", ExecuteAction = OpenSettings },
-            new() { Title = "About", Subtitle = "MyList version and credits", AnchorKey = "About", ExecuteAction = OpenSettings },
+            new() { Title = "Storage", Subtitle = "Local store, backups, import/export", AnchorKey = "Storage", ExecuteAction = () => OpenSettingsAt("Storage") },
+            new() { Title = "About", Subtitle = "MyList version and credits", AnchorKey = "About", ExecuteAction = () => OpenSettingsAt("About") },
         };
     }
 
