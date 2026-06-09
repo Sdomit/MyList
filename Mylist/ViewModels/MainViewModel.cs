@@ -60,6 +60,8 @@ public sealed class MainViewModel : ViewModelBase
     private string _quickEditPath = string.Empty;
     private string _quickEditTags = string.Empty;
     private string _statusText = "Ready";
+    private string? _toastText;
+    private readonly DispatcherTimer _toastTimer;
 
     public MainViewModel(
         AppData appData,
@@ -129,6 +131,7 @@ public sealed class MainViewModel : ViewModelBase
             RefreshSmartCollections();
             UpdateStatusCounts();
             QueueSave();
+            ShowToast("Saved");
         };
 
         AddFileCommand = new RelayCommand(AddFileItem);
@@ -197,6 +200,13 @@ public sealed class MainViewModel : ViewModelBase
         {
             _saveTimer.Stop();
             await _storageService.SaveAsync(AppData);
+        };
+
+        _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2400) };
+        _toastTimer.Tick += (_, _) =>
+        {
+            _toastTimer.Stop();
+            ToastText = null;
         };
 
         _clipboardFeedbackTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.8) };
@@ -493,6 +503,19 @@ public sealed class MainViewModel : ViewModelBase
     public ICommand AddSeparatorCommand { get; }
     public ICommand OpenItemCommand { get; }
     public ICommand OpenIndexedItemCommand { get; }
+
+    public string? ToastText
+    {
+        get => _toastText;
+        private set => SetProperty(ref _toastText, value);
+    }
+
+    public void ShowToast(string text)
+    {
+        ToastText = text;
+        _toastTimer.Stop();
+        _toastTimer.Start();
+    }
     public ICommand OpenNewWindowCommand { get; }
     public ICommand OpenInTerminalCommand { get; }
     public ICommand CopyPathCommand { get; }
@@ -629,6 +652,7 @@ public sealed class MainViewModel : ViewModelBase
         item.IsPinned = !item.IsPinned;
         RefreshSmartCollections();
         QueueSave();
+        ShowToast(item.IsPinned ? $"Pinned: {item.Name}" : $"Unpinned: {item.Name}");
     }
 
     public void MoveItem(CollectionViewModel collection, ItemModel item, int newIndex)
@@ -1023,6 +1047,7 @@ public sealed class MainViewModel : ViewModelBase
         RefreshAllIcons();
         RefreshSmartCollections();
         StatusText = "Refreshed";
+        ShowToast("Data reloaded");
     }
 
     public void QuitApplication()
@@ -1828,7 +1853,10 @@ public sealed class MainViewModel : ViewModelBase
 
     private void CopyPath(ItemModel? item)
     {
-        TryCopyItemReference(item);
+        if (TryCopyItemReference(item))
+        {
+            ShowToast("Copied to clipboard");
+        }
     }
 
     private bool TryCopyClipboardItem(ItemModel item)

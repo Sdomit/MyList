@@ -1636,5 +1636,56 @@
                            Foreground="{DynamicResource Token.TextPrimaryBrush}" />
             </Border>
         </Popup>
+
+        <!-- App-wide transient toast: bound to MainViewModel.ToastText, auto-clears after ~2.4s.
+             Fades in/out via Opacity Storyboard on DataTrigger; IsHitTestVisible=False so it never blocks. -->
+        <Border x:Name="ToastHost"
+                Grid.RowSpan="3"
+                Panel.ZIndex="50"
+                IsHitTestVisible="False"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,28"
+                Background="{DynamicResource Token.BgSurfaceBrush}"
+                BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource Token.RadiusXl}"
+                Padding="14,9"
+                Effect="{DynamicResource Token.ShadowMd}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ToastText}" Value="{x:Null}">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         To="0"
+                                                         Duration="0:0:0.22" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Border.Triggers>
+                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             To="1"
+                                             Duration="0:0:0.18" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Border.Triggers>
+            <TextBlock Text="{Binding ToastText, NotifyOnTargetUpdated=True}"
+                       FontSize="12.5"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource Token.TextPrimaryBrush}" />
+        </Border>
     </Grid>
 </Window>
