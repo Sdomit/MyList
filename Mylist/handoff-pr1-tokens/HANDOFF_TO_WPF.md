@@ -61,6 +61,8 @@
 
 > **Action:** do the renames in one PR with mechanical find/replace. After this, every WPF brush has a 1:1 Forma counterpart, and you can name the new tokens directly after the Forma vars going forward (e.g. anyone reading the prototype CSS can grep the WPF resource dictionary).
 
+> **Reality (PR #9 / #10 / #12):** `Token.MyList.Health{Ok,Bad,Unknown}Brush` and `Token.MyList.Type{File,Folder,Mtab,Clip,Action}Brush` ship as **aliases** in `Themes/Tokens.xaml` pointing at the existing `Token.Status*Color` / `Token.Type*BackgroundColor` definitions — not new colors. Theme cascade auto-flows; no per-theme overrides were added. `Token.MyList.HealthWarn*` from the original spec was never needed (warning band collapses into the unknown / non-binary trend signal in §4 Constellation chips).
+
 > **Shipped (PR #9, #10):** `Token.MyList.Health{Ok,Bad,Unknown}Brush` and `Token.MyList.Type{File,Folder,Mtab,Clip,Action}Brush` are SolidColorBrush **aliases** over the existing `Token.Status*Color` and `Token.Type*BackgroundColor` definitions — not new colors. Themes cascade automatically via `DynamicResource Color` references. Foreground for type chips uses the matching saturated `Token.TypeXxxForegroundBrush` for WCAG-AA contrast on pastel backgrounds.
 
 ### 1.2 Typography
@@ -185,6 +187,8 @@ Hidden at rest, visible on hover/selection. Drop into `ListItemTemplate` in `Mai
 
 Use the existing `helpers:ItemIndex` attached property (or `AlternationIndex` + `+1` converter). Bind to first 9 only — items 10+ get no chip.
 
+> **Reality (PR #5 / #10 / #12 hotkeys PR):** shipped with `ListBox.AlternationCount="9999"` (not `"9"`) because WPF's `AlternationIndex` modulo-cycles at the count; capping at 9 would have given every 10th row a `⌘1` chip. Visibility for rows 10+ is gated by `IntPlusOneConverter` returning `Visibility.Collapsed` when index ≥ 9. Chip chrome lifted into shared `Chip.Kbd` style (`Themes/Chips.xaml`) in PR #10; PR #12 made the chip functional by wiring `Window.InputBindings` `Ctrl+D1..D9` → `OpenIndexedItemCommand`, which resolves the 1-based index to the first 9 non-separator entries in `SelectedCollection.FilteredEntries` and dispatches `OpenItemCommand`.
+
 > **Shipped (PR #5):** `ListBox.AlternationCount="9999"` (not `9`). WPF cycles AlternationIndex modulo AlternationCount; setting it to 9 makes row 10 reuse the chip text for row 1. `IntPlusOneConverter` is dual-mode — returns the `1..9` label string AND a `Visibility` value when target type is `Visibility`, hiding the chip on rows ≥ 10. PR #10 lifted the chip chrome to `Themes/Chips.xaml` as `Chip.Kbd` (ContentControl style); the row template keeps the fade animation + AlternationIndex visibility binding caller-side.
 
 ### 3.2 Sparkline — item row trajectory
@@ -275,6 +279,8 @@ Forma:  20 vertical bars, height ∝ access count. WPF:
 ```
 
 `TrajectoryBars` is `IReadOnlyList<TrajectoryBar>` where `Height` is 4..48 and `Opacity` is 0.3..1 by recency.
+
+> **Reality (PR #6 / #8):** preview pane ships **20 bars** as spec'd; row-level sparkline (§3.2) uses **14 buckets** to fit 60×16 px. Both share `ItemModel.ComputeDailyBuckets(int days)` private helper, and the 14-day bucket result is cached (`_last14DayBucketsCache`) and reused by `ItemModel.TrendDelta` (PR #9) to compute `last7 − prior7` without re-walking timestamps. Cache invalidates inside `RaiseTrajectoryChanged()` alongside `_trajectoryPointsCache` / `_trajectoryBarsCache`. `TrajectoryBarTooltipConverter` formats per-bar tooltip as `"Today — N opens"` / `"Yesterday — 1 open"` / `"N days ago — no opens"`.
 
 > **Shipped (PR #6, #8, #9):** `TrajectoryPoints` uses a 14-day window (row sparkline); `TrajectoryBars` uses a 20-day window (preview pane). Both share the same private `ComputeDailyBuckets(days)` on `ItemModel` and invalidate together via `RaiseTrajectoryChanged()`. `TrendDelta` (PR #9 Constellation Trending) consumes a cached 14-day bucket array via `GetLast14DayBuckets()` — computes `last7 − prior7` without re-walking `OpenedHistory`. Adding new windows: extend the cache by adding a sibling field next to `_last14DayBucketsCache`; clear it in `RaiseTrajectoryChanged`.
 
