@@ -707,6 +707,22 @@
                                 </StackPanel>
                             </Grid>
                         </Border>
+
+                        <Border Style="{StaticResource SettingsCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SettingsRowName}" Text="Author" />
+                                <TextBlock Margin="0,4,0,0"
+                                           Style="{StaticResource Simple.PaneTitle}"
+                                           Text="Sarmad Domit" />
+                                <TextBlock Margin="0,8,0,0" Style="{StaticResource Simple.MetaText}">
+                                    <Hyperlink NavigateUri="https://www.sarmaddomit.com"
+                                               RequestNavigate="OnHyperlinkRequestNavigate"
+                                               Foreground="{DynamicResource Token.TextAccentBrush}">
+                                        www.sarmaddomit.com
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

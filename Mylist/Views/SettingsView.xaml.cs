@@ -1,8 +1,11 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using MyList.Models;
+using MyList.Services;
 using MyList.ViewModels;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
@@ -117,5 +120,18 @@ public partial class SettingsView : System.Windows.Controls.UserControl
                || key == Key.LeftAlt || key == Key.RightAlt
                || key == Key.LeftShift || key == Key.RightShift
                || key == Key.LWin || key == Key.RWin;
+    }
+
+    private void OnHyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            e.Handled = true;
+        }
+        catch (System.Exception ex)
+        {
+            LogService.Instance.Log(ex, $"Failed to open URL: {e.Uri}");
+        }
     }
 }
