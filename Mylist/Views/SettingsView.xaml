@@ -503,6 +503,25 @@
                             </Grid>
                         </Border>
 
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="230" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Quick menu (mini-launcher)" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Global shortcut for the orbit picker. Click the field and press a new shortcut." />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBox Text="{Binding MiniLauncherHotkeyDisplay, Mode=OneWay}"
+                                             IsReadOnly="True"
+                                             FontFamily="{DynamicResource Token.FontMono}"
+                                             PreviewKeyDown="OnMiniLauncherHotkeyPreviewKeyDown" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
                         <Border Margin="0,18,0,0"
                                 Padding="12"
                                 Background="{DynamicResource Token.AccentSubtleBrush}"

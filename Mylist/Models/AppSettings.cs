@@ -1,4 +1,5 @@
 using System;
+using System.Windows.Input;
 
 namespace MyList.Models;
 
@@ -15,6 +16,13 @@ public sealed class AppSettings
     public bool MinimizeToTray { get; set; } = true;
     public bool StartWithWindows { get; set; }
     public HotkeySettings GlobalHotkey { get; set; } = new();
+
+    public HotkeySettings MiniLauncherHotkey { get; set; } = new()
+    {
+        Modifiers = HotkeyModifiers.Control | HotkeyModifiers.Shift,
+        Key = Key.G,
+    };
+
     public UiDensity UiDensity { get; set; } = UiDensity.Comfortable;
     public double ItemScale { get; set; } = 1.0;
     public bool EnableDebugMode { get; set; }

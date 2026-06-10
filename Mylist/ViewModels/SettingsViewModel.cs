@@ -14,6 +14,7 @@ public sealed class SettingsViewModel : ViewModelBase
     private readonly DensityService _densityService;
     private readonly Action _queueSave;
     private readonly Action<HotkeySettings> _hotkeyChanged;
+    private readonly Action<HotkeySettings> _miniLauncherHotkeyChanged;
     private readonly Func<Task> _exportAction;
     private readonly Func<Task> _importAction;
     private readonly Func<Task> _restoreAction;
@@ -33,6 +34,7 @@ public sealed class SettingsViewModel : ViewModelBase
         DensityService densityService,
         Action queueSave,
         Action<HotkeySettings> hotkeyChanged,
+        Action<HotkeySettings> miniLauncherHotkeyChanged,
         Func<Task> exportAction,
         Func<Task> importAction,
         Func<Task> restoreAction,
@@ -45,6 +47,7 @@ public sealed class SettingsViewModel : ViewModelBase
         _densityService = densityService;
         _queueSave = queueSave;
         _hotkeyChanged = hotkeyChanged;
+        _miniLauncherHotkeyChanged = miniLauncherHotkeyChanged;
         _exportAction = exportAction;
         _importAction = importAction;
         _restoreAction = restoreAction;
@@ -289,6 +292,21 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public string HotkeyStatusMessage => RuntimeStatus.HotkeyStatusMessage;
 
+    public HotkeySettings MiniLauncherHotkey
+    {
+        get => _settings.MiniLauncherHotkey;
+        set
+        {
+            _settings.MiniLauncherHotkey = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(MiniLauncherHotkeyDisplay));
+            _miniLauncherHotkeyChanged(value);
+            _queueSave();
+        }
+    }
+
+    public string MiniLauncherHotkeyDisplay => _settings.MiniLauncherHotkey.ToString();
+
     public UiDensity UiDensity
     {
         get => _settings.UiDensity;
@@ -343,6 +361,11 @@ public sealed class SettingsViewModel : ViewModelBase
         GlobalHotkey = settings;
     }
 
+    public void UpdateMiniLauncherHotkey(HotkeySettings settings)
+    {
+        MiniLauncherHotkey = settings;
+    }
+
     public void ReloadFromSettings()
     {
         _themeService.ApplyTheme(_settings.Theme, _settings.Accent);
@@ -365,6 +388,8 @@ public sealed class SettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(GlobalHotkey));
         OnPropertyChanged(nameof(GlobalHotkeyDisplay));
         OnPropertyChanged(nameof(HotkeyStatusMessage));
+        OnPropertyChanged(nameof(MiniLauncherHotkey));
+        OnPropertyChanged(nameof(MiniLauncherHotkeyDisplay));
         OnPropertyChanged(nameof(UiDensity));
         OnPropertyChanged(nameof(EnableDebugMode));
         OnPropertyChanged(nameof(DebugModeStatusText));

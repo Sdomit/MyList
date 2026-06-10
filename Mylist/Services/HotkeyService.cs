@@ -19,6 +19,7 @@ public sealed class HotkeyService : IDisposable
     private Window? _window;
     private readonly List<int> _primaryHotkeyIds = new();
     private readonly List<(HotkeySettings Settings, Action Callback)> _persistentSecondaryHotkeys = new();
+    private readonly Dictionary<string, (int Id, Action Callback)> _namedSecondaryHotkeys = new();
 
     public void Initialize(Window window, MainViewModel viewModel)
     {
@@ -51,6 +52,49 @@ public sealed class HotkeyService : IDisposable
         {
             _log.Log($"Failed to register secondary hotkey {settings} (Win32: {result.errorCode}).");
         }
+    }
+
+    public void RegisterOrUpdateNamedSecondaryHotkey(string name, HotkeySettings settings, Action callback)
+    {
+        UnregisterNamedSecondaryHotkey(name);
+
+        var source = _source;
+        if (source is null || source.Handle == IntPtr.Zero || settings.Key == Key.None)
+        {
+            _log.Log($"Cannot register named secondary hotkey '{name}': source not ready or key unset.");
+            return;
+        }
+
+        var id = _currentId++;
+        var modifiers = (uint)settings.Modifiers;
+        var key = (uint)KeyInterop.VirtualKeyFromKey(settings.Key);
+        if (RegisterHotKey(source.Handle, id, modifiers, key))
+        {
+            _callbacks[id] = callback;
+            _namedSecondaryHotkeys[name] = (id, callback);
+        }
+        else
+        {
+            var error = Marshal.GetLastWin32Error();
+            _log.Log($"Failed to register named secondary hotkey '{name}' {settings} (Win32: {error}).");
+        }
+    }
+
+    public void UnregisterNamedSecondaryHotkey(string name)
+    {
+        if (!_namedSecondaryHotkeys.TryGetValue(name, out var entry))
+        {
+            return;
+        }
+
+        var source = _source;
+        if (source is not null)
+        {
+            UnregisterHotKey(source.Handle, entry.Id);
+        }
+
+        _callbacks.Remove(entry.Id);
+        _namedSecondaryHotkeys.Remove(name);
     }
 
     private void ReregisterSecondaryHotkeys()

@@ -14,6 +14,8 @@ public partial class App : Application
 {
     public bool IsShutdownRequested { get; private set; }
 
+    private const string MiniLauncherHotkeyName = "mini-launcher";
+
     static App()
     {
         AppDomain.CurrentDomain.FirstChanceException += (_, args) =>
@@ -136,13 +138,15 @@ public partial class App : Application
         _mainWindow.SourceInitialized += (_, _) =>
         {
             _hotkeyService.Initialize(_mainWindow, _mainViewModel);
-            _hotkeyService.RegisterSecondaryHotkey(
-                new HotkeySettings
-                {
-                    Modifiers = HotkeyModifiers.Control | HotkeyModifiers.Alt,
-                    Key = System.Windows.Input.Key.Space
-                },
+            _hotkeyService.RegisterOrUpdateNamedSecondaryHotkey(
+                MiniLauncherHotkeyName,
+                _mainViewModel.Settings.AppSettings.MiniLauncherHotkey,
                 () => Dispatcher.Invoke(ShowMiniLauncher));
+            _mainViewModel.MiniLauncherHotkeyChanged += (_, settings) =>
+                _hotkeyService.RegisterOrUpdateNamedSecondaryHotkey(
+                    MiniLauncherHotkeyName,
+                    settings,
+                    () => Dispatcher.Invoke(ShowMiniLauncher));
         };
         _mainWindow.Show();
         _mainWindow.RestoreAndActivate();

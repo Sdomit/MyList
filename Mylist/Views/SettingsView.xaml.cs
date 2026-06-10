@@ -81,11 +81,22 @@ public partial class SettingsView : System.Windows.Controls.UserControl
 
     private void OnHotkeyPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (DataContext is not SettingsViewModel viewModel)
+        CapturePressedHotkey(e, settings =>
         {
-            return;
-        }
+            if (DataContext is SettingsViewModel vm) vm.UpdateHotkey(settings);
+        });
+    }
 
+    private void OnMiniLauncherHotkeyPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        CapturePressedHotkey(e, settings =>
+        {
+            if (DataContext is SettingsViewModel vm) vm.UpdateMiniLauncherHotkey(settings);
+        });
+    }
+
+    private static void CapturePressedHotkey(KeyEventArgs e, Action<HotkeySettings> apply)
+    {
         e.Handled = true;
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
         if (IsModifierKey(key))
@@ -111,7 +122,7 @@ public partial class SettingsView : System.Windows.Controls.UserControl
             modifiers |= HotkeyModifiers.Win;
         }
 
-        viewModel.UpdateHotkey(new HotkeySettings { Key = key, Modifiers = modifiers });
+        apply(new HotkeySettings { Key = key, Modifiers = modifiers });
     }
 
     private static bool IsModifierKey(Key key)
