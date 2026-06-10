@@ -105,20 +105,32 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
                         <Grid Width="36" Height="20">
+                            <!-- Track gains an explicit BorderBrush so the OFF state is
+                                 visible on light themes (BgMutedBrush is near-white there
+                                 and disappears against the card). -->
                             <Border x:Name="Track"
                                     Background="{DynamicResource Token.BgMutedBrush}"
+                                    BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
+                                    BorderThickness="1"
                                     CornerRadius="{DynamicResource Token.RadiusFull}" />
+                            <!-- Thumb gets a 1px Stroke for the same reason — a pure-white
+                                 fill on a light track is otherwise invisible. -->
                             <Ellipse x:Name="Thumb"
-                                     Width="16"
-                                     Height="16"
-                                     Margin="2"
+                                     Width="14"
+                                     Height="14"
+                                     Margin="3,0,0,0"
                                      HorizontalAlignment="Left"
-                                     Fill="{DynamicResource Token.WhiteBrush}" />
+                                     VerticalAlignment="Center"
+                                     Fill="{DynamicResource Token.WhiteBrush}"
+                                     Stroke="{DynamicResource Token.BorderStrongBrush}"
+                                     StrokeThickness="1" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Track" Property="Background" Value="{DynamicResource Token.AccentBrush}" />
-                                <Setter TargetName="Thumb" Property="Margin" Value="18,2,2,2" />
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                <Setter TargetName="Thumb" Property="Margin" Value="19,0,0,0" />
+                                <Setter TargetName="Thumb" Property="Stroke" Value="{DynamicResource Token.AccentBrush}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Track" Property="Opacity" Value="0.88" />
