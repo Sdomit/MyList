@@ -18,7 +18,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8">
+                            CornerRadius="{StaticResource Token.RadiusLg}">
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -54,7 +54,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8" />
+                                CornerRadius="{StaticResource Token.RadiusLg}" />
                         <DockPanel>
                             <ToggleButton x:Name="ToggleButton"
                                           DockPanel.Dock="Right"
@@ -94,7 +94,7 @@
                             <Border Background="{DynamicResource ControlBackground}"
                                     BorderBrush="{DynamicResource ControlBorder}"
                                     BorderThickness="1"
-                                    CornerRadius="8"
+                                    CornerRadius="{StaticResource Token.RadiusLg}"
                                     SnapsToDevicePixels="True">
                                 <ScrollViewer Margin="2" CanContentScroll="True">
                                     <ItemsPresenter />
@@ -128,7 +128,7 @@
                 <ControlTemplate TargetType="ComboBoxItem">
                     <Border x:Name="ItemBorder"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="6"
+                            CornerRadius="{StaticResource Token.RadiusMd}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter />
                     </Border>
@@ -199,7 +199,7 @@
                                 Background="{DynamicResource ControlBackground}"
                                 BorderBrush="{DynamicResource ControlBorder}"
                                 BorderThickness="1"
-                                CornerRadius="8">
+                                CornerRadius="{StaticResource Token.RadiusLg}">
                             <Ellipse x:Name="Inner"
                                      Width="8"
                                      Height="8"
@@ -258,7 +258,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8" />
+                            CornerRadius="{StaticResource Token.RadiusLg}" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="ThumbRoot" Property="Background" Value="{DynamicResource SelectionBackground}" />
@@ -355,7 +355,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8">
+                            CornerRadius="{StaticResource Token.RadiusLg}">
                         <StackPanel IsItemsHost="True"
                                     KeyboardNavigation.DirectionalNavigation="Cycle" />
                     </Border>

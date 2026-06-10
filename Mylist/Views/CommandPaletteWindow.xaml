@@ -18,8 +18,6 @@
         WindowStartupLocation="CenterOwner"
         KeyDown="OnWindowKeyDown">
     <Window.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Invert="True" />
         <helpers:SelectionInSectionConverter x:Key="SelectionInSectionConverter" />
 

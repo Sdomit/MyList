@@ -7,8 +7,6 @@
              Foreground="{DynamicResource Token.TextPrimaryBrush}"
              FontFamily="{DynamicResource Token.FontUi}">
     <UserControl.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <helpers:TerminalProfileToLabelConverter x:Key="TerminalProfileToLabelConverter" />
         <helpers:TerminalProfileToLucideKindConverter x:Key="TerminalProfileToLucideKindConverter" />
         <Style x:Key="EditorFieldLabel" TargetType="TextBlock">

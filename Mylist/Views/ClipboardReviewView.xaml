@@ -5,8 +5,6 @@
              Foreground="{DynamicResource Token.TextPrimaryBrush}"
              FontFamily="{DynamicResource Token.FontUi}">
     <UserControl.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <DataTemplate x:Key="ClipboardPathRow">
             <Grid Margin="10,8">
                 <Grid.ColumnDefinitions>
@@ -59,7 +57,7 @@
                                ToolTip="{Binding DisplayPath}" />
                     <TextBlock Margin="0,3,0,0"
                                Foreground="{DynamicResource Token.StatusDangerBrush}"
-                               FontSize="10.5"
+                               FontSize="{StaticResource Token.TextXs}"
                                Text="{Binding Reason}"
                                TextTrimming="CharacterEllipsis" />
                 </StackPanel>

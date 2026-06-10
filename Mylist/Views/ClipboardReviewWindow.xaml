@@ -12,8 +12,6 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip">
     <Window.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <Style x:Key="ClipboardSectionCard" TargetType="Border" BasedOn="{StaticResource Simple.Card}">
             <Setter Property="Padding" Value="0" />
             <Setter Property="Margin" Value="0,0,0,12" />
@@ -43,7 +41,7 @@
                                TextTrimming="CharacterEllipsis"
                                ToolTip="{Binding DisplayPath}" />
                     <TextBlock Margin="0,3,0,0"
-                               FontSize="10.5"
+                               FontSize="{StaticResource Token.TextXs}"
                                Foreground="{DynamicResource Token.TextTertiaryBrush}"
                                Text="{Binding Reason}"
                                TextTrimming="CharacterEllipsis" />
@@ -74,7 +72,7 @@
                                TextTrimming="CharacterEllipsis"
                                ToolTip="{Binding DisplayPath}" />
                     <TextBlock Margin="0,3,0,0"
-                               FontSize="10.5"
+                               FontSize="{StaticResource Token.TextXs}"
                                Foreground="{DynamicResource Token.StatusDangerBrush}"
                                Text="{Binding Reason}"
                                TextTrimming="CharacterEllipsis" />

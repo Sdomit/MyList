@@ -13,7 +13,7 @@
             Background="{DynamicResource SurfaceBackground}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="1"
-            CornerRadius="12"
+            CornerRadius="{StaticResource Token.RadiusXl}"
             Padding="16">
         <Grid>
             <Grid.RowDefinitions>
@@ -42,7 +42,7 @@
                 <Border Background="{DynamicResource SurfaceElevated}"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="10"
+                        CornerRadius="{StaticResource Token.RadiusLg}"
                         Padding="10">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -65,7 +65,7 @@
                                             Background="{DynamicResource SurfaceBackground}"
                                             BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
-                                            CornerRadius="8">
+                                            CornerRadius="{StaticResource Token.RadiusLg}">
                                         <StackPanel>
                                             <TextBlock Text="{Binding Name}"
                                                        FontWeight="SemiBold"
@@ -109,7 +109,7 @@
                         Click="OnCancel" />
                 <Button Content="Add to Mtab"
                         Width="132"
-                        Style="{StaticResource PrimaryButton}"
+                        Style="{StaticResource Simple.PrimaryButton}"
                         Click="OnConfirm" />
             </StackPanel>
         </Grid>

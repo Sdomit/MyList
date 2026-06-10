@@ -45,8 +45,6 @@
         <KeyBinding Key="D9" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="9" />
     </Window.InputBindings>
     <Window.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Invert="True" />
         <helpers:IntPlusOneConverter x:Key="IntPlusOneConverter" />
         <helpers:PercentToDashArrayConverter x:Key="PercentToDashArrayConverter" />
@@ -269,7 +267,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </ContentControl.Style>
-                            <TextBlock><Run Text="⌘" /><Run Text="{Binding Path=(ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource IntPlusOneConverter}, Mode=OneWay}" /></TextBlock>
+                            <TextBlock><Run Text="Ctrl+" /><Run Text="{Binding Path=(ItemsControl.AlternationIndex), RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource IntPlusOneConverter}, Mode=OneWay}" /></TextBlock>
                         </ContentControl>
                     </Grid>
                     <Border.ContextMenu>
@@ -876,7 +874,7 @@
                                 CornerRadius="{DynamicResource Token.RadiusFull}">
                             <TextBlock Text="ML"
                                        Foreground="{DynamicResource Token.AccentForegroundBrush}"
-                                       FontSize="9.5"
+                                       FontSize="{StaticResource Token.TextXs}"
                                        FontWeight="SemiBold"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" />

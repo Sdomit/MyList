@@ -9,9 +9,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Tokens.xaml" />
                 <ResourceDictionary Source="Resources/Colors.Dark.Blue.xaml" />
+                <ResourceDictionary Source="Themes/SimpleControls.xaml" />
                 <ResourceDictionary Source="Resources/Styles.xaml" />
                 <ResourceDictionary Source="Resources/FluentControls.xaml" />
-                <ResourceDictionary Source="Themes/SimpleControls.xaml" />
                 <ResourceDictionary Source="Themes/Chips.xaml" />
                 <ResourceDictionary Source="Themes/SegmentedControl.xaml" />
                 <ResourceDictionary Source="Resources/Density.Comfortable.xaml" />

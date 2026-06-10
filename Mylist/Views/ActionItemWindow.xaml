@@ -13,7 +13,7 @@
             Background="{DynamicResource SurfaceBackground}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="1"
-            CornerRadius="12"
+            CornerRadius="{StaticResource Token.RadiusXl}"
             Padding="16">
         <Grid>
             <Grid.RowDefinitions>
@@ -69,7 +69,7 @@
                     <Border Margin="0,12,0,0"
                             Padding="10"
                             Background="{DynamicResource SurfaceElevated}"
-                            CornerRadius="8">
+                            CornerRadius="{StaticResource Token.RadiusLg}">
                         <TextBlock Text="Separators are plain collection-local dividers. They do not run, copy, or appear in smart collections."
                                    TextWrapping="Wrap"
                                    Foreground="{DynamicResource TextSecondary}">
@@ -97,7 +97,7 @@
                         Click="OnCancel" />
                 <Button Content="{Binding ConfirmButtonText}"
                         Width="120"
-                        Style="{StaticResource PrimaryButton}"
+                        Style="{StaticResource Simple.PrimaryButton}"
                         Click="OnSave" />
             </StackPanel>
         </Grid>
