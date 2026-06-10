@@ -22,29 +22,6 @@
 
     <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
 
-    <Style x:Key="HeaderActionButton" TargetType="Button" BasedOn="{StaticResource Simple.Button}">
-        <Setter Property="MinHeight" Value="{DynamicResource DensityHeaderButtonMinHeight}" />
-        <Setter Property="Height" Value="{DynamicResource DensityHeaderButtonMinHeight}" />
-        <Setter Property="MinWidth" Value="92" />
-        <Setter Property="Padding" Value="{DynamicResource DensityButtonPadding}" />
-        <Setter Property="helpers:Spacing.Value" Value="{DynamicResource DensityInlineGap}" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Margin">
-            <Setter.Value>
-                <Binding RelativeSource="{RelativeSource Self}"
-                         Path="(helpers:Spacing.Value)"
-                         Converter="{StaticResource MultiplyValueConverter}"
-                         ConverterParameter="0,0,1,0" />
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="HeaderPrimaryActionButton" TargetType="Button" BasedOn="{StaticResource HeaderActionButton}">
-        <Setter Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
-    </Style>
-
     <Style TargetType="ListBox">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />

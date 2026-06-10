@@ -33,21 +33,21 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
                         Content="Copy to Collection"
-                        Style="{StaticResource HeaderPrimaryActionButton}"
+                        Style="{StaticResource Simple.PrimaryButton}"
                         MinWidth="160"
                         MinHeight="34"
                         Margin="0,0,8,0"
                         Click="OnCopyToCollection" />
                 <Button Grid.Column="1"
                         Content="Move to Collection"
-                        Style="{StaticResource HeaderActionButton}"
+                        Style="{StaticResource Simple.Button}"
                         MinWidth="160"
                         MinHeight="34"
                         Margin="0,0,8,0"
                         Click="OnMoveToCollection" />
                 <Button Grid.Column="2"
                         Content="Cancel"
-                        Style="{StaticResource HeaderActionButton}"
+                        Style="{StaticResource Simple.Button}"
                         MinWidth="96"
                         MinHeight="34"
                         Click="OnCancel" />
