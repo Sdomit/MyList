@@ -11,18 +11,20 @@ namespace MyList.ViewModels;
 
 public sealed class MiniLauncherViewModel : ViewModelBase
 {
-    public const double PanelSize = 280;
+    public const double PanelSize = 240;
     private const double NodeSize = 32;
     private const double CenterX = PanelSize / 2;
     private const double CenterY = PanelSize / 2;
-    private const double RadiusX = 100;
-    private const double RadiusY = 100;
-    private const int MaxNodes = 8;
+    private const double RadiusX = 90;
+    private const double RadiusY = 78;
+    private const int MaxOrbitNodes = 6;
+    private const int MaxListItems = 9;
 
     private readonly Func<IReadOnlyList<ItemModel>> _itemsProvider;
     private readonly LauncherService _launcherService;
     private readonly Action _closeRequested;
     private ItemModel? _centerItem;
+    private string _searchText = string.Empty;
 
     public MiniLauncherViewModel(Func<IReadOnlyList<ItemModel>> itemsProvider, LauncherService launcherService, Action closeRequested)
     {
@@ -31,6 +33,8 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         _closeRequested = closeRequested;
 
         OrbitNodes = new ObservableCollection<MiniLauncherOrbitNodeViewModel>();
+        Items = new ObservableCollection<MiniLauncherListItemViewModel>();
+
         ActivateItemCommand = new RelayCommand<ItemModel>(item =>
         {
             if (item is null)
@@ -42,11 +46,29 @@ public sealed class MiniLauncherViewModel : ViewModelBase
             _closeRequested();
         });
         CloseCommand = new RelayCommand(() => _closeRequested());
+        OpenIndexedItemCommand = new RelayCommand<string>(p =>
+        {
+            if (!int.TryParse(p, out var index) || index < 1)
+            {
+                return;
+            }
+
+            var slot = Items.FirstOrDefault(item => item.Index == index);
+            if (slot?.Item is null)
+            {
+                return;
+            }
+
+            _launcherService.Open(slot.Item);
+            _closeRequested();
+        });
 
         Refresh();
     }
 
     public ObservableCollection<MiniLauncherOrbitNodeViewModel> OrbitNodes { get; }
+
+    public ObservableCollection<MiniLauncherListItemViewModel> Items { get; }
 
     public ItemModel? CenterItem
     {
@@ -65,43 +87,94 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
     public bool HasCenterItem => CenterItem is not null;
 
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetProperty(ref _searchText, value ?? string.Empty))
+            {
+                RebuildList();
+            }
+        }
+    }
+
     public ICommand ActivateItemCommand { get; }
 
     public ICommand CloseCommand { get; }
 
+    public ICommand OpenIndexedItemCommand { get; }
+
     public void Refresh()
     {
-        var items = _itemsProvider().ToList();
-        var favorites = items
-            .Where(item => item.IsFavorite && !item.IsClipboardImage)
-            .Take(MaxNodes)
+        var all = _itemsProvider()
+            .Where(item => !item.IsClipboardImage)
+            .ToList();
+
+        CenterItem = all
+            .OrderByDescending(item => item.LastOpenedDate)
+            .FirstOrDefault();
+
+        var favorites = all
+            .Where(item => item.IsFavorite)
+            .Take(MaxOrbitNodes)
             .ToList();
 
         if (favorites.Count == 0)
         {
-            favorites = items
-                .Where(item => !item.IsClipboardImage)
+            favorites = all
                 .OrderByDescending(item => item.LastOpenedDate)
-                .Take(MaxNodes)
+                .Take(MaxOrbitNodes)
                 .ToList();
         }
-
-        CenterItem = items
-            .Where(item => !item.IsClipboardImage)
-            .OrderByDescending(item => item.LastOpenedDate)
-            .FirstOrDefault();
 
         OrbitNodes.Clear();
         var count = favorites.Count;
         for (var i = 0; i < count; i++)
         {
             var node = new MiniLauncherOrbitNodeViewModel(favorites[i], ActivateItemCommand);
-            var (x, y) = OrbitLayoutService.ComputePoint(i, Math.Max(count, 5), CenterX, CenterY, RadiusX, RadiusY);
+            var (x, y) = OrbitLayoutService.ComputePoint(i, Math.Max(count, MaxOrbitNodes), CenterX, CenterY, RadiusX, RadiusY);
             node.LineX2 = x;
             node.LineY2 = y;
             node.NodeLeft = x - NodeSize / 2;
             node.NodeTop = y - NodeSize / 2;
             OrbitNodes.Add(node);
         }
+
+        RebuildList();
+    }
+
+    private void RebuildList()
+    {
+        Items.Clear();
+        var all = _itemsProvider()
+            .Where(item => !item.IsClipboardImage);
+
+        var filtered = string.IsNullOrWhiteSpace(_searchText)
+            ? all
+            : all.Where(item => MatchesSearch(item, _searchText));
+
+        var ordered = filtered
+            .OrderByDescending(item => item.IsFavorite)
+            .ThenByDescending(item => item.LastOpenedDate)
+            .Take(MaxListItems)
+            .ToList();
+
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            Items.Add(new MiniLauncherListItemViewModel(ordered[i], i + 1, ActivateItemCommand));
+        }
+    }
+
+    private static bool MatchesSearch(ItemModel item, string text)
+    {
+        var needle = text.Trim();
+        if (needle.Length == 0)
+        {
+            return true;
+        }
+
+        return (item.Name?.Contains(needle, StringComparison.OrdinalIgnoreCase) ?? false)
+               || (item.DisplayPath?.Contains(needle, StringComparison.OrdinalIgnoreCase) ?? false);
     }
 }
