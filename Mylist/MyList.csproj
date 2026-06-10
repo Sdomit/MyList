@@ -12,6 +12,10 @@
     <Product>MyList</Product>
     <AssemblyTitle>MyList</AssemblyTitle>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <Version>1.2.1</Version>
+    <!-- AssemblyInformationalVersion is auto-composed by the SDK as
+         $(Version)+$(SourceRevisionId). SourceRevisionId is stamped from
+         git below so it stays accurate for every build, no manual bump. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);artifacts\**;dist\**;bin2\**;obj2\**;obj_pub\**;handoff-pr1-tokens\**;handoff-pr2-themes\**;handoff-pr3-accent\**;handoff-pr4-launcher\**;handoff-pr5-chips\**;handoff-pr6-spark\**;handoff-pr7-ring\**;My list (1)\**</DefaultItemExcludes>
   </PropertyGroup>
 
@@ -37,6 +41,21 @@
   <ItemGroup>
     <PackageReference Include="MahApps.Metro.IconPacks.Lucide" Version="*" />
   </ItemGroup>
+
+  <!-- Stamp the current git commit SHA into SourceRevisionId before assembly
+       metadata is generated. The SDK then appends it to InformationalVersion
+       as "1.2.1+<full-sha>", which BuildInfo.DisplayString trims to 7 chars
+       at runtime. ContinueOnError keeps non-git builds (CI tarballs) working. -->
+  <Target Name="StampSourceRevisionId" BeforeTargets="GetAssemblyAttributes">
+    <Exec Command="git rev-parse HEAD"
+          ConsoleToMSBuild="true"
+          ContinueOnError="true"
+          IgnoreExitCode="true"
+          StandardOutputImportance="low"
+          StandardErrorImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="SourceRevisionId" />
+    </Exec>
+  </Target>
 
   <!--
     Single-file publish to an external -o dir drops loose Content: icon.ico is the
