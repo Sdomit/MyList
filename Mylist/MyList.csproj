@@ -38,4 +38,19 @@
     <PackageReference Include="MahApps.Metro.IconPacks.Lucide" Version="*" />
   </ItemGroup>
 
+  <!--
+    Single-file publish to an external -o dir drops loose Content: icon.ico is the
+    embedded ApplicationIcon (deduped), and the icons globs don't flow through.
+    Copy the runtime assets into the publish folder explicitly so a published build
+    matches the build output and the app finds icon.ico / icons at runtime.
+  -->
+  <Target Name="CopyRuntimeAssetsToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_RuntimeAsset Include="icon.ico;desktops.png" />
+      <_RuntimeAssetIcons Include="icons\*.ico;icons\*.cur" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_RuntimeAsset)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_RuntimeAssetIcons)" DestinationFolder="$(PublishDir)icons" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
