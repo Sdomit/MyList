@@ -115,10 +115,6 @@ public partial class App : Application
         }
 
         _themeService.ApplyTheme(appData.AppSettings.Theme, appData.AppSettings.Accent);
-        var explorerIntegrationService = new ExplorerIntegrationService();
-        var explorerIntegrationStatus = explorerIntegrationService.GetStatus();
-        RuntimeStatus.ExplorerMenuInstalled = explorerIntegrationStatus.IsInstalled;
-        RuntimeStatus.ExplorerMenuStatusMessage = explorerIntegrationStatus.StatusMessage;
 
         _mainViewModel = new MainViewModel(
             appData,
@@ -137,38 +133,6 @@ public partial class App : Application
             DataContext = _mainViewModel
         };
 
-        if (!safeMode)
-        {
-            _trayService.Initialize(_mainWindow, _mainViewModel);
-            _networkCheckService.Initialize(_mainViewModel);
-            _mainViewModel.AttachNetworkCheckService(_networkCheckService);
-
-            if (appData.AppSettings.FollowSystemTheme)
-            {
-                _systemThemeService.StartWatching(theme =>
-                {
-                    Dispatcher.Invoke(() => _mainViewModel.Settings.Theme = theme);
-                });
-            }
-
-            _mainViewModel.Settings.FollowSystemThemeChanged += (_, enabled) =>
-            {
-                if (enabled)
-                {
-                    var theme = _systemThemeService.GetCurrentTheme();
-                    _mainViewModel.Settings.Theme = theme;
-                    _systemThemeService.StartWatching(newTheme =>
-                    {
-                        Dispatcher.Invoke(() => _mainViewModel.Settings.Theme = newTheme);
-                    });
-                }
-                else
-                {
-                    _systemThemeService.StopWatching();
-                }
-            };
-        }
-
         _mainWindow.SourceInitialized += (_, _) =>
         {
             _hotkeyService.Initialize(_mainWindow, _mainViewModel);
@@ -182,6 +146,49 @@ public partial class App : Application
         };
         _mainWindow.Show();
         _mainWindow.RestoreAndActivate();
+
+        // Defer non-critical service init until after first paint so the window
+        // appears as fast as possible. Tray, network health, explorer-integration
+        // status, and system-theme watching all run after the dispatcher idles.
+        Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
+        {
+            var explorerIntegrationService = new ExplorerIntegrationService();
+            var explorerIntegrationStatus = explorerIntegrationService.GetStatus();
+            RuntimeStatus.ExplorerMenuInstalled = explorerIntegrationStatus.IsInstalled;
+            RuntimeStatus.ExplorerMenuStatusMessage = explorerIntegrationStatus.StatusMessage;
+
+            if (!safeMode)
+            {
+                _trayService.Initialize(_mainWindow, _mainViewModel);
+                _networkCheckService.Initialize(_mainViewModel);
+                _mainViewModel.AttachNetworkCheckService(_networkCheckService);
+
+                if (appData.AppSettings.FollowSystemTheme)
+                {
+                    _systemThemeService.StartWatching(theme =>
+                    {
+                        Dispatcher.Invoke(() => _mainViewModel.Settings.Theme = theme);
+                    });
+                }
+
+                _mainViewModel.Settings.FollowSystemThemeChanged += (_, enabled) =>
+                {
+                    if (enabled)
+                    {
+                        var theme = _systemThemeService.GetCurrentTheme();
+                        _mainViewModel.Settings.Theme = theme;
+                        _systemThemeService.StartWatching(newTheme =>
+                        {
+                            Dispatcher.Invoke(() => _mainViewModel.Settings.Theme = newTheme);
+                        });
+                    }
+                    else
+                    {
+                        _systemThemeService.StopWatching();
+                    }
+                };
+            }
+        }));
 
         _appInstanceService.StartServer(HandleIncomingAppCommandAsync);
 
