@@ -16,7 +16,7 @@
     <Color x:Key="Token.BgActiveColor">#14000000</Color>
     <Color x:Key="Token.TextPrimaryColor">#0F2826</Color>
     <Color x:Key="Token.TextSecondaryColor">#2A5050</Color>
-    <Color x:Key="Token.TextTertiaryColor">#6AACAA</Color>
+    <Color x:Key="Token.TextTertiaryColor">#3A7474</Color>
     <Color x:Key="Token.TextDisabledColor">#6AACAA</Color>
     <Color x:Key="Token.TextInverseColor">#FFFFFF</Color>
     <Color x:Key="Token.TextAccentColor">#0F766E</Color>
