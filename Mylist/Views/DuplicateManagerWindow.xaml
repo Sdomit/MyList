@@ -11,8 +11,6 @@
         FontFamily="{DynamicResource Token.FontUi}"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <DataTemplate x:Key="DuplicateGroupTemplate">
             <StackPanel>
                 <TextBlock Text="{Binding DisplayPath}"
@@ -199,7 +197,7 @@
                                             VerticalAlignment="Center">
                                         <TextBlock Foreground="{DynamicResource Token.StatusWarningBrush}"
                                                    FontFamily="{DynamicResource Token.FontMono}"
-                                                   FontSize="10.5"
+                                                   FontSize="{StaticResource Token.TextXs}"
                                                    Text="{Binding SelectedGroup.Items.Count, StringFormat={}{0} COPIES}" />
                                     </Border>
                                 </Grid>

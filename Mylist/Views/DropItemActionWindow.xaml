@@ -14,7 +14,7 @@
             Background="{DynamicResource SurfaceBackground}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="1"
-            CornerRadius="12"
+            CornerRadius="{StaticResource Token.RadiusXl}"
             Padding="16">
         <StackPanel>
             <TextBlock Text="Drop Action"

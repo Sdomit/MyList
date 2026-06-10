@@ -5,8 +5,6 @@
              Foreground="{DynamicResource Token.TextPrimaryBrush}"
              FontFamily="{DynamicResource Token.FontUi}">
     <UserControl.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <Style x:Key="SettingsTabItem" TargetType="TabItem">
             <Setter Property="Height" Value="30" />
             <Setter Property="Margin" Value="0,1" />

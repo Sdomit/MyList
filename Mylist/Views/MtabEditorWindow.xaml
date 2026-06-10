@@ -11,8 +11,6 @@
         FontFamily="{DynamicResource Token.FontUi}"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
-        <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />
         <DataTemplate x:Key="MtabPathRowTemplate">
             <Grid Margin="0,0,0,6">
                 <Grid.ColumnDefinitions>
@@ -27,7 +25,7 @@
                         Margin="0,6,0,0">
                     <TextBlock Text="{Binding Number}"
                                Foreground="{DynamicResource Token.TextAccentBrush}"
-                               FontSize="10.5"
+                               FontSize="{StaticResource Token.TextXs}"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
@@ -37,7 +35,7 @@
                              FontSize="{DynamicResource Token.TextXs}"
                              Text="{Binding PathText, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Margin="2,3,0,0"
-                               FontSize="10.5"
+                               FontSize="{StaticResource Token.TextXs}"
                                Foreground="{DynamicResource Token.TextTertiaryBrush}"
                                Text="{Binding ValidationMessage}"
                                TextWrapping="Wrap" />
@@ -74,7 +72,7 @@
                             CornerRadius="{DynamicResource Token.RadiusXs}"
                             VerticalAlignment="Center">
                         <TextBlock FontFamily="{DynamicResource Token.FontMono}"
-                                   FontSize="9.5"
+                                   FontSize="{StaticResource Token.TextXs}"
                                    Foreground="{DynamicResource Token.TextAccentBrush}"
                                    Text="{Binding Message}" />
                     </Border>
@@ -118,7 +116,7 @@
                                 CornerRadius="{DynamicResource Token.RadiusXs}"
                                 VerticalAlignment="Top">
                             <TextBlock FontFamily="{DynamicResource Token.FontMono}"
-                                       FontSize="10.5"
+                                       FontSize="{StaticResource Token.TextXs}"
                                        Foreground="{DynamicResource Token.TextAccentBrush}"
                                        Text="{Binding SummaryText}" />
                         </Border>

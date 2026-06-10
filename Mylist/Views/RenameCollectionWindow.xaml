@@ -13,7 +13,7 @@
             Background="{DynamicResource SurfaceBackground}"
             BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="1"
-            CornerRadius="12"
+            CornerRadius="{StaticResource Token.RadiusXl}"
             Padding="16">
         <Grid>
             <Grid.RowDefinitions>
