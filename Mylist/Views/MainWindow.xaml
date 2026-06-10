@@ -353,6 +353,73 @@
             </DataTemplate.Triggers>
         </DataTemplate>
 
+        <DataTemplate x:Key="GridItemTemplate">
+            <Border Margin="3"
+                    Padding="10,9"
+                    Background="{DynamicResource Token.BgSurfaceBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource Token.RadiusLg}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="26" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Width="22"
+                            Height="22"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Token.RadiusSm}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource Token.TypeFileBackgroundBrush}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeFileBorderBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                        <Setter Property="Background" Value="{DynamicResource Token.TypeFolderBackgroundBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeFolderBorderBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsMtab}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Token.TypeMtabBackgroundBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeMtabBorderBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsClipboardText}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Token.TypeClipBackgroundBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeClipBorderBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsClipboardImage}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Token.TypeClipBackgroundBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeClipBorderBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsActionItem}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Token.TypeActionBackgroundBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.TypeActionBorderBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Image Width="13"
+                               Height="13"
+                               Source="{Binding Icon}"
+                               Stretch="Uniform"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Border>
+
+                    <TextBlock Grid.Column="1"
+                               Margin="6,0,0,0"
+                               VerticalAlignment="Center"
+                               Text="{Binding Name}"
+                               Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                               FontSize="{StaticResource Token.TextSm}"
+                               FontWeight="{StaticResource Token.WeightMedium}"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTip="{Binding DisplayPath}" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
         <Style x:Key="PreviewVisibilityWhenSelected" TargetType="Grid">
             <Setter Property="Visibility" Value="Visible" />
             <Style.Triggers>
@@ -465,21 +532,56 @@
                 </Grid>
             </Border>
 
-            <Button Grid.Column="2"
-                    Style="{StaticResource Simple.PrimaryButton}"
-                    Content="Add"
-                    Margin="0,0,4,0"
-                    Click="OnMoreActionsClick">
-                <Button.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="File..." Command="{Binding PlacementTarget.DataContext.AddFileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                        <MenuItem Header="Folder..." Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                        <MenuItem Header="Mtab" Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                        <MenuItem Header="Action / script" Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                        <MenuItem Header="Clipboard" Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                    </ContextMenu>
-                </Button.ContextMenu>
-            </Button>
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button Style="{StaticResource Simple.GhostButton}"
+                        Margin="0,0,6,0"
+                        Padding="6,4"
+                        Command="{Binding ToggleViewModeCommand}"
+                        ToolTip="Toggle list / grid view">
+                    <Grid>
+                        <iconPacks:PackIconLucide Kind="LayoutGrid" Width="14" Height="14">
+                            <iconPacks:PackIconLucide.Style>
+                                <Style TargetType="iconPacks:PackIconLucide">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Settings.ViewMode}" Value="List">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </iconPacks:PackIconLucide.Style>
+                        </iconPacks:PackIconLucide>
+                        <iconPacks:PackIconLucide Kind="List" Width="14" Height="14">
+                            <iconPacks:PackIconLucide.Style>
+                                <Style TargetType="iconPacks:PackIconLucide">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Settings.ViewMode}" Value="Grid">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </iconPacks:PackIconLucide.Style>
+                        </iconPacks:PackIconLucide>
+                    </Grid>
+                </Button>
+                <Button Style="{StaticResource Simple.PrimaryButton}"
+                        Content="Add"
+                        Margin="0,0,4,0"
+                        Click="OnMoreActionsClick">
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="File..." Command="{Binding PlacementTarget.DataContext.AddFileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Folder..." Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Mtab" Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Action / script" Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            <MenuItem Header="Clipboard" Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+            </StackPanel>
         </Grid>
 
         <!-- Simple main surface -->
@@ -1008,13 +1110,30 @@
                                      SelectionMode="Extended"
                                      SelectionChanged="OnItemSelectionChanged"
                                      ItemContainerStyle="{StaticResource Simple.ItemListBoxItem}"
-                                     ItemTemplate="{StaticResource ListItemTemplate}"
                                      AlternationCount="9999"
                                      MouseDoubleClick="OnItemMouseDoubleClick"
                                      PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
                                      PreviewMouseMove="OnItemPreviewMouseMove"
                                      Drop="OnItemDrop"
-                                     AllowDrop="True" />
+                                     AllowDrop="True">
+                                <ListBox.Style>
+                                    <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                                        <Setter Property="ItemTemplate" Value="{StaticResource ListItemTemplate}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Settings.ViewMode}" Value="Grid">
+                                                <Setter Property="ItemTemplate" Value="{StaticResource GridItemTemplate}" />
+                                                <Setter Property="ItemsPanel">
+                                                    <Setter.Value>
+                                                        <ItemsPanelTemplate>
+                                                            <UniformGrid Columns="2" />
+                                                        </ItemsPanelTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListBox.Style>
+                            </ListBox>
 
                             <StackPanel HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
