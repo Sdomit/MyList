@@ -41,7 +41,11 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{DynamicResource Token.RadiusMd}">
+                            CornerRadius="{DynamicResource Token.RadiusMd}"
+                            RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </Border.RenderTransform>
                         <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           RecognizesAccessKey="True" />
@@ -53,6 +57,11 @@
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgActiveBrush}" />
                             <Setter TargetName="Chrome" Property="Opacity" Value="0.9" />
+                            <Setter TargetName="Chrome" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.97" ScaleY="0.97" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Chrome" Property="Opacity" Value="0.5" />
@@ -177,10 +186,10 @@
                             <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.BgActiveBrush}" />
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
                             <Setter TargetName="ActiveBar" Property="Visibility" Value="Visible" />
-                            <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
-                            <Setter Property="FontWeight" Value="Medium" />
+                            <Setter Property="Foreground" Value="{DynamicResource Token.TextAccentBrush}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

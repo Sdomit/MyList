@@ -272,7 +272,6 @@
     <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource Token.BorderDefaultColor}" />
     <SolidColorBrush x:Key="ItemHover" Color="{DynamicResource Token.BgHoverColor}" />
     <SolidColorBrush x:Key="ItemSelected" Color="{DynamicResource Token.AccentSubtleColor}" />
-    <SolidColorBrush x:Key="ShadowBrush" Color="#A6000000" />
     <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource Token.BgSubtleColor}" />
     <SolidColorBrush x:Key="ControlForeground" Color="{DynamicResource Token.TextPrimaryColor}" />
     <SolidColorBrush x:Key="ControlBorder" Color="{DynamicResource Token.BorderDefaultColor}" />
