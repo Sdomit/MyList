@@ -16,6 +16,8 @@ bin2/
 obj2/
 obj_pub/
 publish/
+publish-loose/
+MyList-win-x64.zip
 
 # Visual Studio
 .vs/
