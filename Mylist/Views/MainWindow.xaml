@@ -1493,7 +1493,7 @@
                                         <TextBlock Grid.Row="1" Margin="0,6,0,0" Style="{StaticResource Simple.MetaText}" Text="Favorite" TextTrimming="CharacterEllipsis" />
                                         <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.IsFavorite}" TextTrimming="CharacterEllipsis" />
                                         <TextBlock Grid.Row="2" Margin="0,6,0,0" Style="{StaticResource Simple.MetaText}" Text="Last opened" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,6,0,0" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.LastOpenedDate, StringFormat={}{0:g}}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,6,0,0" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.LastOpenedDisplay}" TextTrimming="CharacterEllipsis" />
                                     </Grid>
                                 </StackPanel>
 

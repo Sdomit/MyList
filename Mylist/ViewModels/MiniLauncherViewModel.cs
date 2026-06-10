@@ -94,7 +94,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         {
             if (SetProperty(ref _searchText, value ?? string.Empty))
             {
-                RebuildList();
+                Rebuild();
             }
         }
     }
@@ -105,64 +105,74 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
     public ICommand OpenIndexedItemCommand { get; }
 
-    public void Refresh()
+    public void Refresh() => Rebuild();
+
+    private void Rebuild()
     {
         var all = _itemsProvider()
             .Where(item => !item.IsClipboardImage)
             .ToList();
 
-        CenterItem = all
-            .OrderByDescending(item => item.LastOpenedDate)
-            .FirstOrDefault();
-
-        var favorites = all
-            .Where(item => item.IsFavorite)
-            .Take(MaxOrbitNodes)
+        var searching = !string.IsNullOrWhiteSpace(_searchText);
+        var matches = (searching
+                ? all.Where(item => MatchesSearch(item, _searchText))
+                : all)
+            .OrderByDescending(item => item.IsFavorite)
+            .ThenByDescending(item => item.LastOpenedDate)
             .ToList();
 
-        if (favorites.Count == 0)
+        Items.Clear();
+        var listItems = matches.Take(MaxListItems).ToList();
+        for (var i = 0; i < listItems.Count; i++)
         {
-            favorites = all
-                .OrderByDescending(item => item.LastOpenedDate)
-                .Take(MaxOrbitNodes)
-                .ToList();
+            Items.Add(new MiniLauncherListItemViewModel(listItems[i], i + 1, ActivateItemCommand));
         }
 
+        // The orbit mirrors the active query: center on the top match, satellites
+        // are the remaining matches. With no query it falls back to favorites,
+        // then most-recently-opened, centered on the most recent item.
+        List<ItemModel> orbitSource;
+        if (searching)
+        {
+            CenterItem = matches.FirstOrDefault();
+            orbitSource = matches.Skip(1).Take(MaxOrbitNodes).ToList();
+        }
+        else
+        {
+            CenterItem = all
+                .OrderByDescending(item => item.LastOpenedDate)
+                .FirstOrDefault();
+
+            orbitSource = all
+                .Where(item => item.IsFavorite)
+                .Take(MaxOrbitNodes)
+                .ToList();
+
+            if (orbitSource.Count == 0)
+            {
+                orbitSource = all
+                    .OrderByDescending(item => item.LastOpenedDate)
+                    .Take(MaxOrbitNodes)
+                    .ToList();
+            }
+        }
+
+        BuildOrbit(orbitSource);
+    }
+
+    private void BuildOrbit(IReadOnlyList<ItemModel> source)
+    {
         OrbitNodes.Clear();
-        var count = favorites.Count;
+        var count = source.Count;
         for (var i = 0; i < count; i++)
         {
-            var node = new MiniLauncherOrbitNodeViewModel(favorites[i], ActivateItemCommand);
+            var node = new MiniLauncherOrbitNodeViewModel(source[i], ActivateItemCommand);
             var (x, y) = OrbitLayoutService.ComputePoint(i, Math.Max(count, MaxOrbitNodes), CenterX, CenterY, RadiusX, RadiusY);
             node.LineX2 = x;
             node.LineY2 = y;
             node.NodeLeft = x - NodeSize / 2;
             node.NodeTop = y - NodeSize / 2;
             OrbitNodes.Add(node);
-        }
-
-        RebuildList();
-    }
-
-    private void RebuildList()
-    {
-        Items.Clear();
-        var all = _itemsProvider()
-            .Where(item => !item.IsClipboardImage);
-
-        var filtered = string.IsNullOrWhiteSpace(_searchText)
-            ? all
-            : all.Where(item => MatchesSearch(item, _searchText));
-
-        var ordered = filtered
-            .OrderByDescending(item => item.IsFavorite)
-            .ThenByDescending(item => item.LastOpenedDate)
-            .Take(MaxListItems)
-            .ToList();
-
-        for (var i = 0; i < ordered.Count; i++)
-        {
-            Items.Add(new MiniLauncherListItemViewModel(ordered[i], i + 1, ActivateItemCommand));
         }
     }
 

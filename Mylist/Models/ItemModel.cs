@@ -155,9 +155,14 @@ public sealed class ItemModel : ObservableObject
             {
                 RecordHistoryEntry(value);
                 RaiseTrajectoryChanged();
+                OnPropertyChanged(nameof(LastOpenedDisplay));
             }
         }
     }
+
+    [JsonIgnore]
+    public string LastOpenedDisplay =>
+        _lastOpenedDate == DateTime.MinValue ? "Never" : _lastOpenedDate.ToString("g");
 
     public List<DateTime> OpenedHistory { get; set; } = new();
 
