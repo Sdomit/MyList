@@ -117,6 +117,7 @@ public sealed class MainViewModel : ViewModelBase
             _densityService,
             QueueSave,
             settings => HotkeyChanged?.Invoke(this, settings),
+            settings => MiniLauncherHotkeyChanged?.Invoke(this, settings),
             ExportDataAsync,
             ImportDataAsync,
             RestoreBackupAsync,
@@ -240,6 +241,7 @@ public sealed class MainViewModel : ViewModelBase
     }
 
     public event EventHandler<HotkeySettings>? HotkeyChanged;
+    public event EventHandler<HotkeySettings>? MiniLauncherHotkeyChanged;
 
     public AppData AppData { get; }
 
