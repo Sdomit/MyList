@@ -7,7 +7,7 @@
                     <!-- 2 px accent outline + 3 px accent-muted glow (a11y focus ring) -->
                     <Border BorderBrush="{DynamicResource Token.AccentBrush}"
                             BorderThickness="2"
-                            CornerRadius="{DynamicResource Token.RadiusLg}"
+                            CornerRadius="{DynamicResource Token.RadiusFull}"
                             Margin="2">
                         <Border.Effect>
                             <DropShadowEffect Color="{DynamicResource Token.AccentMutedColor}"
@@ -50,10 +50,10 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}" />
+                                CornerRadius="{DynamicResource Token.RadiusFull}" />
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgActiveBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.RadiusFull}"
                                 Opacity="0" />
                         <ContentPresenter Margin="{TemplateBinding Padding}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -146,6 +146,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
         <Setter Property="FontSize" Value="{DynamicResource Token.TextBase}" />
         <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="16,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -157,7 +158,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}">
+                                CornerRadius="{DynamicResource Token.RadiusFull}">
                             <Border.Effect>
                                 <DropShadowEffect Color="{DynamicResource Token.AccentColor}"
                                                   BlurRadius="14"
@@ -169,7 +170,7 @@
                              mutating the shared accent brush. -->
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.WhiteBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.RadiusFull}"
                                 Opacity="0" />
                         <ContentPresenter Margin="{TemplateBinding Padding}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -288,11 +289,11 @@
                     <Grid>
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgHoverBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Opacity="0" />
                         <Border x:Name="Chrome"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="Center" />
@@ -343,11 +344,11 @@
                     <Grid>
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgHoverBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Opacity="0" />
                         <Border x:Name="Chrome"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
@@ -431,11 +432,11 @@
                     <Grid>
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgHoverBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Opacity="0" />
                         <Border x:Name="Chrome"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.RadiusLg}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />

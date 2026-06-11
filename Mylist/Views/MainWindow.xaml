@@ -474,15 +474,15 @@
             </StackPanel>
 
             <Border Grid.Column="1"
-                    MaxWidth="460"
-                    Height="26"
+                    MaxWidth="520"
+                    Height="30"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Background="{DynamicResource Token.BgSurfaceBrush}"
                     BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
-                    CornerRadius="{DynamicResource Token.RadiusMd}">
-                <Grid Margin="10,0,7,0">
+                    CornerRadius="{DynamicResource Token.RadiusFull}">
+                <Grid Margin="13,0,9,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="14" />
                         <ColumnDefinition Width="*" />
@@ -521,11 +521,11 @@
                         </TextBlock.Style>
                     </TextBlock>
                     <Border Grid.Column="2"
-                            Padding="5,1"
+                            Padding="7,1"
                             Background="{DynamicResource Token.BgSubtleBrush}"
                             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                             BorderThickness="1"
-                            CornerRadius="{DynamicResource Token.RadiusXs}"
+                            CornerRadius="{DynamicResource Token.RadiusFull}"
                             VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource Simple.MonoText}" Text="Ctrl+K" FontSize="10" />
                     </Border>
