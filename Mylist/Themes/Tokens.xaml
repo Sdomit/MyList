@@ -206,7 +206,9 @@
     <!-- CSS font tokens (Windows 11 skin defaults; MyList skin overrides with the
          bundled Plus Jakarta Sans / JetBrains Mono) -->
     <FontFamily x:Key="Token.FontSans">Segoe UI Variable Text, Segoe UI</FontFamily>
-    <FontFamily x:Key="Token.FontMono">Cascadia Mono, Consolas</FontFamily>
+    <!-- Win11 skin renders technical/meta text (paths, hints, statuses) in the UI sans;
+         the MyList skin overrides this back to a real mono. -->
+    <FontFamily x:Key="Token.FontMono">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Token.FontUi">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Token.FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
 

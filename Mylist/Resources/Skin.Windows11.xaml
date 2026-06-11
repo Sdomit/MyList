@@ -8,7 +8,7 @@
     <CornerRadius x:Key="Token.Skin.ChipRadius">4</CornerRadius>
 
     <FontFamily x:Key="Token.FontSans">Segoe UI Variable Text, Segoe UI</FontFamily>
-    <FontFamily x:Key="Token.FontMono">Cascadia Mono, Consolas</FontFamily>
+    <FontFamily x:Key="Token.FontMono">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Token.FontUi">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Token.FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
 </ResourceDictionary>

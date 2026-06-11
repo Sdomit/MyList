@@ -168,14 +168,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{DynamicResource Token.Skin.ControlRadius}">
-                            <Border.Effect>
-                                <DropShadowEffect Color="{DynamicResource Token.AccentColor}"
-                                                  BlurRadius="14"
-                                                  ShadowDepth="0"
-                                                  Opacity="0" />
-                            </Border.Effect>
-                        </Border>
+                                CornerRadius="{DynamicResource Token.Skin.ControlRadius}" />
                         <!-- White-glaze hover layer: brightens the accent fill without
                              mutating the shared accent brush. -->
                         <Border x:Name="HoverLayer"
@@ -202,10 +195,6 @@
                                                          Storyboard.TargetProperty="Opacity"
                                                          To="0.12"
                                                          Duration="0:0:0.12" />
-                                        <DoubleAnimation Storyboard.TargetName="Chrome"
-                                                         Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.Opacity)"
-                                                         To="0.45"
-                                                         Duration="0:0:0.15" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -216,13 +205,19 @@
                                                          Storyboard.TargetProperty="Opacity"
                                                          To="0"
                                                          Duration="0:0:0.18" />
-                                        <DoubleAnimation Storyboard.TargetName="Chrome"
-                                                         Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.Opacity)"
-                                                         To="0"
-                                                         Duration="0:0:0.25" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
+                            <!-- Glow only while hovered; a resting effect costs a software
+                                 render surface per button. -->
+                            <Setter TargetName="Chrome" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{DynamicResource Token.AccentColor}"
+                                                      BlurRadius="14"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.45" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Trigger.EnterActions>
@@ -539,40 +534,24 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{DynamicResource Token.Skin.InputRadius}">
-                        <Border.Effect>
-                            <DropShadowEffect Color="{DynamicResource Token.AccentColor}"
-                                              BlurRadius="8"
-                                              ShadowDepth="0"
-                                              Opacity="0" />
-                        </Border.Effect>
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.BorderStrongBrush}" />
                         </Trigger>
+                        <!-- Glow effect only exists while focused: a resting DropShadowEffect
+                             (even at opacity 0) forces a software render surface per textbox. -->
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Trigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="Chrome"
-                                                         Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.Opacity)"
-                                                         To="0.35"
-                                                         Duration="0:0:0.15" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.EnterActions>
-                            <Trigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="Chrome"
-                                                         Storyboard.TargetProperty="(UIElement.Effect).(DropShadowEffect.Opacity)"
-                                                         To="0"
-                                                         Duration="0:0:0.2" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.ExitActions>
                             <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                            <Setter TargetName="Chrome" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="{DynamicResource Token.AccentColor}"
+                                                      BlurRadius="8"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.35" />
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Chrome" Property="Opacity" Value="0.55" />

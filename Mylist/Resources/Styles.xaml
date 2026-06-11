@@ -70,18 +70,8 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <EventTrigger RoutedEvent="Loaded">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                         From="0"
-                                         To="1"
-                                         Duration="0:0:0.18" />
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Style.Triggers>
+        <!-- No Loaded fade-in here: with recycling virtualization the storyboard re-runs
+             on every container reuse, which janks scrolling and view switches. -->
     </Style>
 
 </ResourceDictionary>
