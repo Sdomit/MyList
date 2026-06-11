@@ -59,16 +59,39 @@ Findings from a full code review of the C# sources. Severity reflects user impac
   `Thickness`, so WPF falls back to the property default rather than silently
   flattening padding.
 
+## Fixed: previously-listed Open items, confirmed already addressed in code
+
+These were carried as Open until a re-audit against current code confirmed each
+had already been resolved by an earlier merged PR. Verified line references:
+
+- **Mini-launcher orbit reacts to the search query** — `MiniLauncherViewModel.Rebuild`
+  re-derives both the indexed list and the orbit center/satellites from the
+  filtered `matches` set, falling back to favorites / recents only when the
+  query is empty (`MiniLauncherViewModel.cs:110-160`).
+- **"Last opened" shows "Never" for unopened items** — `ItemModel.LastOpenedDisplay`
+  returns `"Never"` when `_lastOpenedDate == DateTime.MinValue`
+  (`Mylist/Models/ItemModel.cs:173-174`).
+- **Grid view item cards no longer bottom-anchor** — the `UniformGrid` items
+  panel sets `VerticalAlignment="Top"` so a single row of cards sizes to the
+  cards instead of stretching to the viewport (`Mylist/Views/MainWindow.xaml:1145`).
+- **Settings "Dark-first tokens active" debug chip removed** — the sidebar
+  `Border` that rendered the literal status banner was deleted in the UI
+  polish pass (no remaining occurrence in `SettingsView.xaml`).
+
+## Fixed: Mini-launcher dead-path safety
+
+- **Mini-launcher silently dismissed on dead paths** — both `ActivateItemCommand`
+  and `OpenIndexedItemCommand` now route through a `TryLaunch` guard that
+  checks `ItemHealthState` before launching: `Missing` / `Offline` items keep
+  the launcher open and surface a status message ("Path not found: …" or
+  "Offline: …") in the footer in the warning-status color, and an unexpected
+  exception from `LauncherService.Open` is caught and surfaced the same way.
+  The launcher only dismisses on a successful launch
+  (`MiniLauncherViewModel.cs:38-65, 99-138`, `MiniLauncherWindow.xaml` footer).
+
 ## Open
 
-### Medium
-- **Mini-launcher orbit ignores the search query** — typing filters the indexed list, but the orbit visual stays static (always centered on the first item; satellites are unlabeled). `MiniLauncherViewModel` / `OrbitLayoutService` don't re-layout on the filtered set.
-
 ### Low
-- **"Last opened" renders `1/1/0001 12:00 AM`** for never-opened items (`DateTime.MinValue` shown raw; should read "Never").
-- **Path health flaps** — the same unreachable UNC item cycles `Offline` ↔ `Missing` ↔ healthy across re-checks within one session.
-- **Mini-launcher launches dead paths silently** — `Enter` / `Ctrl+N` on an item whose path no longer exists dismisses the launcher with no feedback, and the launcher list shows no missing-state indicator.
-- **Grid view** item cards render bottom-anchored, leaving a large empty gap above the first row.
-- **Settings "Dark-first tokens active" chip is a hardcoded literal** (`SettingsView.xaml:195`), not bound to the active theme — misleading as a status indicator.
+- **Path health flaps** — the same unreachable UNC item cycles `Offline` ↔ `Missing` ↔ healthy across re-checks within one session. Likely root cause: `NetworkCheckService.EvaluatePathStateAsync` distinguishes Missing from Offline by the exception type thrown by `Directory.Exists` / `File.Exists` against an SMB target with intermittent reachability, and the OS swaps the underlying error code between probes. Needs a stable Offline detector (e.g. ping the host once per cycle and short-circuit Missing) before this can be cleanly closed.
 
 > All fixes verified by a clean `dotnet build` (0 warnings, 0 errors). The two theme fixes were additionally verified live in the running app: Dark↔Light and accent switch instantly, and the light-mode sidebar/header render light with legible text.
