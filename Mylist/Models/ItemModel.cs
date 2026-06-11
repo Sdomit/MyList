@@ -116,7 +116,13 @@ public sealed class ItemModel : ObservableObject
     public bool IsFavorite
     {
         get => _isFavorite;
-        set => SetProperty(ref _isFavorite, value);
+        set
+        {
+            if (SetProperty(ref _isFavorite, value))
+            {
+                OnPropertyChanged(nameof(FavoriteDisplay));
+            }
+        }
     }
 
     public bool IsPinned
@@ -159,6 +165,9 @@ public sealed class ItemModel : ObservableObject
             }
         }
     }
+
+    [JsonIgnore]
+    public string FavoriteDisplay => _isFavorite ? "Yes" : "No";
 
     [JsonIgnore]
     public string LastOpenedDisplay =>

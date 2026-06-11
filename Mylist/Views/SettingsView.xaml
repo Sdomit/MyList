@@ -178,24 +178,6 @@
                                            Style="{StaticResource Simple.SectionLabel}"
                                            Text="SETTINGS" />
                                 <ItemsPresenter Grid.Row="1" />
-                                <Border Grid.Row="2"
-                                        Margin="6,14,6,0"
-                                        Padding="10"
-                                        Background="{DynamicResource Token.AccentSubtleBrush}"
-                                        BorderBrush="{DynamicResource Token.AccentMutedBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="{DynamicResource Token.RadiusMd}">
-                                    <StackPanel>
-                                        <TextBlock Text="Simple variant"
-                                                   Foreground="{DynamicResource Token.TextAccentBrush}"
-                                                   FontSize="{DynamicResource Token.TextXs}"
-                                                   FontWeight="Medium" />
-                                        <TextBlock Margin="0,3,0,0"
-                                                   Style="{StaticResource Simple.MonoText}"
-                                                   Text="Dark-first tokens active"
-                                                   TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </Border>
                             </Grid>
                         </Border>
 
