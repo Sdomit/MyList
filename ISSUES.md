@@ -39,11 +39,22 @@ Findings from a full code review of the C# sources. Severity reflects user impac
 
 - **Explorer automation froze the UI** — `ExplorerTabAutomationService` ran `SendKeys.SendWait` (plus WPF Clipboard and Shell COM) on the dispatcher thread, so multi-folder mtab opens blocked the UI. The whole flow now runs on a dedicated background **STA** thread (`RunOnStaThreadAsync`); the async/await chain was converted to synchronous, cancellable sleeps. Public method signatures are unchanged, so callers still `await` and resume on the UI thread for result handling. Merged to main; runtime verification against real Explorer windows is still owed (interactive, GUI-only).
 
+## Fixed: Low-severity safety pass
+
+- **Dialog `Owner` null safety** — `MainViewModel` now routes 15 dialog-open
+  sites through a `GetOwnerWindow()` helper that returns `Application.Current?.MainWindow`,
+  so shutdown-race NREs can't surface.
+- **StorageService.ReplaceFile fallback** — the cross-volume / network-share
+  path swapped delete-then-move for `File.Move(temp, target, overwrite: true)`,
+  closing the window where the target file was missing on crash or for
+  concurrent readers.
+- **MultiplyValueConverter** — malformed `ConverterParameter` (e.g. a 3-value
+  list) now returns `DependencyProperty.UnsetValue` instead of a zero
+  `Thickness`, so WPF falls back to the property default rather than silently
+  flattening padding.
+
 ## Open
 
-### Low
-- Some dialogs set `Owner = Application.Current.MainWindow` without a null check (throws only in rare shutdown races).
-- `StorageService.ReplaceFile` fallback (for providers without atomic replace) deletes-then-moves; the primary path uses atomic `File.Replace`.
-- `MultiplyValueConverter` yields a zero `Thickness` for a malformed 3-value `ConverterParameter`.
+(none)
 
 > All fixes verified by a clean `dotnet build` (0 warnings, 0 errors).
