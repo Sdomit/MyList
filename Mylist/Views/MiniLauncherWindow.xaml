@@ -259,38 +259,69 @@
                 </ScrollViewer>
             </Border>
 
-            <!-- Footer hint bar -->
+            <!-- Footer hint bar (or status when launch fails) -->
             <Border Grid.Row="3"
                     Padding="16,10"
                     Background="{DynamicResource Token.BgSubtleBrush}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Ctrl+1..9"
-                                   FontFamily="{DynamicResource Token.FontMono}"
-                                   FontSize="{StaticResource Token.TextXs}"
-                                   Foreground="{DynamicResource Token.TextSecondaryBrush}" />
-                        <TextBlock Text=" open slot"
-                                   FontSize="{StaticResource Token.TextXs}"
-                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                                   Margin="2,0,16,0" />
-                        <TextBlock Text="Enter"
-                                   FontFamily="{DynamicResource Token.FontMono}"
-                                   FontSize="{StaticResource Token.TextXs}"
-                                   Foreground="{DynamicResource Token.TextSecondaryBrush}" />
-                        <TextBlock Text=" open first match"
-                                   FontSize="{StaticResource Token.TextXs}"
-                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                                   Margin="2,0,0,0" />
-                    </StackPanel>
-                    <TextBlock Grid.Column="1"
-                               Text="Ctrl+Shift+G to summon"
-                               FontFamily="{DynamicResource Token.FontMono}"
+                    <!-- Status text shown when a launch fails (dead path, offline, etc.) -->
+                    <TextBlock Text="{Binding StatusText}"
                                FontSize="{StaticResource Token.TextXs}"
-                               Foreground="{DynamicResource Token.TextTertiaryBrush}" />
+                               Foreground="{DynamicResource Token.StatusWarningBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasStatus}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Default hint bar (hidden when StatusText is set). -->
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasStatus}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Ctrl+1..9"
+                                       FontFamily="{DynamicResource Token.FontMono}"
+                                       FontSize="{StaticResource Token.TextXs}"
+                                       Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                            <TextBlock Text=" open slot"
+                                       FontSize="{StaticResource Token.TextXs}"
+                                       Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                       Margin="2,0,16,0" />
+                            <TextBlock Text="Enter"
+                                       FontFamily="{DynamicResource Token.FontMono}"
+                                       FontSize="{StaticResource Token.TextXs}"
+                                       Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                            <TextBlock Text=" open first match"
+                                       FontSize="{StaticResource Token.TextXs}"
+                                       Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                       Margin="2,0,0,0" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1"
+                                   Text="Ctrl+Shift+G to summon"
+                                   FontFamily="{DynamicResource Token.FontMono}"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextTertiaryBrush}" />
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

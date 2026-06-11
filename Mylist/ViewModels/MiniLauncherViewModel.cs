@@ -25,6 +25,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
     private readonly Action _closeRequested;
     private ItemModel? _centerItem;
     private string _searchText = string.Empty;
+    private string _statusText = string.Empty;
 
     public MiniLauncherViewModel(Func<IReadOnlyList<ItemModel>> itemsProvider, LauncherService launcherService, Action closeRequested)
     {
@@ -42,8 +43,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
                 return;
             }
 
-            _launcherService.Open(item);
-            _closeRequested();
+            TryLaunch(item);
         });
         CloseCommand = new RelayCommand(() => _closeRequested());
         OpenIndexedItemCommand = new RelayCommand<string>(p =>
@@ -59,8 +59,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
                 return;
             }
 
-            _launcherService.Open(slot.Item);
-            _closeRequested();
+            TryLaunch(slot.Item);
         });
 
         Refresh();
@@ -94,8 +93,44 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         {
             if (SetProperty(ref _searchText, value ?? string.Empty))
             {
+                StatusText = string.Empty;
                 Rebuild();
             }
+        }
+    }
+
+    public string StatusText
+    {
+        get => _statusText;
+        private set
+        {
+            if (SetProperty(ref _statusText, value ?? string.Empty))
+            {
+                OnPropertyChanged(nameof(HasStatus));
+            }
+        }
+    }
+
+    public bool HasStatus => !string.IsNullOrEmpty(_statusText);
+
+    private void TryLaunch(ItemModel item)
+    {
+        if (item.HealthState is ItemHealthState.Missing or ItemHealthState.Offline)
+        {
+            StatusText = item.HealthState == ItemHealthState.Offline
+                ? $"Offline: {item.Path}"
+                : $"Path not found: {item.Path}";
+            return;
+        }
+
+        try
+        {
+            _launcherService.Open(item);
+            _closeRequested();
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Couldn't open '{item.Name}': {ex.Message}";
         }
     }
 
