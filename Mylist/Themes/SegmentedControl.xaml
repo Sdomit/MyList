@@ -59,7 +59,15 @@
                                             Padding="{TemplateBinding Padding}">
                                         <ContentPresenter HorizontalAlignment="Center"
                                                           VerticalAlignment="Center"
-                                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                                                          TextElement.Foreground="{TemplateBinding Foreground}">
+                                            <!-- Beat the app-wide implicit TextBlock style so the
+                                                 selected segment's accent foreground applies. -->
+                                            <ContentPresenter.Resources>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+                                                </Style>
+                                            </ContentPresenter.Resources>
+                                        </ContentPresenter>
                                     </Border>
                                 </Grid>
                                 <ControlTemplate.Triggers>

@@ -385,7 +385,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <TextBlock Style="{StaticResource SettingsRowName}" Text="Accent" />
-                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Pick one of eight Forma accent palettes." />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Pick an accent palette; Neutral is plain black and white." />
                                 </StackPanel>
                                 <ListBox Grid.Column="1"
                                          BorderThickness="0"
