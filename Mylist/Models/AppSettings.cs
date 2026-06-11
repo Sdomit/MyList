@@ -24,6 +24,7 @@ public sealed class AppSettings
     };
 
     public UiDensity UiDensity { get; set; } = UiDensity.Comfortable;
+    public UiSkin Skin { get; set; } = UiSkin.Windows11;
     public double ItemScale { get; set; } = 1.0;
     public bool EnableDebugMode { get; set; }
     public WindowPlacement WindowPlacement { get; set; } = new();

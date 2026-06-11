@@ -479,6 +479,11 @@ public sealed class StorageService
             data.AppSettings.ItemScale = Math.Clamp(data.AppSettings.ItemScale, 0.75, 1.5);
         }
 
+        if (!Enum.IsDefined(typeof(UiSkin), data.AppSettings.Skin))
+        {
+            data.AppSettings.Skin = UiSkin.Windows11;
+        }
+
         if (data.Collections.Count == 0)
         {
             data.Collections.Add(new CollectionModel { Name = "Main" });

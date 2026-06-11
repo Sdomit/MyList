@@ -323,6 +323,28 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="220" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="App style" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Windows 11 follows the system look; MyList is the custom theme." />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1"
+                                          SelectedItem="{Binding Skin}"
+                                          ItemsSource="{Binding SkinModes}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource UiSkinToLabelConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>

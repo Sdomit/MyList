@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Windows 11 skin - Fluent 2 shape + system fonts (see Themes/Tokens.xaml) -->
+    <CornerRadius x:Key="Token.Skin.ControlRadius">4</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.InputRadius">4</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.RowRadius">4</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.MenuRadius">8</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.ChipRadius">4</CornerRadius>
+
+    <FontFamily x:Key="Token.FontSans">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Token.FontMono">Cascadia Mono, Consolas</FontFamily>
+    <FontFamily x:Key="Token.FontUi">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Token.FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+</ResourceDictionary>

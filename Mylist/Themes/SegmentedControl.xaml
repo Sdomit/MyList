@@ -19,7 +19,7 @@
                     <Border BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="{StaticResource Token.RadiusLg}"
+                            CornerRadius="{DynamicResource Token.Skin.InputRadius}"
                             Padding="2"
                             SnapsToDevicePixels="True">
                         <ItemsPresenter />
@@ -51,11 +51,11 @@
                                 <Grid>
                                     <Border x:Name="HoverLayer"
                                             Background="{DynamicResource Token.BgHoverBrush}"
-                                            CornerRadius="{StaticResource Token.RadiusMd}"
+                                            CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                             Opacity="0" />
                                     <Border x:Name="Chrome"
                                             Background="Transparent"
-                                            CornerRadius="{StaticResource Token.RadiusMd}"
+                                            CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                             Padding="{TemplateBinding Padding}">
                                         <ContentPresenter HorizontalAlignment="Center"
                                                           VerticalAlignment="Center"

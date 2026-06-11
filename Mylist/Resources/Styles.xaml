@@ -54,7 +54,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Border Background="{TemplateBinding Background}"
-                            CornerRadius="{DynamicResource Token.RadiusLg}"
+                            CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />

@@ -7,7 +7,7 @@
                     <!-- 2 px accent outline + 3 px accent-muted glow (a11y focus ring) -->
                     <Border BorderBrush="{DynamicResource Token.AccentBrush}"
                             BorderThickness="2"
-                            CornerRadius="{DynamicResource Token.RadiusFull}"
+                            CornerRadius="{DynamicResource Token.Skin.ControlRadius}"
                             Margin="2">
                         <Border.Effect>
                             <DropShadowEffect Color="{DynamicResource Token.AccentMutedColor}"
@@ -50,10 +50,10 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{DynamicResource Token.RadiusFull}" />
+                                CornerRadius="{DynamicResource Token.Skin.ControlRadius}" />
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgActiveBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusFull}"
+                                CornerRadius="{DynamicResource Token.Skin.ControlRadius}"
                                 Opacity="0" />
                         <ContentPresenter Margin="{TemplateBinding Padding}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -158,7 +158,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{DynamicResource Token.RadiusFull}">
+                                CornerRadius="{DynamicResource Token.Skin.ControlRadius}">
                             <Border.Effect>
                                 <DropShadowEffect Color="{DynamicResource Token.AccentColor}"
                                                   BlurRadius="14"
@@ -170,7 +170,7 @@
                              mutating the shared accent brush. -->
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.WhiteBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusFull}"
+                                CornerRadius="{DynamicResource Token.Skin.ControlRadius}"
                                 Opacity="0" />
                         <ContentPresenter Margin="{TemplateBinding Padding}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -289,11 +289,11 @@
                     <Grid>
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgHoverBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                 Opacity="0" />
                         <Border x:Name="Chrome"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="Center" />
@@ -344,11 +344,11 @@
                     <Grid>
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgHoverBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                 Opacity="0" />
                         <Border x:Name="Chrome"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
@@ -432,11 +432,11 @@
                     <Grid>
                         <Border x:Name="HoverLayer"
                                 Background="{DynamicResource Token.BgHoverBrush}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                 Opacity="0" />
                         <Border x:Name="Chrome"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource Token.RadiusLg}"
+                                CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
@@ -522,7 +522,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{DynamicResource Token.RadiusLg}">
+                            CornerRadius="{DynamicResource Token.Skin.InputRadius}">
                         <Border.Effect>
                             <DropShadowEffect Color="{DynamicResource Token.AccentColor}"
                                               BlurRadius="8"

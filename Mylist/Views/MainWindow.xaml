@@ -481,7 +481,7 @@
                     Background="{DynamicResource Token.BgSurfaceBrush}"
                     BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
-                    CornerRadius="{DynamicResource Token.RadiusFull}">
+                    CornerRadius="{DynamicResource Token.Skin.ControlRadius}">
                 <Grid Margin="13,0,9,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="14" />
@@ -525,7 +525,7 @@
                             Background="{DynamicResource Token.BgSubtleBrush}"
                             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                             BorderThickness="1"
-                            CornerRadius="{DynamicResource Token.RadiusFull}"
+                            CornerRadius="{DynamicResource Token.Skin.ChipRadius}"
                             VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource Simple.MonoText}" Text="Ctrl+K" FontSize="10" />
                     </Border>

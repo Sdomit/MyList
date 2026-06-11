@@ -18,7 +18,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource Token.RadiusLg}">
+                            CornerRadius="{DynamicResource Token.Skin.InputRadius}">
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -54,7 +54,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{StaticResource Token.RadiusLg}" />
+                                CornerRadius="{DynamicResource Token.Skin.InputRadius}" />
                         <DockPanel>
                             <ToggleButton x:Name="ToggleButton"
                                           DockPanel.Dock="Right"
@@ -96,7 +96,7 @@
                             <Border Background="{DynamicResource ControlBackground}"
                                     BorderBrush="{DynamicResource ControlBorder}"
                                     BorderThickness="1"
-                                    CornerRadius="{StaticResource Token.RadiusLg}"
+                                    CornerRadius="{DynamicResource Token.Skin.MenuRadius}"
                                     Margin="8,4,8,12"
                                     Effect="{StaticResource Token.ShadowMd}"
                                     SnapsToDevicePixels="True">
@@ -132,7 +132,7 @@
                 <ControlTemplate TargetType="ComboBoxItem">
                     <Border x:Name="ItemBorder"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="{StaticResource Token.RadiusMd}"
+                            CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter />
                     </Border>
@@ -470,7 +470,7 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource Token.RadiusLg}"
+                            CornerRadius="{DynamicResource Token.Skin.MenuRadius}"
                             Padding="{TemplateBinding Padding}">
                         <StackPanel IsItemsHost="True"
                                     KeyboardNavigation.DirectionalNavigation="Cycle" />
