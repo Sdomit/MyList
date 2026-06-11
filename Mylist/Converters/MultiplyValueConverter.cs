@@ -56,7 +56,7 @@ public sealed class MultiplyValueConverter : IValueConverter
             : fallback;
     }
 
-    private static Thickness ScaleThickness(object? parameter, double factor)
+    private static object ScaleThickness(object? parameter, double factor)
     {
         if (parameter is null)
         {
@@ -79,7 +79,10 @@ public sealed class MultiplyValueConverter : IValueConverter
             1 => new Thickness(parts[0] * factor),
             2 => new Thickness(parts[0] * factor, parts[1] * factor, parts[0] * factor, parts[1] * factor),
             4 => new Thickness(parts[0] * factor, parts[1] * factor, parts[2] * factor, parts[3] * factor),
-            _ => new Thickness()
+            // A malformed parameter (e.g. a 3-value list) used to collapse to
+            // a zero Thickness, silently flattening padding. Return UnsetValue
+            // so WPF falls back to the property's default or prior setter.
+            _ => DependencyProperty.UnsetValue
         };
     }
 }

@@ -1032,13 +1032,17 @@ public sealed class MainViewModel : ViewModelBase
         ExecuteAction(action);
     }
 
+    // Application.Current can be null during shutdown / design-time; MainWindow is
+    // null until the first window is shown. WPF accepts a null Owner.
+    private static Window? GetOwnerWindow() => Application.Current?.MainWindow;
+
     public void ShowCommandPalette()
     {
         var commands = BuildCommandRows();
         var settings = BuildSettingsRows();
         var palette = new CommandPaletteWindow(this, commands, settings)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
 
         palette.ShowDialog();
@@ -1108,7 +1112,7 @@ public sealed class MainViewModel : ViewModelBase
             Height = 520,
             MinWidth = 640,
             MinHeight = 420,
-            Owner = Application.Current.MainWindow,
+            Owner = GetOwnerWindow(),
             Content = new DiagnosticsView { DataContext = Diagnostics }
         };
 
@@ -1119,7 +1123,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         var duplicateManager = new DuplicateManagerWindow(this)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
 
         duplicateManager.ShowDialog();
@@ -1456,7 +1460,7 @@ public sealed class MainViewModel : ViewModelBase
                 ResolveTargetCollection(),
                 history)
             {
-                Owner = Application.Current.MainWindow
+                Owner = GetOwnerWindow()
             };
 
             if (reviewWindow.ShowDialog() != true)
@@ -1532,7 +1536,7 @@ public sealed class MainViewModel : ViewModelBase
                 BuildSuggestedMtabNameFromPaths(normalizedFolders),
                 normalizedFolders)
             {
-                Owner = Application.Current.MainWindow
+                Owner = GetOwnerWindow()
             };
 
             if (createDialog.ShowDialog() != true)
@@ -1559,7 +1563,7 @@ public sealed class MainViewModel : ViewModelBase
 
         var picker = new MtabPickerWindow(existingMtabs, normalizedFolders)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
 
         if (picker.ShowDialog() != true || picker.SelectedMtab is null)
@@ -2145,7 +2149,7 @@ public sealed class MainViewModel : ViewModelBase
 
         var dialog = new RenameCollectionWindow(vm, "New Collection")
         {
-            Owner = Application.Current.MainWindow,
+            Owner = GetOwnerWindow(),
             IsCollectionNameAvailable = name => IsCollectionNameAvailable(name)
         };
 
@@ -2274,7 +2278,7 @@ public sealed class MainViewModel : ViewModelBase
         var suggestedName = BuildSuggestedMtabName(Array.Empty<ItemModel>());
         var editor = new MtabEditorWindow("New Mtab", suggestedName)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
 
         if (editor.ShowDialog() != true)
@@ -2309,7 +2313,7 @@ public sealed class MainViewModel : ViewModelBase
             BuildSuggestedMtabNameFromPaths(capturedPaths),
             capturedPaths)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
 
         if (editor.ShowDialog() != true)
@@ -2330,7 +2334,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         var dialog = new ActionItemWindow("New Action")
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
 
         if (dialog.ShowDialog() != true)
@@ -2390,7 +2394,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         var dialog = new ActionItemWindow("Edit Action")
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
         dialog.ViewModel.Load(item);
 
@@ -2438,7 +2442,7 @@ public sealed class MainViewModel : ViewModelBase
             var suggestedName = BuildSuggestedMtabName(new[] { targetItem, sourceItem });
             var editor = new MtabEditorWindow("Create Mtab", suggestedName, new[] { targetItem.Path, sourceItem.Path })
             {
-                Owner = Application.Current.MainWindow
+                Owner = GetOwnerWindow()
             };
 
             if (editor.ShowDialog() != true)
@@ -2514,7 +2518,7 @@ public sealed class MainViewModel : ViewModelBase
             var suggestedName = BuildSuggestedMtabName(new[] { targetItem });
             var editor = new MtabEditorWindow("Create Mtab", suggestedName, initialPaths)
             {
-                Owner = Application.Current.MainWindow
+                Owner = GetOwnerWindow()
             };
 
             if (editor.ShowDialog() != true)
@@ -2602,7 +2606,7 @@ public sealed class MainViewModel : ViewModelBase
 
         var dialog = new RenameCollectionWindow(collection)
         {
-            Owner = Application.Current.MainWindow,
+            Owner = GetOwnerWindow(),
             IsCollectionNameAvailable = name => IsCollectionNameAvailable(name, collection)
         };
 
@@ -3447,7 +3451,7 @@ public sealed class MainViewModel : ViewModelBase
         var prompt = $"Dropped \"{sourceLabel}\" on \"{targetLabel}\".\nChoose what to create:";
         var dialog = new DropItemActionWindow(prompt)
         {
-            Owner = Application.Current.MainWindow
+            Owner = GetOwnerWindow()
         };
 
         _ = dialog.ShowDialog();

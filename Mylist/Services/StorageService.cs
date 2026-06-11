@@ -311,12 +311,11 @@ public sealed class StorageService
         }
         catch
         {
-            // Fallback for providers that don't support Replace semantics.
-            if (File.Exists(targetPath))
-            {
-                File.Delete(targetPath);
-            }
-            File.Move(tempPath, targetPath);
+            // Fallback for providers that don't support File.Replace semantics
+            // (cross-volume, network shares). Move-with-overwrite avoids the
+            // delete-then-move window that left the target missing on crash
+            // or for concurrent readers.
+            File.Move(tempPath, targetPath, overwrite: true);
         }
     }
 
