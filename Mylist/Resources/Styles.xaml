@@ -12,6 +12,9 @@
         <Setter Property="Icon" Value="pack://siteoforigin:,,,/desktops.png" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
+        <!-- Display-mode formatting pixel-snaps glyphs: crisper small UI text than the
+             default Ideal mode. Inherits to every TextBlock in the window. -->
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
     </Style>
 
     <Style TargetType="TextBlock">

@@ -91,12 +91,16 @@
                                AllowsTransparency="True"
                                Focusable="False"
                                PopupAnimation="Fade">
+                            <!-- Outer margin reserves room for the drop shadow inside the
+                                 transparent popup window. -->
                             <Border Background="{DynamicResource ControlBackground}"
                                     BorderBrush="{DynamicResource ControlBorder}"
                                     BorderThickness="1"
                                     CornerRadius="{StaticResource Token.RadiusLg}"
+                                    Margin="8,4,8,12"
+                                    Effect="{StaticResource Token.ShadowMd}"
                                     SnapsToDevicePixels="True">
-                                <ScrollViewer Margin="2" CanContentScroll="True">
+                                <ScrollViewer Margin="4" CanContentScroll="True">
                                     <ItemsPresenter />
                                 </ScrollViewer>
                             </Border>
@@ -158,12 +162,17 @@
                                 Background="{DynamicResource ControlBackground}"
                                 BorderBrush="{DynamicResource ControlBorder}"
                                 BorderThickness="1"
-                                CornerRadius="3">
+                                CornerRadius="4">
                             <Path x:Name="Check"
                                   Data="M 2 8 L 6 12 L 14 4"
                                   Stroke="{DynamicResource SelectionForeground}"
                                   StrokeThickness="2"
-                                  Visibility="Collapsed" />
+                                  Opacity="0"
+                                  RenderTransformOrigin="0.5,0.5">
+                                <Path.RenderTransform>
+                                    <ScaleTransform ScaleX="0.6" ScaleY="0.6" />
+                                </Path.RenderTransform>
+                            </Path>
                         </Border>
                         <ContentPresenter Margin="8,0,0,0"
                                           VerticalAlignment="Center"
@@ -172,11 +181,55 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Box" Property="Background" Value="{DynamicResource ControlHover}" />
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Token.BorderStrongBrush}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Check"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0:0:0.12" />
+                                        <DoubleAnimation Storyboard.TargetName="Check"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                         To="1"
+                                                         Duration="0:0:0.18">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.5" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="Check"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                         To="1"
+                                                         Duration="0:0:0.18">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.5" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Check"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0"
+                                                         Duration="0:0:0.1" />
+                                        <DoubleAnimation Storyboard.TargetName="Check"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                         To="0.6"
+                                                         Duration="0:0:0.1" />
+                                        <DoubleAnimation Storyboard.TargetName="Check"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                         To="0.6"
+                                                         Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                             <Setter TargetName="Box" Property="Background" Value="{DynamicResource SelectionBackground}" />
                             <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource SelectionBackground}" />
-                            <Setter TargetName="Check" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.6" />
@@ -204,9 +257,14 @@
                                      Width="8"
                                      Height="8"
                                      Fill="{DynamicResource SelectionForeground}"
-                                     Visibility="Collapsed"
+                                     Opacity="0"
+                                     RenderTransformOrigin="0.5,0.5"
                                      HorizontalAlignment="Center"
-                                     VerticalAlignment="Center" />
+                                     VerticalAlignment="Center">
+                                <Ellipse.RenderTransform>
+                                    <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
                         </Border>
                         <ContentPresenter Margin="8,0,0,0"
                                           VerticalAlignment="Center"
@@ -215,11 +273,55 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Outer" Property="Background" Value="{DynamicResource ControlHover}" />
+                            <Setter TargetName="Outer" Property="BorderBrush" Value="{DynamicResource Token.BorderStrongBrush}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Inner"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0:0:0.12" />
+                                        <DoubleAnimation Storyboard.TargetName="Inner"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                         To="1"
+                                                         Duration="0:0:0.18">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.5" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="Inner"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                         To="1"
+                                                         Duration="0:0:0.18">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.5" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Inner"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0"
+                                                         Duration="0:0:0.1" />
+                                        <DoubleAnimation Storyboard.TargetName="Inner"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                         To="0.5"
+                                                         Duration="0:0:0.1" />
+                                        <DoubleAnimation Storyboard.TargetName="Inner"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                         To="0.5"
+                                                         Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                             <Setter TargetName="Outer" Property="Background" Value="{DynamicResource SelectionBackground}" />
                             <Setter TargetName="Outer" Property="BorderBrush" Value="{DynamicResource SelectionBackground}" />
-                            <Setter TargetName="Inner" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.6" />
@@ -313,8 +415,9 @@
         </Setter>
     </Style>
 
+    <!-- Slim overlay-style scrollbar: hairline thumb that brightens on hover. -->
     <Style TargetType="ScrollBar">
-        <Setter Property="Width" Value="10" />
+        <Setter Property="Width" Value="8" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
@@ -325,7 +428,18 @@
                                 <Thumb>
                                     <Thumb.Template>
                                         <ControlTemplate TargetType="Thumb">
-                                            <Border Background="{DynamicResource ControlHover}" CornerRadius="5" />
+                                            <Border x:Name="ThumbChrome"
+                                                    Background="{DynamicResource Token.BgMutedBrush}"
+                                                    CornerRadius="{StaticResource Token.RadiusFull}"
+                                                    Margin="2" />
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="ThumbChrome" Property="Background" Value="{DynamicResource Token.BorderStrongBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsDragging" Value="True">
+                                                    <Setter TargetName="ThumbChrome" Property="Background" Value="{DynamicResource Token.AccentBrush}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
                                         </ControlTemplate>
                                     </Thumb.Template>
                                 </Thumb>
@@ -334,7 +448,7 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="Orientation" Value="Horizontal">
-                            <Setter Property="Height" Value="10" />
+                            <Setter Property="Height" Value="8" />
                             <Setter Property="Width" Value="Auto" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -348,14 +462,16 @@
         <Setter Property="Foreground" Value="{DynamicResource ControlForeground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ControlBorder}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="4" />
+        <Setter Property="Padding" Value="5" />
+        <Setter Property="HasDropShadow" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ContextMenu">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource Token.RadiusLg}">
+                            CornerRadius="{StaticResource Token.RadiusLg}"
+                            Padding="{TemplateBinding Padding}">
                         <StackPanel IsItemsHost="True"
                                     KeyboardNavigation.DirectionalNavigation="Cycle" />
                     </Border>

@@ -24,7 +24,7 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            CornerRadius="{StaticResource Token.RadiusXs}"
+                            CornerRadius="{StaticResource Token.RadiusSm}"
                             Effect="{StaticResource Token.ShadowXs}">
                         <ContentPresenter TextBlock.FontFamily="{TemplateBinding FontFamily}"
                                           TextBlock.FontSize="{TemplateBinding FontSize}"
