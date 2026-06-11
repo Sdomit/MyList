@@ -71,7 +71,8 @@ public enum AccentPalette
     Teal,
     Terracotta,
     Crimson,
-    Slate
+    Slate,
+    Neutral
 }
 
 public enum WindowDockEdge
