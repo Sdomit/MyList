@@ -1023,50 +1023,95 @@
                         </Button>
 
                         <Border Margin="16,10,16,6"
-                                Padding="8"
+                                Padding="10"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
                                 BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                 BorderThickness="1"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.Skin.InputRadius}"
                                 Visibility="{Binding IsAddFormOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBox x:Name="InlineAddBox"
-                                         Margin="0,0,6,0"
-                                         Text="{Binding InlineAddValue, UpdateSourceTrigger=PropertyChanged}"
-                                         ToolTip="Paste or type a rooted file, folder, or UNC path"
-                                         KeyDown="OnInlineAddKeyDown" />
-                                <Button Grid.Column="1"
-                                        Content="File..."
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding AddFileCommand}" />
-                                <Button Grid.Column="2"
-                                        Margin="4,0,0,0"
-                                        Content="Folder..."
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding AddFolderCommand}" />
-                                <Button Grid.Column="3"
-                                        Margin="4,0,0,0"
-                                        Content="Mtab"
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding NewMtabCommand}" />
-                                <Button Grid.Column="4"
-                                        Margin="6,0,0,0"
-                                        Content="Add"
-                                        Style="{StaticResource Simple.PrimaryButton}"
-                                        Command="{Binding SaveInlineAddCommand}" />
-                                <Button Grid.Column="5"
-                                        Margin="4,0,0,0"
-                                        Content="Cancel"
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding CancelInlineAddCommand}" />
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <!-- Row 1: path input owns the width; confirm/cancel stay pinned. -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid>
+                                        <TextBox x:Name="InlineAddBox"
+                                                 Text="{Binding InlineAddValue, UpdateSourceTrigger=PropertyChanged}"
+                                                 ToolTip="Paste or type a rooted file, folder, or UNC path"
+                                                 KeyDown="OnInlineAddKeyDown" />
+                                        <TextBlock Margin="11,0,11,0"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                                   FontSize="12"
+                                                   Text="Paste or type a path, then press Enter"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   IsHitTestVisible="False">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Text, ElementName=InlineAddBox}" Value="">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                    <Button Grid.Column="1"
+                                            Margin="8,0,0,0"
+                                            MinWidth="60"
+                                            Content="Add"
+                                            Style="{StaticResource Simple.PrimaryButton}"
+                                            Command="{Binding SaveInlineAddCommand}" />
+                                    <Button Grid.Column="2"
+                                            Margin="4,0,0,0"
+                                            Style="{StaticResource Simple.IconButton}"
+                                            Command="{Binding CancelInlineAddCommand}"
+                                            ToolTip="Cancel">
+                                        <iconPacks:PackIconLucide Kind="X" Width="13" Height="13" />
+                                    </Button>
+                                </Grid>
+                                <!-- Row 2: browse shortcuts -->
+                                <StackPanel Grid.Row="1"
+                                            Orientation="Horizontal"
+                                            Margin="1,8,0,0">
+                                    <TextBlock Margin="0,0,8,0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                               FontSize="11"
+                                               Text="or browse" />
+                                    <Button Style="{StaticResource Simple.GhostButton}"
+                                            Command="{Binding AddFileCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="File" Width="12" Height="12" VerticalAlignment="Center" />
+                                            <TextBlock Margin="6,0,0,0" Text="File" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Margin="2,0,0,0"
+                                            Style="{StaticResource Simple.GhostButton}"
+                                            Command="{Binding AddFolderCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="Folder" Width="12" Height="12" VerticalAlignment="Center" />
+                                            <TextBlock Margin="6,0,0,0" Text="Folder" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Margin="2,0,0,0"
+                                            Style="{StaticResource Simple.GhostButton}"
+                                            Command="{Binding NewMtabCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="Link" Width="12" Height="12" VerticalAlignment="Center" />
+                                            <TextBlock Margin="6,0,0,0" Text="Mtab" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
                             </Grid>
                         </Border>
 
