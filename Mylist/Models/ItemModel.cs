@@ -116,7 +116,13 @@ public sealed class ItemModel : ObservableObject
     public bool IsFavorite
     {
         get => _isFavorite;
-        set => SetProperty(ref _isFavorite, value);
+        set
+        {
+            if (SetProperty(ref _isFavorite, value))
+            {
+                OnPropertyChanged(nameof(FavoriteDisplay));
+            }
+        }
     }
 
     public bool IsPinned
@@ -155,9 +161,17 @@ public sealed class ItemModel : ObservableObject
             {
                 RecordHistoryEntry(value);
                 RaiseTrajectoryChanged();
+                OnPropertyChanged(nameof(LastOpenedDisplay));
             }
         }
     }
+
+    [JsonIgnore]
+    public string FavoriteDisplay => _isFavorite ? "Yes" : "No";
+
+    [JsonIgnore]
+    public string LastOpenedDisplay =>
+        _lastOpenedDate == DateTime.MinValue ? "Never" : _lastOpenedDate.ToString("g");
 
     public List<DateTime> OpenedHistory { get; set; } = new();
 

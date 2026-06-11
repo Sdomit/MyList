@@ -930,7 +930,20 @@
                                              Height="2"
                                              Fill="{DynamicResource Token.TextTertiaryBrush}"
                                              Margin="8,0"
-                                             VerticalAlignment="Center" />
+                                             VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SearchStatusText}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding SearchStatusText}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
                                     <TextBlock Style="{StaticResource Simple.MetaText}"
                                                Text="{Binding SearchStatusText}" />
                                 </StackPanel>
@@ -1126,7 +1139,10 @@
                                                 <Setter Property="ItemsPanel">
                                                     <Setter.Value>
                                                         <ItemsPanelTemplate>
-                                                            <UniformGrid Columns="2" />
+                                                            <!-- Top-aligned so the grid sizes to its cards; otherwise the
+                                                                 viewport height is split across rows and a single row of
+                                                                 cards stretches to fill the whole list. -->
+                                                            <UniformGrid Columns="2" VerticalAlignment="Top" />
                                                         </ItemsPanelTemplate>
                                                     </Setter.Value>
                                                 </Setter>
@@ -1491,9 +1507,9 @@
                                         <TextBlock Style="{StaticResource Simple.MetaText}" Text="Type" TextTrimming="CharacterEllipsis" />
                                         <TextBlock Grid.Column="1" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.Type}" TextTrimming="CharacterEllipsis" />
                                         <TextBlock Grid.Row="1" Margin="0,6,0,0" Style="{StaticResource Simple.MetaText}" Text="Favorite" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.IsFavorite}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,6,0,0" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.FavoriteDisplay}" TextTrimming="CharacterEllipsis" />
                                         <TextBlock Grid.Row="2" Margin="0,6,0,0" Style="{StaticResource Simple.MetaText}" Text="Last opened" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,6,0,0" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.LastOpenedDate, StringFormat={}{0:g}}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,6,0,0" Style="{StaticResource Simple.MonoText}" Text="{Binding SelectedItem.LastOpenedDisplay}" TextTrimming="CharacterEllipsis" />
                                     </Grid>
                                 </StackPanel>
 
@@ -1778,6 +1794,10 @@
                     <Setter Property="Visibility" Value="Visible" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding ToastText}" Value="{x:Null}">
+                            <!-- Collapse outright: the fade-in EventTrigger fires on the initial
+                                 (null) binding too, which otherwise leaves an empty capsule
+                                 floating over every view. -->
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <DataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
