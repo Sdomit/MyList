@@ -9,7 +9,7 @@
         <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource Token.FontUi}" />
         <Setter Property="FontSize" Value="{DynamicResource Token.TextMd}" />
-        <Setter Property="Icon" Value="pack://siteoforigin:,,,/desktops.png" />
+        <Setter Property="Icon" Value="pack://siteoforigin:,,,/icon.ico" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <!-- Display-mode formatting pixel-snaps glyphs: crisper small UI text than the
