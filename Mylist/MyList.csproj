@@ -16,7 +16,7 @@
     <!-- AssemblyInformationalVersion is auto-composed by the SDK as
          $(Version)+$(SourceRevisionId). SourceRevisionId is stamped from
          git below so it stays accurate for every build, no manual bump. -->
-    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts\**;dist\**;bin2\**;obj2\**;obj_pub\**;handoff-pr1-tokens\**;handoff-pr2-themes\**;handoff-pr3-accent\**;handoff-pr4-launcher\**;handoff-pr5-chips\**;handoff-pr6-spark\**;handoff-pr7-ring\**;My list (1)\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts\**;dist\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

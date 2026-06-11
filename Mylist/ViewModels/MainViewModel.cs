@@ -1134,6 +1134,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         SetActiveToolPane(showClipboard: true, showDuplicates: false);
         RefreshClipboardReview();
+        StatusText = "Ready";
     }
 
     private void OpenDuplicateManagerPane()
@@ -1146,6 +1147,7 @@ public sealed class MainViewModel : ViewModelBase
     private void CloseToolPane()
     {
         SetActiveToolPane(showClipboard: false, showDuplicates: false);
+        StatusText = "Ready";
     }
 
     private void SetActiveToolPane(bool showClipboard, bool showDuplicates)

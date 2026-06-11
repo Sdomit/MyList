@@ -8,6 +8,7 @@
     <Color x:Key="Token.AccentMutedColor">#DCFCE7</Color>
     <Color x:Key="Token.AccentForegroundColor">#FFFFFF</Color>
     <Color x:Key="Token.BgCanvasColor">#F5F9F5</Color>
+    <Color x:Key="Token.BgMicaColor">#F5F9F5</Color>
     <Color x:Key="Token.BgSurfaceColor">#FFFFFF</Color>
     <Color x:Key="Token.BgSubtleColor">#EDFAED</Color>
     <Color x:Key="Token.BgMutedColor">#D8EED8</Color>

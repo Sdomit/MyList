@@ -25,6 +25,8 @@
         <Setter Property="Height" Value="{DynamicResource Token.Size.Button}" />
         <Setter Property="MinWidth" Value="{DynamicResource Token.Size.Button}" />
         <Setter Property="Padding" Value="{DynamicResource Token.ThicknessControlPadding}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Background" Value="{DynamicResource Token.BgSubtleBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
@@ -46,7 +48,8 @@
                         <Border.RenderTransform>
                             <ScaleTransform ScaleX="1" ScaleY="1" />
                         </Border.RenderTransform>
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           RecognizesAccessKey="True" />
                     </Border>
@@ -86,7 +89,8 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{DynamicResource Token.RadiusMd}">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                     </Border>
                     <ControlTemplate.Triggers>

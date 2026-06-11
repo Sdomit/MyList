@@ -54,6 +54,23 @@ public sealed class ThemeService
             ?.index ?? -1;
         dictionaries.Insert(Math.Min(tokenIndex + 1, dictionaries.Count), themeDictionary);
 
+        // Rebuild the brush layer so already-loaded windows pick up the swapped colors.
+        // The Token.*Brush definitions resolve their Color via DynamicResource against the
+        // sibling color dictionary; an already-instantiated brush does not re-resolve when
+        // only that sibling is swapped, so a runtime theme change would otherwise be a no-op
+        // (startup works only because ApplyTheme runs before any window is realized).
+        foreach (var brushDictionary in dictionaries.Where(IsTokenDictionary).ToList())
+        {
+            var brushIndex = dictionaries.IndexOf(brushDictionary);
+            if (brushIndex < 0 || brushDictionary.Source is null)
+            {
+                continue;
+            }
+
+            dictionaries.RemoveAt(brushIndex);
+            dictionaries.Insert(brushIndex, new ResourceDictionary { Source = brushDictionary.Source });
+        }
+
         foreach (Window window in app.Windows)
         {
             ApplyWindowFrameTheme(window, mode);
