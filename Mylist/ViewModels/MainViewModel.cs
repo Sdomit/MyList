@@ -72,7 +72,8 @@ public sealed class MainViewModel : ViewModelBase
         ExplorerTabAutomationService explorerTabAutomationService,
         ClipboardAssetService clipboardAssetService,
         ThemeService themeService,
-        DensityService densityService)
+        DensityService densityService,
+        SkinService skinService)
     {
         AppData = appData;
         RuntimeStatus.DebugMode = appData.AppSettings.EnableDebugMode;
@@ -115,6 +116,7 @@ public sealed class MainViewModel : ViewModelBase
             appData.AppSettings,
             themeService,
             _densityService,
+            skinService,
             QueueSave,
             settings => HotkeyChanged?.Invoke(this, settings),
             settings => MiniLauncherHotkeyChanged?.Invoke(this, settings),

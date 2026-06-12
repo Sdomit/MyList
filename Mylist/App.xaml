@@ -15,9 +15,11 @@
                 <ResourceDictionary Source="Themes/Chips.xaml" />
                 <ResourceDictionary Source="Themes/SegmentedControl.xaml" />
                 <ResourceDictionary Source="Resources/Density.Comfortable.xaml" />
+                <ResourceDictionary Source="Resources/Skin.Windows11.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
+            <converters:UiSkinToLabelConverter x:Key="UiSkinToLabelConverter" />
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
             <converters:AccentPaletteToBrushConverter x:Key="AccentPaletteToBrushConverter" />
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

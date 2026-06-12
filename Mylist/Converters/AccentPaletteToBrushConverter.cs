@@ -5,7 +5,10 @@ using Binding = System.Windows.Data.Binding;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Windows.Media.Color;
+using GradientStop = System.Windows.Media.GradientStop;
 using IValueConverter = System.Windows.Data.IValueConverter;
+using LinearGradientBrush = System.Windows.Media.LinearGradientBrush;
+using Point = System.Windows.Point;
 using SolidColorBrush = System.Windows.Media.SolidColorBrush;
 
 namespace MyList.Converters;
@@ -22,7 +25,28 @@ public sealed class AccentPaletteToBrushConverter : IValueConverter
         Freeze(new SolidColorBrush(Color.FromRgb(0xC2, 0x41, 0x0C))),
         Freeze(new SolidColorBrush(Color.FromRgb(0xE1, 0x1D, 0x48))),
         Freeze(new SolidColorBrush(Color.FromRgb(0x33, 0x41, 0x55))),
+        CreateNeutralSwatch(),
     };
+
+    // Hard-split white/black diagonal: "white accent in dark mode, black in light mode".
+    private static Brush CreateNeutralSwatch()
+    {
+        var brush = new LinearGradientBrush
+        {
+            StartPoint = new Point(0, 0),
+            EndPoint = new Point(1, 1),
+        };
+        brush.GradientStops.Add(new GradientStop(Color.FromRgb(0xFA, 0xFA, 0xFA), 0.0));
+        brush.GradientStops.Add(new GradientStop(Color.FromRgb(0xFA, 0xFA, 0xFA), 0.5));
+        brush.GradientStops.Add(new GradientStop(Color.FromRgb(0x18, 0x18, 0x1B), 0.5));
+        brush.GradientStops.Add(new GradientStop(Color.FromRgb(0x18, 0x18, 0x1B), 1.0));
+        if (brush.CanFreeze)
+        {
+            brush.Freeze();
+        }
+
+        return brush;
+    }
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

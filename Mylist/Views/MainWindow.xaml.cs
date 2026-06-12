@@ -552,6 +552,12 @@ public partial class MainWindow : Window
         });
     }
 
+    private void OnSearchClearClick(object sender, RoutedEventArgs e)
+    {
+        SearchBox.Clear();
+        SearchBox.Focus();
+    }
+
     private void OnInlineAddKeyDown(object sender, KeyEventArgs e)
     {
         if (ViewModel is null)

@@ -193,11 +193,24 @@
     <CornerRadius x:Key="Token.Radius3Xl">24</CornerRadius>
     <CornerRadius x:Key="Token.RadiusFull">9999</CornerRadius>
 
-    <!-- CSS font tokens -->
-    <FontFamily x:Key="Token.FontSans">pack://application:,,,/Assets/Fonts/#Plus Jakarta Sans</FontFamily>
-    <FontFamily x:Key="Token.FontMono">pack://application:,,,/Assets/Fonts/#JetBrains Mono</FontFamily>
-    <FontFamily x:Key="Token.FontUi">pack://application:,,,/Assets/Fonts/#Plus Jakarta Sans</FontFamily>
-    <FontFamily x:Key="Token.FontDisplay">pack://application:,,,/Assets/Fonts/#Plus Jakarta Sans</FontFamily>
+    <!-- Skin tokens: shape + font axis swapped at runtime by SkinService
+         (Resources/Skin.Windows11.xaml / Skin.MyList.xaml). Defaults below are the
+         Windows 11 skin so the design surface and a missing skin dictionary both
+         render Fluent. -->
+    <CornerRadius x:Key="Token.Skin.ControlRadius">4</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.InputRadius">4</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.RowRadius">4</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.MenuRadius">8</CornerRadius>
+    <CornerRadius x:Key="Token.Skin.ChipRadius">4</CornerRadius>
+
+    <!-- CSS font tokens (Windows 11 skin defaults; MyList skin overrides with the
+         bundled Plus Jakarta Sans / JetBrains Mono) -->
+    <FontFamily x:Key="Token.FontSans">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <!-- Win11 skin renders technical/meta text (paths, hints, statuses) in the UI sans;
+         the MyList skin overrides this back to a real mono. -->
+    <FontFamily x:Key="Token.FontMono">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Token.FontUi">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Token.FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
 
     <!-- CSS typography size tokens -->
     <sys:Double x:Key="Token.TextXs">11</sys:Double>

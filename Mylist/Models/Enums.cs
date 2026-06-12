@@ -56,6 +56,12 @@ public enum ThemeMode
     Dark
 }
 
+public enum UiSkin
+{
+    Windows11,
+    MyList
+}
+
 public enum AccentPalette
 {
     Amber,
@@ -65,7 +71,8 @@ public enum AccentPalette
     Teal,
     Terracotta,
     Crimson,
-    Slate
+    Slate,
+    Neutral
 }
 
 public enum WindowDockEdge

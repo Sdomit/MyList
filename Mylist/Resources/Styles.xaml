@@ -9,9 +9,12 @@
         <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource Token.FontUi}" />
         <Setter Property="FontSize" Value="{DynamicResource Token.TextMd}" />
-        <Setter Property="Icon" Value="pack://siteoforigin:,,,/desktops.png" />
+        <Setter Property="Icon" Value="pack://siteoforigin:,,,/icon.ico" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
+        <!-- Display-mode formatting pixel-snaps glyphs: crisper small UI text than the
+             default Ideal mode. Inherits to every TextBlock in the window. -->
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
     </Style>
 
     <Style TargetType="TextBlock">
@@ -51,7 +54,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Border Background="{TemplateBinding Background}"
-                            CornerRadius="{DynamicResource Token.RadiusLg}"
+                            CornerRadius="{DynamicResource Token.Skin.RowRadius}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
@@ -67,18 +70,8 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <EventTrigger RoutedEvent="Loaded">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                         From="0"
-                                         To="1"
-                                         Duration="0:0:0.18" />
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Style.Triggers>
+        <!-- No Loaded fade-in here: with recycling virtualization the storyboard re-runs
+             on every container reuse, which janks scrolling and view switches. -->
     </Style>
 
 </ResourceDictionary>

@@ -12,6 +12,7 @@ public sealed class SettingsViewModel : ViewModelBase
     private readonly AppSettings _settings;
     private readonly ThemeService _themeService;
     private readonly DensityService _densityService;
+    private readonly SkinService _skinService;
     private readonly Action _queueSave;
     private readonly Action<HotkeySettings> _hotkeyChanged;
     private readonly Action<HotkeySettings> _miniLauncherHotkeyChanged;
@@ -32,6 +33,7 @@ public sealed class SettingsViewModel : ViewModelBase
         AppSettings settings,
         ThemeService themeService,
         DensityService densityService,
+        SkinService skinService,
         Action queueSave,
         Action<HotkeySettings> hotkeyChanged,
         Action<HotkeySettings> miniLauncherHotkeyChanged,
@@ -45,6 +47,7 @@ public sealed class SettingsViewModel : ViewModelBase
         _settings = settings;
         _themeService = themeService;
         _densityService = densityService;
+        _skinService = skinService;
         _queueSave = queueSave;
         _hotkeyChanged = hotkeyChanged;
         _miniLauncherHotkeyChanged = miniLauncherHotkeyChanged;
@@ -68,6 +71,7 @@ public sealed class SettingsViewModel : ViewModelBase
         LayoutModes = Enum.GetValues<LayoutMode>();
         CollectionsLayouts = Enum.GetValues<CollectionsLayout>();
         DensityModes = Enum.GetValues<UiDensity>();
+        SkinModes = Enum.GetValues<UiSkin>();
         RuntimeStatus.DebugMode = _settings.EnableDebugMode;
         RefreshExplorerIntegrationStatus();
     }
@@ -79,6 +83,8 @@ public sealed class SettingsViewModel : ViewModelBase
     public Array CollectionsLayouts { get; }
 
     public Array DensityModes { get; }
+
+    public Array SkinModes { get; }
 
     public ThemeMode Theme
     {
@@ -322,6 +328,21 @@ public sealed class SettingsViewModel : ViewModelBase
         }
     }
 
+    public UiSkin Skin
+    {
+        get => _settings.Skin;
+        set
+        {
+            if (_settings.Skin != value)
+            {
+                _settings.Skin = value;
+                _skinService.ApplySkin(value);
+                OnPropertyChanged();
+                _queueSave();
+            }
+        }
+    }
+
     public double ItemScale
     {
         get => ClampItemScale(_settings.ItemScale);
@@ -370,6 +391,7 @@ public sealed class SettingsViewModel : ViewModelBase
     {
         _themeService.ApplyTheme(_settings.Theme, _settings.Accent);
         _densityService.ApplyDensity(_settings.UiDensity);
+        _skinService.ApplySkin(_settings.Skin);
         RuntimeStatus.DebugMode = _settings.EnableDebugMode;
 
         OnPropertyChanged(nameof(Theme));
@@ -391,6 +413,7 @@ public sealed class SettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(MiniLauncherHotkey));
         OnPropertyChanged(nameof(MiniLauncherHotkeyDisplay));
         OnPropertyChanged(nameof(UiDensity));
+        OnPropertyChanged(nameof(Skin));
         OnPropertyChanged(nameof(EnableDebugMode));
         OnPropertyChanged(nameof(DebugModeStatusText));
         OnPropertyChanged(nameof(DebugCopyStatus));

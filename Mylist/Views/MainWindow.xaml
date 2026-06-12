@@ -7,7 +7,7 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:views="clr-namespace:MyList.Views"
         Title="MyList"
-        Icon="pack://siteoforigin:,,,/desktops.png"
+        Icon="pack://siteoforigin:,,,/icon.ico"
         Width="1280"
         Height="820"
         MinWidth="980"
@@ -455,17 +455,12 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="16"
-                        Height="16"
-                        Background="{DynamicResource Token.AccentBrush}"
-                        CornerRadius="{DynamicResource Token.RadiusSm}">
-                    <!-- Brand badge — intentional inline geometry; no Lucide equivalent. -->
-                    <Path Data="M3,4 L8,12 L13,4 M3,12 L13,12"
-                          Stroke="{DynamicResource Token.AccentForegroundBrush}"
-                          StrokeThickness="1.5"
-                          Stretch="Uniform"
-                          Margin="3" />
-                </Border>
+                <Image Width="18"
+                       Height="18"
+                       Source="pack://siteoforigin:,,,/icon.ico"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       SnapsToDevicePixels="True"
+                       VerticalAlignment="Center" />
                 <TextBlock Margin="8,0,0,0"
                            Text="MyList"
                            FontSize="12"
@@ -473,16 +468,29 @@
                            VerticalAlignment="Center" />
             </StackPanel>
 
-            <Border Grid.Column="1"
-                    MaxWidth="460"
-                    Height="26"
+            <Border x:Name="SearchChrome"
+                    Grid.Column="1"
+                    MaxWidth="520"
+                    Height="30"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Background="{DynamicResource Token.BgSurfaceBrush}"
-                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
-                    BorderThickness="1"
-                    CornerRadius="{DynamicResource Token.RadiusMd}">
-                <Grid Margin="10,0,7,0">
+                    VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="CornerRadius" Value="{DynamicResource Token.Skin.ControlRadius}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderStrongBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid Margin="13,0,6,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="14" />
                         <ColumnDefinition Width="*" />
@@ -491,8 +499,18 @@
                     <iconPacks:PackIconLucide Kind="Search"
                                               Width="13"
                                               Height="13"
-                                              Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                                              VerticalAlignment="Center" />
+                                              VerticalAlignment="Center">
+                        <iconPacks:PackIconLucide.Style>
+                            <Style TargetType="iconPacks:PackIconLucide">
+                                <Setter Property="Foreground" Value="{DynamicResource Token.TextTertiaryBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsKeyboardFocusWithin, ElementName=SearchChrome}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource Token.AccentBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </iconPacks:PackIconLucide.Style>
+                    </iconPacks:PackIconLucide>
                     <TextBox x:Name="SearchBox"
                              Grid.Column="1"
                              Height="24"
@@ -520,15 +538,45 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <Border Grid.Column="2"
-                            Padding="5,1"
-                            Background="{DynamicResource Token.BgSubtleBrush}"
-                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{DynamicResource Token.RadiusXs}"
-                            VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource Simple.MonoText}" Text="Ctrl+K" FontSize="10" />
-                    </Border>
+                    <!-- Empty: Ctrl+K hint chip. Typing: clear button takes its slot. -->
+                    <Grid Grid.Column="2" VerticalAlignment="Center">
+                        <Border Padding="7,1"
+                                Background="{DynamicResource Token.BgSubtleBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{DynamicResource Token.Skin.ChipRadius}"
+                                Margin="0,0,3,0"
+                                VerticalAlignment="Center">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Style="{StaticResource Simple.MonoText}" Text="Ctrl+K" FontSize="10" />
+                        </Border>
+                        <Button Width="22"
+                                Height="22"
+                                MinWidth="22"
+                                Padding="0"
+                                Click="OnSearchClearClick"
+                                ToolTip="Clear search">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource Simple.IconButton}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <iconPacks:PackIconLucide Kind="X" Width="11" Height="11" />
+                        </Button>
+                    </Grid>
                 </Grid>
             </Border>
 
@@ -1023,50 +1071,95 @@
                         </Button>
 
                         <Border Margin="16,10,16,6"
-                                Padding="8"
+                                Padding="10"
                                 Background="{DynamicResource Token.BgSubtleBrush}"
                                 BorderBrush="{DynamicResource Token.AccentMutedBrush}"
                                 BorderThickness="1"
-                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                CornerRadius="{DynamicResource Token.Skin.InputRadius}"
                                 Visibility="{Binding IsAddFormOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBox x:Name="InlineAddBox"
-                                         Margin="0,0,6,0"
-                                         Text="{Binding InlineAddValue, UpdateSourceTrigger=PropertyChanged}"
-                                         ToolTip="Paste or type a rooted file, folder, or UNC path"
-                                         KeyDown="OnInlineAddKeyDown" />
-                                <Button Grid.Column="1"
-                                        Content="File..."
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding AddFileCommand}" />
-                                <Button Grid.Column="2"
-                                        Margin="4,0,0,0"
-                                        Content="Folder..."
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding AddFolderCommand}" />
-                                <Button Grid.Column="3"
-                                        Margin="4,0,0,0"
-                                        Content="Mtab"
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding NewMtabCommand}" />
-                                <Button Grid.Column="4"
-                                        Margin="6,0,0,0"
-                                        Content="Add"
-                                        Style="{StaticResource Simple.PrimaryButton}"
-                                        Command="{Binding SaveInlineAddCommand}" />
-                                <Button Grid.Column="5"
-                                        Margin="4,0,0,0"
-                                        Content="Cancel"
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Command="{Binding CancelInlineAddCommand}" />
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <!-- Row 1: path input owns the width; confirm/cancel stay pinned. -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid>
+                                        <TextBox x:Name="InlineAddBox"
+                                                 Text="{Binding InlineAddValue, UpdateSourceTrigger=PropertyChanged}"
+                                                 ToolTip="Paste or type a rooted file, folder, or UNC path"
+                                                 KeyDown="OnInlineAddKeyDown" />
+                                        <TextBlock Margin="11,0,11,0"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                                   FontSize="12"
+                                                   Text="Paste or type a path, then press Enter"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   IsHitTestVisible="False">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Text, ElementName=InlineAddBox}" Value="">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                    <Button Grid.Column="1"
+                                            Margin="8,0,0,0"
+                                            MinWidth="60"
+                                            Content="Add"
+                                            Style="{StaticResource Simple.PrimaryButton}"
+                                            Command="{Binding SaveInlineAddCommand}" />
+                                    <Button Grid.Column="2"
+                                            Margin="4,0,0,0"
+                                            Style="{StaticResource Simple.IconButton}"
+                                            Command="{Binding CancelInlineAddCommand}"
+                                            ToolTip="Cancel">
+                                        <iconPacks:PackIconLucide Kind="X" Width="13" Height="13" />
+                                    </Button>
+                                </Grid>
+                                <!-- Row 2: browse shortcuts -->
+                                <StackPanel Grid.Row="1"
+                                            Orientation="Horizontal"
+                                            Margin="1,8,0,0">
+                                    <TextBlock Margin="0,0,8,0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                               FontSize="11"
+                                               Text="or browse" />
+                                    <Button Style="{StaticResource Simple.GhostButton}"
+                                            Command="{Binding AddFileCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="File" Width="12" Height="12" VerticalAlignment="Center" />
+                                            <TextBlock Margin="6,0,0,0" Text="File" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Margin="2,0,0,0"
+                                            Style="{StaticResource Simple.GhostButton}"
+                                            Command="{Binding AddFolderCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="Folder" Width="12" Height="12" VerticalAlignment="Center" />
+                                            <TextBlock Margin="6,0,0,0" Text="Folder" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Margin="2,0,0,0"
+                                            Style="{StaticResource Simple.GhostButton}"
+                                            Command="{Binding NewMtabCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <iconPacks:PackIconLucide Kind="Link" Width="12" Height="12" VerticalAlignment="Center" />
+                                            <TextBlock Margin="6,0,0,0" Text="Mtab" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
                             </Grid>
                         </Border>
 

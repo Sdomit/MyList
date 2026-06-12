@@ -96,45 +96,81 @@
             <Setter Property="TextWrapping" Value="Wrap" />
         </Style>
 
+        <!-- Win11-style ToggleSwitch: 40x20 track with an exact half-height radius
+             (an oversized CornerRadius like RadiusFull distorts the geometry in WPF),
+             12px knob inset 4px that slides 20px with an eased animation. -->
         <Style x:Key="SettingsToggle" TargetType="CheckBox">
-            <Setter Property="Width" Value="36" />
+            <Setter Property="Width" Value="40" />
             <Setter Property="Height" Value="20" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{StaticResource Simple.FocusVisual}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
-                        <Grid Width="36" Height="20">
-                            <!-- Track gains an explicit BorderBrush so the OFF state is
-                                 visible on light themes (BgMutedBrush is near-white there
-                                 and disappears against the card). -->
+                        <Grid Width="40" Height="20">
                             <Border x:Name="Track"
-                                    Background="{DynamicResource Token.BgMutedBrush}"
-                                    BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
+                                    Background="{DynamicResource Token.TransparentBrush}"
+                                    BorderBrush="{DynamicResource Token.BorderStrongBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="{DynamicResource Token.RadiusFull}" />
-                            <!-- Thumb gets a 1px Stroke for the same reason — a pure-white
-                                 fill on a light track is otherwise invisible. -->
+                                    CornerRadius="10" />
                             <Ellipse x:Name="Thumb"
-                                     Width="14"
-                                     Height="14"
-                                     Margin="3,0,0,0"
+                                     Width="12"
+                                     Height="12"
+                                     Margin="4,0,0,0"
                                      HorizontalAlignment="Left"
                                      VerticalAlignment="Center"
-                                     Fill="{DynamicResource Token.WhiteBrush}"
-                                     Stroke="{DynamicResource Token.BorderStrongBrush}"
-                                     StrokeThickness="1" />
+                                     Fill="{DynamicResource Token.TextSecondaryBrush}">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="0" />
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
                         </Grid>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
+                                <Setter TargetName="Thumb" Property="Fill" Value="{DynamicResource Token.TextPrimaryBrush}" />
+                            </Trigger>
                             <Trigger Property="IsChecked" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Thumb"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                             To="20"
+                                                             Duration="0:0:0.15">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Thumb"
+                                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                             To="0"
+                                                             Duration="0:0:0.15">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                                 <Setter TargetName="Track" Property="Background" Value="{DynamicResource Token.AccentBrush}" />
                                 <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
-                                <Setter TargetName="Thumb" Property="Margin" Value="19,0,0,0" />
-                                <Setter TargetName="Thumb" Property="Stroke" Value="{DynamicResource Token.AccentBrush}" />
+                                <Setter TargetName="Thumb" Property="Fill" Value="{DynamicResource Token.AccentForegroundBrush}" />
                             </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Track" Property="Opacity" Value="0.88" />
-                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Track" Property="Background" Value="{DynamicResource Token.AccentHoverBrush}" />
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Token.AccentHoverBrush}" />
+                            </MultiTrigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.45" />
                             </Trigger>
@@ -323,11 +359,33 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="220" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="App style" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Windows 11 follows the system look; MyList is the custom theme." />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1"
+                                          SelectedItem="{Binding Skin}"
+                                          ItemsSource="{Binding SkinModes}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource UiSkinToLabelConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <TextBlock Style="{StaticResource SettingsRowName}" Text="Accent" />
-                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Pick one of eight Forma accent palettes." />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Pick an accent palette; Neutral is plain black and white." />
                                 </StackPanel>
                                 <ListBox Grid.Column="1"
                                          BorderThickness="0"

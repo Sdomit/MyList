@@ -20,12 +20,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ContentControl">
+                    <!-- No drop shadow: DropShadowEffect renders in software per element and
+                         these chips appear once per visible row. -->
                     <Border Padding="{TemplateBinding Padding}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            CornerRadius="{StaticResource Token.RadiusXs}"
-                            Effect="{StaticResource Token.ShadowXs}">
+                            CornerRadius="{DynamicResource Token.Skin.ChipRadius}">
                         <ContentPresenter TextBlock.FontFamily="{TemplateBinding FontFamily}"
                                           TextBlock.FontSize="{TemplateBinding FontSize}"
                                           TextBlock.Foreground="{TemplateBinding Foreground}"

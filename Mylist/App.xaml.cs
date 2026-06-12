@@ -32,6 +32,7 @@ public partial class App : Application
     private HotkeyService? _hotkeyService;
     private ThemeService? _themeService;
     private DensityService? _densityService;
+    private SkinService? _skinService;
     private NetworkCheckService? _networkCheckService;
     private SystemThemeService? _systemThemeService;
     private AppInstanceService? _appInstanceService;
@@ -71,6 +72,7 @@ public partial class App : Application
         _storageService = new StorageService(_clipboardAssetService);
         _themeService = new ThemeService();
         _densityService = new DensityService();
+        _skinService = new SkinService();
         _hotkeyService = new HotkeyService();
         _trayService = new TrayService();
         _networkCheckService = new NetworkCheckService();
@@ -117,6 +119,7 @@ public partial class App : Application
         }
 
         _themeService.ApplyTheme(appData.AppSettings.Theme, appData.AppSettings.Accent);
+        _skinService.ApplySkin(appData.AppSettings.Skin);
 
         _mainViewModel = new MainViewModel(
             appData,
@@ -127,7 +130,8 @@ public partial class App : Application
             explorerTabAutomationService,
             _clipboardAssetService,
             _themeService,
-            _densityService
+            _densityService,
+            _skinService
         );
 
         _mainWindow = new MainWindow
