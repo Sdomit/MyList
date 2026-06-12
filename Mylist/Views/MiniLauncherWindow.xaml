@@ -7,6 +7,7 @@
         Title="MyList Quick Launcher"
         WindowStyle="None"
         Background="{DynamicResource Token.BgSurfaceBrush}"
+        FontFamily="{DynamicResource Token.FontUi}"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
         SizeToContent="Manual"
