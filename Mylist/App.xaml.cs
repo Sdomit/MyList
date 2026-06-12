@@ -221,10 +221,18 @@ public partial class App : Application
 
         if (_miniLauncherWindow is null)
         {
-            var viewModel = new MiniLauncherViewModel(
+            var source = new OrbitSourceService(
                 () => _mainViewModel.AllItems,
+                () => _mainViewModel.Collections
+                    .Where(collection => !collection.IsSmart)
+                    .Select(collection => new OrbitUserCollection(
+                        collection.Id, collection.Name, collection.Items.ToList()))
+                    .ToList());
+            var viewModel = new MiniLauncherViewModel(
+                source,
                 _launcherService,
-                () => _miniLauncherWindow?.Hide());
+                () => _miniLauncherWindow?.Hide(),
+                ActivateMainWindow);
             _miniLauncherWindow = new MiniLauncherWindow(viewModel);
         }
 
