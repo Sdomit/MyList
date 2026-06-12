@@ -6,63 +6,80 @@
         xmlns:helpers="clr-namespace:MyList.Helpers"
         Title="MyList Quick Launcher"
         WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
+        Background="{DynamicResource Token.BgSurfaceBrush}"
+        FontFamily="{DynamicResource Token.FontUi}"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="Manual"
+        Width="400"
+        Height="454"
         Topmost="True"
-        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        WindowStartupLocation="Manual"
         Deactivated="OnDeactivated">
     <Window.Resources>
         <helpers:KindToLucideKindConverter x:Key="KindToLucideKindConverter" />
+        <helpers:HealthStateToBrushConverter x:Key="HealthStateToBrushConverter" />
     </Window.Resources>
-    <Window.InputBindings>
-        <KeyBinding Key="Escape" Command="{Binding CloseCommand}" />
-        <KeyBinding Key="D1" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="1" />
-        <KeyBinding Key="D2" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="2" />
-        <KeyBinding Key="D3" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="3" />
-        <KeyBinding Key="D4" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="4" />
-        <KeyBinding Key="D5" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="5" />
-        <KeyBinding Key="D6" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="6" />
-        <KeyBinding Key="D7" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="7" />
-        <KeyBinding Key="D8" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="8" />
-        <KeyBinding Key="D9" Modifiers="Control" Command="{Binding OpenIndexedItemCommand}" CommandParameter="9" />
-    </Window.InputBindings>
 
-    <Border Width="520"
-            Background="{DynamicResource Token.BgSurfaceBrush}"
+    <Border Background="{DynamicResource Token.BgSurfaceBrush}"
             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1"
-            CornerRadius="{StaticResource Token.Radius2Xl}"
-            Padding="0">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="32" ShadowDepth="8" Color="#000000" Opacity="0.55" />
-        </Border.Effect>
+            ClipToBounds="True"
+            CornerRadius="{StaticResource Token.Radius3Xl}">
+        <Border.RenderTransform>
+            <ScaleTransform x:Name="ShellScale" CenterX="200" CenterY="227" ScaleX="1" ScaleY="1" />
+        </Border.RenderTransform>
+        <Border.Triggers>
+            <EventTrigger RoutedEvent="Loaded">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetName="ShellScale" Storyboard.TargetProperty="ScaleX"
+                                         From="0.9" To="1" Duration="0:0:0.22">
+                            <DoubleAnimation.EasingFunction>
+                                <CubicEase EasingMode="EaseOut" />
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                        <DoubleAnimation Storyboard.TargetName="ShellScale" Storyboard.TargetProperty="ScaleY"
+                                         From="0.9" To="1" Duration="0:0:0.22">
+                            <DoubleAnimation.EasingFunction>
+                                <CubicEase EasingMode="EaseOut" />
+                            </DoubleAnimation.EasingFunction>
+                        </DoubleAnimation>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Border.Triggers>
 
         <Grid>
+            <!-- Border doesn't clip children to CornerRadius, so the square row
+                 backgrounds bleed past the rounded corners. Clip to match. -->
+            <Grid.Clip>
+                <RectangleGeometry Rect="0,0,398,452" RadiusX="23" RadiusY="23" />
+            </Grid.Clip>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="52" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="34" />
             </Grid.RowDefinitions>
 
-            <!-- Top: search bar + Esc badge -->
+            <!-- ── Search bar ───────────────────────────────────────────────── -->
             <Border Grid.Row="0"
-                    Padding="16,14,16,12"
+                    Background="{DynamicResource Token.BgSubtleBrush}"
                     BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
-                    BorderThickness="0,0,0,1">
+                    BorderThickness="0,0,0,1"
+                    Padding="16,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <iconPacks:PackIconLucide Kind="Search"
-                                              Width="14"
-                                              Height="14"
+                                              Width="15" Height="15"
                                               Margin="0,0,10,0"
                                               VerticalAlignment="Center"
                                               Foreground="{DynamicResource Token.TextTertiaryBrush}" />
@@ -76,12 +93,13 @@
                                  Foreground="{DynamicResource Token.TextPrimaryBrush}"
                                  CaretBrush="{DynamicResource Token.AccentBrush}"
                                  VerticalAlignment="Center"
+                                 VerticalContentAlignment="Center"
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock IsHitTestVisible="False"
                                    Foreground="{DynamicResource Token.TextTertiaryBrush}"
                                    FontSize="{StaticResource Token.TextBase}"
                                    VerticalAlignment="Center"
-                                   Text="Quick launch — search or pick a slot">
+                                   Text="Search everything…">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -95,9 +113,53 @@
                         </TextBlock>
                     </Grid>
 
-                    <Border Grid.Column="2"
+                    <!-- Breadcrumb chip (visible inside a collection) -->
+                    <Button Grid.Column="2"
+                            Command="{Binding DrillUpCommand}"
+                            Cursor="Hand"
+                            Margin="8,0,8,0"
+                            VerticalAlignment="Center"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Padding="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{DynamicResource Token.AccentSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.AccentMutedBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="{DynamicResource Token.RadiusMd}"
+                                        Padding="7,3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="←"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Margin="0,0,5,0"
+                                                   Foreground="{DynamicResource Token.AccentBrush}" />
+                                        <TextBlock Text="{Binding CurrentCollectionName}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   MaxWidth="120"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="{DynamicResource Token.AccentBrush}" />
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsInCollection}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Border Grid.Column="3"
                             Padding="6,2"
-                            Background="{DynamicResource Token.BgSubtleBrush}"
+                            Background="{DynamicResource Token.BgMutedBrush}"
                             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                             BorderThickness="1"
                             CornerRadius="{DynamicResource Token.RadiusXs}"
@@ -110,161 +172,363 @@
                 </Grid>
             </Border>
 
-            <!-- Orbit: 240x200 decorative panel with center badge + satellite nodes -->
-            <Grid Grid.Row="1" Width="240" Height="200" Margin="0,18,0,4">
-                <ItemsControl ItemsSource="{Binding OrbitNodes}" IsHitTestVisible="False">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas Width="240" Height="200" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:MiniLauncherOrbitNodeViewModel}">
-                            <Line X1="120" Y1="100"
-                                  X2="{Binding LineX2}" Y2="{Binding LineY2}"
-                                  Stroke="{DynamicResource Token.AccentBrush}"
-                                  StrokeThickness="1"
-                                  StrokeDashArray="3,3"
-                                  Opacity="0.35" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+            <!-- ── Body: orbit canvas OR search results ─────────────────────── -->
+            <Grid Grid.Row="1">
 
-                <Ellipse Width="58" Height="58"
-                         Stroke="{DynamicResource Token.AccentBrush}"
-                         StrokeThickness="2"
-                         Fill="{DynamicResource Token.AccentSubtleBrush}"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center" />
-                <TextBlock Text="{Binding CenterLabel}"
-                           Foreground="{DynamicResource Token.TextAccentBrush}"
-                           FontFamily="{DynamicResource Token.FontUi}"
-                           FontSize="{StaticResource Token.TextSm}"
-                           FontWeight="SemiBold"
-                           TextTrimming="CharacterEllipsis"
-                           TextAlignment="Center"
-                           MaxWidth="48"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-
-                <ItemsControl ItemsSource="{Binding OrbitNodes}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas Width="240" Height="200" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemContainerStyle>
-                        <Style TargetType="ContentPresenter">
-                            <Setter Property="Canvas.Left" Value="{Binding NodeLeft}" />
-                            <Setter Property="Canvas.Top" Value="{Binding NodeTop}" />
+                <!-- Orbit canvas -->
+                <Canvas Width="400" Height="348">
+                    <Canvas.Style>
+                        <Style TargetType="Canvas">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSearching}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
-                    </ItemsControl.ItemContainerStyle>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:MiniLauncherOrbitNodeViewModel}">
-                            <Button Command="{Binding ActivateCommand}"
-                                    Width="32" Height="32"
-                                    BorderThickness="0"
-                                    Background="Transparent"
-                                    Padding="0"
-                                    Cursor="Hand"
-                                    ToolTip="{Binding Label}">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="Chrome"
-                                                Background="{DynamicResource Token.BgSubtleBrush}"
-                                                BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
-                                                BorderThickness="1"
-                                                CornerRadius="{DynamicResource Token.RadiusMd}">
-                                            <iconPacks:PackIconLucide Kind="{Binding Item.Kind, Converter={StaticResource KindToLucideKindConverter}}"
-                                                                      Width="14"
-                                                                      Height="14"
-                                                                      HorizontalAlignment="Center"
-                                                                      VerticalAlignment="Center"
-                                                                      Foreground="{DynamicResource Token.TextSecondaryBrush}" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
+                    </Canvas.Style>
 
-            <!-- Item list: filtered, indexed, Ctrl+N to open -->
-            <Border Grid.Row="2"
-                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
-                    BorderThickness="0,1,0,1">
-                <ScrollViewer MaxHeight="288"
-                              VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding Items}">
+                    <!-- Mode eyebrow -->
+                    <TextBlock Canvas.Top="10" Width="400"
+                               Text="{Binding EyebrowText}"
+                               TextAlignment="Center"
+                               FontSize="9"
+                               FontWeight="Bold"
+                               Opacity="0.7"
+                               Foreground="{DynamicResource Token.TextTertiaryBrush}">
+                        <TextBlock.LayoutTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+
+                    <!-- Ghost ring -->
+                    <Ellipse Canvas.Left="{Binding GhostRingLeft}"
+                             Canvas.Top="{Binding GhostRingTop}"
+                             Width="{Binding GhostRingSize}"
+                             Height="{Binding GhostRingSize}"
+                             Stroke="{DynamicResource Token.BorderSubtleBrush}"
+                             StrokeThickness="1"
+                             Opacity="0.35" />
+
+                    <!-- Guide ring -->
+                    <Ellipse Canvas.Left="{Binding GuideRingLeft}"
+                             Canvas.Top="{Binding GuideRingTop}"
+                             Width="{Binding GuideRingSize}"
+                             Height="{Binding GuideRingSize}"
+                             Stroke="{DynamicResource Token.BorderDefaultBrush}"
+                             StrokeThickness="1"
+                             StrokeDashArray="2,7"
+                             Opacity="0.55" />
+
+                    <!-- Connection line centre → selected node -->
+                    <Line X1="{Binding CentreX}" Y1="{Binding CentreY}"
+                          X2="{Binding SelectedX}" Y2="{Binding SelectedY}"
+                          Stroke="{DynamicResource Token.AccentBrush}"
+                          StrokeThickness="1"
+                          StrokeDashArray="3,5"
+                          Opacity="0.5">
+                        <Line.Style>
+                            <Style TargetType="Line">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasSelection}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Line.Style>
+                    </Line>
+
+                    <!-- Centre hub -->
+                    <Button Canvas.Left="{Binding HubLeft}"
+                            Canvas.Top="{Binding HubTop}"
+                            Width="72" Height="72"
+                            Command="{Binding DrillUpCommand}"
+                            BorderThickness="0"
+                            Background="Transparent"
+                            Padding="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="HubChrome"
+                                        Background="{DynamicResource Token.BgSubtleBrush}"
+                                        BorderBrush="{DynamicResource Token.BorderDefaultBrush}"
+                                        BorderThickness="1.5"
+                                        CornerRadius="36">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="4" ShadowDepth="1" Opacity="0.4" Color="#000000" />
+                                    </Border.Effect>
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding HubLabel}"
+                                                   TextAlignment="Center"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource Token.TextAccentBrush}" />
+                                        <TextBlock Text="{Binding HubSublabel}"
+                                                   TextAlignment="Center"
+                                                   FontSize="8"
+                                                   Margin="0,1,0,0"
+                                                   Foreground="{DynamicResource Token.TextTertiaryBrush}" />
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsInCollection}" Value="True">
+                                        <Setter TargetName="HubChrome" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
+                                        <Setter TargetName="HubChrome" Property="BorderBrush" Value="{DynamicResource Token.AccentMutedBrush}" />
+                                    </DataTrigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Cursor" Value="Arrow" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Cursor" Value="Hand" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Orbit nodes -->
+                    <ItemsControl ItemsSource="{Binding VisibleSlots}" Canvas.Left="0" Canvas.Top="0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas Width="400" Height="348" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding DiscLeft}" />
+                                <Setter Property="Canvas.Top" Value="{Binding DiscTop}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type vm:MiniLauncherListItemViewModel}">
-                                <Button Command="{Binding ActivateCommand}"
-                                        Style="{StaticResource Simple.GhostButton}"
-                                        Height="44"
-                                        HorizontalContentAlignment="Stretch"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Padding="16,0">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="22" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <iconPacks:PackIconLucide Kind="{Binding Kind, Converter={StaticResource KindToLucideKindConverter}}"
-                                                                  Width="16"
-                                                                  Height="16"
-                                                                  VerticalAlignment="Center"
-                                                                  Foreground="{DynamicResource Token.TextSecondaryBrush}" />
-                                        <StackPanel Grid.Column="1"
-                                                    Margin="10,0,12,0"
-                                                    VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}"
-                                                       FontSize="{StaticResource Token.TextSm}"
-                                                       FontWeight="Medium"
-                                                       Foreground="{DynamicResource Token.TextPrimaryBrush}"
-                                                       TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Text="{Binding DisplayPath}"
-                                                       FontFamily="{DynamicResource Token.FontMono}"
-                                                       FontSize="{StaticResource Token.TextXs}"
-                                                       Margin="0,1,0,0"
-                                                       Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                                                       TextTrimming="CharacterEllipsis" />
-                                        </StackPanel>
-                                        <Border Grid.Column="2"
-                                                Padding="6,2"
-                                                Background="{DynamicResource Token.BgSubtleBrush}"
-                                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
-                                                BorderThickness="1"
-                                                CornerRadius="{DynamicResource Token.RadiusXs}"
-                                                VerticalAlignment="Center"
-                                                Visibility="{Binding HasIndex, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                            <TextBlock Text="{Binding IndexLabel}"
-                                                       FontFamily="{DynamicResource Token.FontMono}"
-                                                       FontSize="{StaticResource Token.TextXs}"
-                                                       Foreground="{DynamicResource Token.TextSecondaryBrush}" />
-                                        </Border>
-                                    </Grid>
-                                </Button>
+                            <DataTemplate DataType="{x:Type vm:OrbitSlotViewModel}">
+                                <Grid Width="48">
+                                    <Button Command="{Binding ClickCommand}"
+                                            Width="48" Height="48"
+                                            VerticalAlignment="Top"
+                                            BorderThickness="0"
+                                            Background="Transparent"
+                                            Padding="0"
+                                            Cursor="Hand"
+                                            ToolTip="{Binding Name}">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Grid>
+                                                    <Border x:Name="Disc"
+                                                            Width="48" Height="48"
+                                                            Background="{DynamicResource Token.BgSurfaceBrush}"
+                                                            BorderBrush="{Binding HealthState, Converter={StaticResource HealthStateToBrushConverter}}"
+                                                            BorderThickness="1.5"
+                                                            CornerRadius="24"
+                                                            RenderTransformOrigin="0.5,0.5">
+                                                        <Border.RenderTransform>
+                                                            <ScaleTransform x:Name="DiscScale" ScaleX="1" ScaleY="1" />
+                                                        </Border.RenderTransform>
+                                                        <iconPacks:PackIconLucide x:Name="NodeIcon"
+                                                                                  Kind="{Binding IconKind}"
+                                                                                  Width="18" Height="18"
+                                                                                  HorizontalAlignment="Center"
+                                                                                  VerticalAlignment="Center"
+                                                                                  Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                                                    </Border>
+                                                    <!-- Index badge -->
+                                                    <Border x:Name="Badge"
+                                                            Width="16" Height="16"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Top"
+                                                            Margin="0,-2,-2,0"
+                                                            Background="{DynamicResource Token.BgCanvasBrush}"
+                                                            BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="8">
+                                                        <TextBlock Text="{Binding IndexLabel}"
+                                                                   FontFamily="{DynamicResource Token.FontMono}"
+                                                                   FontSize="8.5"
+                                                                   FontWeight="Bold"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   Foreground="{DynamicResource Token.TextTertiaryBrush}" />
+                                                    </Border>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter TargetName="Disc" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
+                                                        <Setter TargetName="Disc" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                                        <Setter TargetName="Disc" Property="BorderThickness" Value="2" />
+                                                        <Setter TargetName="NodeIcon" Property="Foreground" Value="{DynamicResource Token.AccentBrush}" />
+                                                        <Setter TargetName="Badge" Property="Background" Value="{DynamicResource Token.AccentBrush}" />
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleX"
+                                                                                     To="1.11" Duration="0:0:0.18" />
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleY"
+                                                                                     To="1.11" Duration="0:0:0.18" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.EnterActions>
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleX"
+                                                                                     To="1" Duration="0:0:0.18" />
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleY"
+                                                                                     To="1" Duration="0:0:0.18" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Disc" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+
+                                    <!-- Label below disc -->
+                                    <TextBlock Text="{Binding Label}"
+                                               Width="72"
+                                               Margin="-12,53,-12,0"
+                                               TextAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               FontSize="10.5"
+                                               Foreground="{DynamicResource Token.TextSecondaryBrush}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </ScrollViewer>
-            </Border>
+                </Canvas>
 
-            <!-- Footer hint bar (or status when launch fails) -->
-            <Border Grid.Row="3"
-                    Padding="16,10"
-                    Background="{DynamicResource Token.BgSubtleBrush}">
+                <!-- Search results overlay -->
                 <Grid>
-                    <!-- Status text shown when a launch fails (dead path, offline, etc.) -->
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSearching}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Padding="8,6">
+                        <ItemsControl ItemsSource="{Binding SearchResults}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:MiniLauncherListItemViewModel}">
+                                    <Button Command="{Binding ActivateCommand}"
+                                            Height="44"
+                                            HorizontalContentAlignment="Stretch"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="10,0"
+                                            Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Row"
+                                                        Background="Transparent"
+                                                        CornerRadius="{DynamicResource Token.RadiusMd}"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter VerticalAlignment="Center" />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Row" Property="Background" Value="{DynamicResource Token.BgSubtleBrush}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="30" Height="30"
+                                                    Background="{DynamicResource Token.BgSubtleBrush}"
+                                                    BorderBrush="{Binding Item.HealthState, Converter={StaticResource HealthStateToBrushConverter}}"
+                                                    BorderThickness="1.5"
+                                                    CornerRadius="{DynamicResource Token.RadiusMd}">
+                                                <iconPacks:PackIconLucide Kind="{Binding Kind, Converter={StaticResource KindToLucideKindConverter}}"
+                                                                          Width="15" Height="15"
+                                                                          HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center"
+                                                                          Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1"
+                                                        Margin="10,0,12,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="{StaticResource Token.TextMd}"
+                                                           Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding DisplayPath}"
+                                                           FontFamily="{DynamicResource Token.FontMono}"
+                                                           FontSize="{StaticResource Token.TextXs}"
+                                                           Margin="0,1,0,0"
+                                                           Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                            <Border Grid.Column="2"
+                                                    Padding="6,2"
+                                                    Background="{DynamicResource Token.BgSubtleBrush}"
+                                                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="{DynamicResource Token.RadiusXs}"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding HasIndex, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <TextBlock Text="{Binding IndexLabel}"
+                                                           FontFamily="{DynamicResource Token.FontMono}"
+                                                           FontSize="{StaticResource Token.TextXs}"
+                                                           Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                                            </Border>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <TextBlock Text="No matches"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="{StaticResource Token.TextMd}"
+                               Foreground="{DynamicResource Token.TextTertiaryBrush}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasResults}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Grid>
+
+            <!-- ── Footer ───────────────────────────────────────────────────── -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource Token.BgSubtleBrush}"
+                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="16,0">
+                <Grid>
+                    <!-- Launch-failure status -->
                     <TextBlock Text="{Binding StatusText}"
                                FontSize="{StaticResource Token.TextXs}"
                                Foreground="{DynamicResource Token.StatusWarningBrush}"
@@ -282,10 +546,11 @@
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <!-- Default hint bar (hidden when StatusText is set). -->
-                    <Grid>
-                        <Grid.Style>
-                            <Style TargetType="Grid">
+                    <!-- Keyboard legend -->
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
                                 <Setter Property="Visibility" Value="Visible" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasStatus}" Value="True">
@@ -293,35 +558,63 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Ctrl+1..9"
-                                       FontFamily="{DynamicResource Token.FontMono}"
-                                       FontSize="{StaticResource Token.TextXs}"
-                                       Foreground="{DynamicResource Token.TextSecondaryBrush}" />
-                            <TextBlock Text=" open slot"
-                                       FontSize="{StaticResource Token.TextXs}"
-                                       Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                                       Margin="2,0,16,0" />
-                            <TextBlock Text="Enter"
-                                       FontFamily="{DynamicResource Token.FontMono}"
-                                       FontSize="{StaticResource Token.TextXs}"
-                                       Foreground="{DynamicResource Token.TextSecondaryBrush}" />
-                            <TextBlock Text=" open first match"
-                                       FontSize="{StaticResource Token.TextXs}"
-                                       Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                                       Margin="2,0,0,0" />
-                        </StackPanel>
-                        <TextBlock Grid.Column="1"
-                                   Text="Ctrl+Shift+G to summon"
+                        </StackPanel.Style>
+
+                        <TextBlock Text="← →"
                                    FontFamily="{DynamicResource Token.FontMono}"
                                    FontSize="{StaticResource Token.TextXs}"
-                                   Foreground="{DynamicResource Token.TextTertiaryBrush}" />
-                    </Grid>
+                                   Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="rotate"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                   Margin="3,0,12,0" />
+                        <TextBlock Text="1–6"
+                                   FontFamily="{DynamicResource Token.FontMono}"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="open"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                   Margin="3,0,12,0" />
+                        <TextBlock Text="↵"
+                                   FontFamily="{DynamicResource Token.FontMono}"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="select"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                   Margin="3,0,12,0" />
+                        <TextBlock Text="⌫"
+                                   FontFamily="{DynamicResource Token.FontMono}"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextSecondaryBrush}"
+                                   Margin="0,0,3,0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding FooterBackVisible}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Text="back"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   Foreground="{DynamicResource Token.TextTertiaryBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding FooterBackVisible}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>
