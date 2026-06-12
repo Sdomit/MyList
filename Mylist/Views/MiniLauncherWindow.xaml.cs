@@ -1,5 +1,7 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using MyList.ViewModels;
 using Key = System.Windows.Input.Key;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -10,6 +12,7 @@ namespace MyList.Views;
 
 public partial class MiniLauncherWindow : Window
 {
+    private const int CornerRadiusDip = 24;
     private readonly MiniLauncherViewModel _viewModel;
 
     public MiniLauncherWindow(MiniLauncherViewModel viewModel)
@@ -18,6 +21,8 @@ public partial class MiniLauncherWindow : Window
         _viewModel = viewModel;
         DataContext = viewModel;
         PreviewKeyDown += OnPreviewKeyDown;
+        SourceInitialized += (_, _) => ApplyRoundedRegion();
+        SizeChanged += (_, _) => ApplyRoundedRegion();
     }
 
     public void Summon()
@@ -150,4 +155,51 @@ public partial class MiniLauncherWindow : Window
     {
         Hide();
     }
+
+    // Shape the HWND itself so the launcher is truly rounded instead of a
+    // rectangular layered window with rounded content inside it.
+    private void ApplyRoundedRegion()
+    {
+        var hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd == IntPtr.Zero)
+        {
+            return;
+        }
+
+        var cornerPreference = DWMWCP_ROUND;
+        _ = DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPreference, sizeof(int));
+
+        var source = PresentationSource.FromVisual(this);
+        var dpiX = source?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
+        var dpiY = source?.CompositionTarget?.TransformToDevice.M22 ?? 1.0;
+        var widthPx = Math.Max(1, (int)Math.Ceiling((ActualWidth > 0 ? ActualWidth : Width) * dpiX));
+        var heightPx = Math.Max(1, (int)Math.Ceiling((ActualHeight > 0 ? ActualHeight : Height) * dpiY));
+        var radiusPx = Math.Max(1, (int)Math.Ceiling(CornerRadiusDip * Math.Min(dpiX, dpiY)));
+
+        var region = CreateRoundRectRgn(0, 0, widthPx + 1, heightPx + 1, radiusPx * 2, radiusPx * 2);
+        if (region == IntPtr.Zero)
+        {
+            return;
+        }
+
+        if (SetWindowRgn(hwnd, region, true) == 0)
+        {
+            DeleteObject(region);
+        }
+    }
+
+    [DllImport("gdi32.dll")]
+    private static extern IntPtr CreateRoundRectRgn(int left, int top, int right, int bottom, int widthEllipse, int heightEllipse);
+
+    [DllImport("user32.dll")]
+    private static extern int SetWindowRgn(IntPtr hwnd, IntPtr region, bool redraw);
+
+    [DllImport("gdi32.dll")]
+    private static extern bool DeleteObject(IntPtr hObject);
+
+    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+    private const int DWMWCP_ROUND = 2;
+
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int attrSize);
 }

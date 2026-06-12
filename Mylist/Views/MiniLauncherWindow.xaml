@@ -6,13 +6,12 @@
         xmlns:helpers="clr-namespace:MyList.Helpers"
         Title="MyList Quick Launcher"
         WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
+        Background="{DynamicResource Token.BgSurfaceBrush}"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
         SizeToContent="Manual"
-        Width="448"
-        Height="502"
+        Width="400"
+        Height="454"
         Topmost="True"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
@@ -23,16 +22,11 @@
         <helpers:HealthStateToBrushConverter x:Key="HealthStateToBrushConverter" />
     </Window.Resources>
 
-    <Border Width="400"
-            Height="454"
-            Margin="24"
-            Background="{DynamicResource Token.BgSurfaceBrush}"
+    <Border Background="{DynamicResource Token.BgSurfaceBrush}"
             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1"
+            ClipToBounds="True"
             CornerRadius="{StaticResource Token.Radius3Xl}">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="32" ShadowDepth="8" Color="#000000" Opacity="0.5" />
-        </Border.Effect>
         <Border.RenderTransform>
             <ScaleTransform x:Name="ShellScale" CenterX="200" CenterY="227" ScaleX="1" ScaleY="1" />
         </Border.RenderTransform>
@@ -65,7 +59,7 @@
             </Grid.Clip>
             <Grid.RowDefinitions>
                 <RowDefinition Height="52" />
-                <RowDefinition Height="348" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="34" />
             </Grid.RowDefinitions>
 
@@ -74,7 +68,6 @@
                     Background="{DynamicResource Token.BgSubtleBrush}"
                     BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="0,0,0,1"
-                    CornerRadius="24,24,0,0"
                     Padding="16,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -532,7 +525,6 @@
                     Background="{DynamicResource Token.BgSubtleBrush}"
                     BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="0,1,0,0"
-                    CornerRadius="0,0,24,24"
                     Padding="16,0">
                 <Grid>
                     <!-- Launch-failure status -->
