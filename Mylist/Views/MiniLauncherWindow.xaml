@@ -11,22 +11,27 @@
         ResizeMode="NoResize"
         ShowInTaskbar="False"
         SizeToContent="Manual"
-        Width="400"
-        Height="454"
+        Width="448"
+        Height="502"
         Topmost="True"
-        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        WindowStartupLocation="Manual"
         Deactivated="OnDeactivated">
     <Window.Resources>
         <helpers:KindToLucideKindConverter x:Key="KindToLucideKindConverter" />
         <helpers:HealthStateToBrushConverter x:Key="HealthStateToBrushConverter" />
     </Window.Resources>
 
-    <Border Background="{DynamicResource Token.BgSurfaceBrush}"
+    <Border Width="400"
+            Height="454"
+            Margin="24"
+            Background="{DynamicResource Token.BgSurfaceBrush}"
             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1"
             CornerRadius="{StaticResource Token.Radius3Xl}">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="48" ShadowDepth="14" Color="#000000" Opacity="0.6" />
+            <DropShadowEffect BlurRadius="32" ShadowDepth="8" Color="#000000" Opacity="0.5" />
         </Border.Effect>
         <Border.RenderTransform>
             <ScaleTransform x:Name="ShellScale" CenterX="200" CenterY="227" ScaleX="1" ScaleY="1" />
@@ -53,6 +58,11 @@
         </Border.Triggers>
 
         <Grid>
+            <!-- Border doesn't clip children to CornerRadius, so the square row
+                 backgrounds bleed past the rounded corners. Clip to match. -->
+            <Grid.Clip>
+                <RectangleGeometry Rect="0,0,398,452" RadiusX="23" RadiusY="23" />
+            </Grid.Clip>
             <Grid.RowDefinitions>
                 <RowDefinition Height="52" />
                 <RowDefinition Height="348" />

@@ -28,10 +28,32 @@ public partial class MiniLauncherWindow : Window
             Show();
         }
 
+        PositionAtCursor();
         Activate();
         Focus();
         SearchBox.SelectAll();
         SearchBox.Focus();
+    }
+
+    // Spring up centred on the mouse, clamped to the cursor's monitor work area.
+    private void PositionAtCursor()
+    {
+        var mouse = System.Windows.Forms.Control.MousePosition; // device pixels
+        var source = PresentationSource.FromVisual(this);
+        var dpiX = source?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
+        var dpiY = source?.CompositionTarget?.TransformToDevice.M22 ?? 1.0;
+        var work = System.Windows.Forms.Screen.FromPoint(mouse).WorkingArea; // device pixels
+
+        var left = mouse.X / dpiX - ActualWidth / 2;
+        var top = mouse.Y / dpiY - ActualHeight / 2;
+
+        var minLeft = work.Left / dpiX;
+        var minTop = work.Top / dpiY;
+        var maxLeft = work.Right / dpiX - ActualWidth;
+        var maxTop = work.Bottom / dpiY - ActualHeight;
+
+        Left = Math.Max(minLeft, Math.Min(left, maxLeft));
+        Top = Math.Max(minTop, Math.Min(top, maxTop));
     }
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
