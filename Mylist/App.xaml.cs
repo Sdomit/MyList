@@ -236,7 +236,16 @@ public partial class App : Application
                 source,
                 _launcherService,
                 () => _miniLauncherWindow?.Hide(),
-                ActivateMainWindow);
+                ActivateMainWindow,
+                item => _mainViewModel.DeleteItemGloballyCommand.Execute(item),
+                collectionId =>
+                {
+                    var target = _mainViewModel.Collections.FirstOrDefault(c => c.Id == collectionId);
+                    if (target is not null)
+                    {
+                        _mainViewModel.DeleteCollectionCommand.Execute(target);
+                    }
+                });
             _miniLauncherWindow = new MiniLauncherWindow(viewModel);
         }
 

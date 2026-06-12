@@ -1,7 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using MyList.ViewModels;
 using Key = System.Windows.Input.Key;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -12,8 +14,9 @@ namespace MyList.Views;
 
 public partial class MiniLauncherWindow : Window
 {
-    private const int CornerRadiusDip = 24;
+    private const int CornerRadiusDip = 50;
     private readonly MiniLauncherViewModel _viewModel;
+    private bool _suppressHide;
 
     public MiniLauncherWindow(MiniLauncherViewModel viewModel)
     {
@@ -23,7 +26,19 @@ public partial class MiniLauncherWindow : Window
         PreviewKeyDown += OnPreviewKeyDown;
         SourceInitialized += (_, _) => ApplyRoundedRegion();
         SizeChanged += (_, _) => ApplyRoundedRegion();
+
+        // A right-click menu (and the global-delete confirm dialog it can spawn)
+        // steals activation; keep the launcher from auto-hiding while it's up.
+        AddHandler(ContextMenuOpeningEvent, new ContextMenuEventHandler(OnContextMenuOpening), true);
+        AddHandler(ContextMenuClosingEvent, new ContextMenuEventHandler(OnContextMenuClosing), true);
     }
+
+    private void OnContextMenuOpening(object sender, ContextMenuEventArgs e) => _suppressHide = true;
+
+    private void OnContextMenuClosing(object sender, ContextMenuEventArgs e) =>
+        // Idle priority lets the menu's command (incl. a modal confirm dialog)
+        // run before auto-hide is re-armed.
+        Dispatcher.BeginInvoke(new Action(() => _suppressHide = false), DispatcherPriority.ApplicationIdle);
 
     public void Summon()
     {
@@ -153,6 +168,11 @@ public partial class MiniLauncherWindow : Window
 
     private void OnDeactivated(object? sender, EventArgs e)
     {
+        if (_suppressHide)
+        {
+            return;
+        }
+
         Hide();
     }
 

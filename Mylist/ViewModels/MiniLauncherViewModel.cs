@@ -32,6 +32,9 @@ public sealed class MiniLauncherViewModel : ViewModelBase
     private readonly LauncherService _launcherService;
     private readonly Action _closeRequested;
     private readonly Action _moreRequested;
+    private readonly Action<ItemModel> _deleteItem;
+    private readonly Action<Guid> _deleteCollection;
+    private readonly ICommand _deleteResultCommand;
 
     private OrbitCollection? _currentCollection;
     private int _selectedIndex = -1;
@@ -42,12 +45,16 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         IOrbitSourceService source,
         LauncherService launcherService,
         Action closeRequested,
-        Action moreRequested)
+        Action moreRequested,
+        Action<ItemModel> deleteItem,
+        Action<Guid> deleteCollection)
     {
         _source = source;
         _launcherService = launcherService;
         _closeRequested = closeRequested;
         _moreRequested = moreRequested;
+        _deleteItem = deleteItem;
+        _deleteCollection = deleteCollection;
 
         VisibleSlots = new ObservableCollection<OrbitSlotViewModel>();
         SearchResults = new ObservableCollection<MiniLauncherListItemViewModel>();
@@ -63,6 +70,13 @@ public sealed class MiniLauncherViewModel : ViewModelBase
             if (item is not null)
             {
                 Launch(item);
+            }
+        });
+        _deleteResultCommand = new RelayCommand<ItemModel>(item =>
+        {
+            if (item is not null)
+            {
+                DeleteResult(item);
             }
         });
 
@@ -245,8 +259,34 @@ public sealed class MiniLauncherViewModel : ViewModelBase
             var slot = capped[i];
             slot.SetPosition(positions[i].X, positions[i].Y, Nr, i);
             slot.ClickCommand = new RelayCommand(() => Activate(slot));
+            slot.DeleteCommand = new RelayCommand(() => DeleteSlot(slot), () => slot.CanDelete);
             VisibleSlots.Add(slot);
         }
+    }
+
+    private void DeleteSlot(OrbitSlotViewModel slot)
+    {
+        if (slot.IsItem && slot.Item is not null)
+        {
+            _deleteItem(slot.Item);
+        }
+        else if (slot.IsCollection && slot.Collection is { IsSmart: false } collection
+                 && Guid.TryParse(collection.Id, out var id))
+        {
+            _deleteCollection(id);
+        }
+        else
+        {
+            return;
+        }
+
+        Repopulate();
+    }
+
+    private void DeleteResult(ItemModel item)
+    {
+        _deleteItem(item);
+        RefreshSearch();
     }
 
     private void Activate(OrbitSlotViewModel slot)
@@ -355,7 +395,8 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
             for (var i = 0; i < matches.Count; i++)
             {
-                SearchResults.Add(new MiniLauncherListItemViewModel(matches[i], i + 1, ActivateResultCommand));
+                SearchResults.Add(new MiniLauncherListItemViewModel(
+                    matches[i], i + 1, ActivateResultCommand, _deleteResultCommand));
             }
         }
 
