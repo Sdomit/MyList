@@ -27,7 +27,7 @@
             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
             BorderThickness="1"
             ClipToBounds="True"
-            CornerRadius="{StaticResource Token.Radius3Xl}">
+            CornerRadius="50">
         <Border.RenderTransform>
             <ScaleTransform x:Name="ShellScale" CenterX="200" CenterY="227" ScaleX="1" ScaleY="1" />
         </Border.RenderTransform>
@@ -56,7 +56,7 @@
             <!-- Border doesn't clip children to CornerRadius, so the square row
                  backgrounds bleed past the rounded corners. Clip to match. -->
             <Grid.Clip>
-                <RectangleGeometry Rect="0,0,398,452" RadiusX="23" RadiusY="23" />
+                <RectangleGeometry Rect="0,0,398,452" RadiusX="49" RadiusY="49" />
             </Grid.Clip>
             <Grid.RowDefinitions>
                 <RowDefinition Height="52" />
@@ -310,6 +310,16 @@
                                             Padding="0"
                                             Cursor="Hand"
                                             ToolTip="{Binding Name}">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Delete"
+                                                          Command="{Binding PlacementTarget.DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <iconPacks:PackIconLucide Kind="Trash2" Width="13" Height="13" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
                                                 <Grid>
@@ -436,6 +446,16 @@
                                             BorderThickness="0"
                                             Padding="10,0"
                                             Cursor="Hand">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Delete"
+                                                          Command="{Binding PlacementTarget.DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <iconPacks:PackIconLucide Kind="Trash2" Width="13" Height="13" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="Row"

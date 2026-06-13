@@ -8,11 +8,12 @@ public sealed class MiniLauncherListItemViewModel : ViewModelBase
 {
     private int _index;
 
-    public MiniLauncherListItemViewModel(ItemModel item, int index, ICommand activateCommand)
+    public MiniLauncherListItemViewModel(ItemModel item, int index, ICommand activateCommand, ICommand deleteCommand)
     {
         Item = item;
         _index = index;
         ActivateCommand = new RelayCommand(() => activateCommand.Execute(item));
+        DeleteCommand = new RelayCommand(() => deleteCommand.Execute(item));
     }
 
     public ItemModel Item { get; }
@@ -41,4 +42,6 @@ public sealed class MiniLauncherListItemViewModel : ViewModelBase
     public ContentKind Kind => Item.Kind;
 
     public ICommand ActivateCommand { get; }
+
+    public ICommand DeleteCommand { get; }
 }
