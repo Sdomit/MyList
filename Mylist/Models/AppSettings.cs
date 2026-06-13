@@ -23,6 +23,9 @@ public sealed class AppSettings
         Key = Key.G,
     };
 
+    // Smart-view ids (recent/fav/trending/pinned) the user hid from the quick menu.
+    public List<string> HiddenQuickMenuViews { get; set; } = new();
+
     public UiDensity UiDensity { get; set; } = UiDensity.Comfortable;
     public UiSkin Skin { get; set; } = UiSkin.Windows11;
     public double ItemScale { get; set; } = 1.0;

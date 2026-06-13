@@ -46,6 +46,8 @@ public sealed class MainViewModel : ViewModelBase
     private bool _isAddFormOpen;
     private bool _isRefreshingClipboardReview;
     private bool _clipboardHasImmediateAsset;
+    private bool _clipboardImmediateIsImage;
+    private string _clipboardImmediatePreview = string.Empty;
     private string _clipboardButtonText = "Add Clipboard";
     private string _clipboardReviewStatusText = "Copy paths, then refresh to review them.";
     private string _inlineAddValue = string.Empty;
@@ -298,11 +300,14 @@ public sealed class MainViewModel : ViewModelBase
         {
             if (SetProperty(ref _selectedItem, value))
             {
+                OnPropertyChanged(nameof(HasSelectedItem));
                 LoadInlineMtabDraft(value);
                 CommandManager.InvalidateRequerySuggested();
             }
         }
     }
+
+    public bool HasSelectedItem => _selectedItem is not null;
 
     public SettingsViewModel Settings { get; }
 
@@ -403,6 +408,23 @@ public sealed class MainViewModel : ViewModelBase
         : _clipboardHasImmediateAsset
             ? "Save Clipboard Item"
             : "No Valid Paths";
+
+    // Drives the friendlier inbox layout: when the clipboard is plain text or an
+    // image (no file paths), show a single "save as item" card instead of a long
+    // list of "skipped — path is not rooted" rows.
+    public bool ClipboardHasImportablePaths => ClipboardApplyCount > 0;
+
+    public bool ClipboardShowImmediatePanel => ClipboardApplyCount == 0;
+
+    public bool ClipboardImmediateIsImage => _clipboardImmediateIsImage;
+
+    public string ClipboardImmediatePreview => _clipboardImmediatePreview;
+
+    public string ClipboardImmediateTitle => _clipboardImmediateIsImage
+        ? "Save clipboard image"
+        : _clipboardHasImmediateAsset
+            ? "Save clipboard text"
+            : "Nothing to import";
 
     public string ClipboardReviewSummaryText =>
         $"Will add {ClipboardWillAddEntries.Count}, link {ClipboardWillLinkEntries.Count}, skip {ClipboardSkippedEntries.Count}.";
@@ -1217,8 +1239,22 @@ public sealed class MainViewModel : ViewModelBase
 
             if (ClipboardApplyCount == 0)
             {
-                _clipboardHasImmediateAsset = Clipboard.ContainsImage()
-                    || (Clipboard.ContainsText() && !string.IsNullOrWhiteSpace(Clipboard.GetText()));
+                var hasImage = Clipboard.ContainsImage();
+                var text = Clipboard.ContainsText() ? Clipboard.GetText() : string.Empty;
+                var hasText = !string.IsNullOrWhiteSpace(text);
+                _clipboardHasImmediateAsset = hasImage || hasText;
+                _clipboardImmediateIsImage = hasImage && !hasText;
+                _clipboardImmediatePreview = _clipboardImmediateIsImage
+                    ? "An image is on the clipboard, ready to save as an item."
+                    : hasText
+                        ? (text.Length > 600 ? text[..600] + "…" : text)
+                        : "Nothing on the clipboard to save. Copy a file path, some text, or an image, then Refresh.";
+            }
+            else
+            {
+                _clipboardHasImmediateAsset = false;
+                _clipboardImmediateIsImage = false;
+                _clipboardImmediatePreview = string.Empty;
             }
 
             ClipboardReviewStatusText = ClipboardApplyCount > 0
@@ -1299,6 +1335,11 @@ public sealed class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(ClipboardApplyCount));
         OnPropertyChanged(nameof(CanApplyClipboardReview));
         OnPropertyChanged(nameof(ClipboardApplyButtonText));
+        OnPropertyChanged(nameof(ClipboardHasImportablePaths));
+        OnPropertyChanged(nameof(ClipboardShowImmediatePanel));
+        OnPropertyChanged(nameof(ClipboardImmediateIsImage));
+        OnPropertyChanged(nameof(ClipboardImmediatePreview));
+        OnPropertyChanged(nameof(ClipboardImmediateTitle));
         OnPropertyChanged(nameof(ClipboardReviewSummaryText));
         OnPropertyChanged(nameof(ClipboardWillAddHeader));
         OnPropertyChanged(nameof(ClipboardWillLinkHeader));
@@ -1624,6 +1665,56 @@ public sealed class MainViewModel : ViewModelBase
                 RefreshSmartCollections();
                 QueueSave();
                 ApplyPostOpenWindowBehavior(keepToolOnTop);
+            }
+
+            return;
+        }
+
+        if (item.IsClipboardImage)
+        {
+            var imagePath = _clipboardAssetService.GetImageFilePath(item);
+            if (imagePath is null)
+            {
+                StatusText = "Clipboard image file is missing.";
+                return;
+            }
+
+            try
+            {
+                _launcherService.OpenPath(imagePath);
+                item.LastOpenedDate = DateTime.UtcNow;
+                RefreshSmartCollections();
+                QueueSave();
+                ApplyPostOpenWindowBehavior(keepToolOnTop);
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"Couldn't open image: {ex.Message}";
+            }
+
+            return;
+        }
+
+        if (item.IsClipboardText)
+        {
+            var textPath = _clipboardAssetService.WriteClipboardTextToTempFile(item);
+            if (textPath is null)
+            {
+                StatusText = "Couldn't open the saved text.";
+                return;
+            }
+
+            try
+            {
+                _launcherService.OpenPath(textPath);
+                item.LastOpenedDate = DateTime.UtcNow;
+                RefreshSmartCollections();
+                QueueSave();
+                ApplyPostOpenWindowBehavior(keepToolOnTop);
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"Couldn't open text: {ex.Message}";
             }
 
             return;
@@ -4231,11 +4322,7 @@ public sealed class MainViewModel : ViewModelBase
                 : $"Delete {distinctItems.Count} items globally?{Environment.NewLine}{Environment.NewLine}They will be removed from the app and all collection links.";
         }
 
-        return MessageBox.Show(
-            message,
-            "Delete Globally",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning) == MessageBoxResult.Yes;
+        return Views.ConfirmWindow.Show("Delete Globally", message);
     }
 
     private IUndoableAction? CreateRemoveItemFromCollectionAction(CollectionViewModel collection, ItemModel item)

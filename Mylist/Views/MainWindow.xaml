@@ -77,6 +77,87 @@
             <Setter Property="Margin" Value="12,0,12,4" />
         </Style>
 
+        <!-- Right-click menu for grid/list rows (DataContext = CollectionEntryViewModel, item at .Item). -->
+        <ContextMenu x:Key="EntryItemContextMenu" x:Shared="False">
+            <MenuItem Header="Open"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Edit"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Rename"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.QuickEditItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.TogglePinCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                <MenuItem.Style>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Header" Value="Pin" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Item.IsPinned, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+                                <Setter Property="Header" Value="Unpin" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+            </MenuItem>
+            <MenuItem Header="Copy"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.CopyPathCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <Separator />
+            <MenuItem Header="Delete"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.DeleteItemGloballyCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        </ContextMenu>
+
+        <!-- Right-click menu for sidebar panel rows (DataContext = ItemModel). -->
+        <ContextMenu x:Key="ModelItemContextMenu" x:Shared="False">
+            <MenuItem Header="Open"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Edit"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Rename"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.QuickEditItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.TogglePinCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                <MenuItem.Style>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Header" Value="Pin" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.IsPinned, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+                                <Setter Property="Header" Value="Unpin" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+            </MenuItem>
+            <MenuItem Header="Copy"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.CopyPathCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <Separator />
+            <MenuItem Header="Delete"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.DeleteItemGloballyCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        </ContextMenu>
+
+        <!-- Right-click menu for the items area: add into the open collection. -->
+        <ContextMenu x:Key="AddItemContextMenu" x:Shared="False">
+            <MenuItem Header="Add file…"
+                      Command="{Binding PlacementTarget.DataContext.AddFileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Add folder…"
+                      Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="New Mtab"
+                      Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="New action / script"
+                      Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <Separator />
+            <MenuItem Header="Add from clipboard…"
+                      Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        </ContextMenu>
+
         <DataTemplate x:Key="CollectionTemplate">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -359,11 +440,13 @@
                     Background="{DynamicResource Token.BgSurfaceBrush}"
                     BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
-                    CornerRadius="{StaticResource Token.RadiusLg}">
+                    CornerRadius="{StaticResource Token.RadiusLg}"
+                    ContextMenu="{StaticResource EntryItemContextMenu}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="26" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Border Width="22"
@@ -407,15 +490,57 @@
                                RenderOptions.BitmapScalingMode="HighQuality" />
                     </Border>
 
-                    <TextBlock Grid.Column="1"
-                               Margin="6,0,0,0"
-                               VerticalAlignment="Center"
-                               Text="{Binding Name}"
-                               Foreground="{DynamicResource Token.TextPrimaryBrush}"
-                               FontSize="{StaticResource Token.TextSm}"
-                               FontWeight="{StaticResource Token.WeightMedium}"
-                               TextTrimming="CharacterEllipsis"
-                               ToolTip="{Binding DisplayPath}" />
+                    <StackPanel Grid.Column="1"
+                                Margin="7,0,0,0"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}"
+                                   Foreground="{DynamicResource Token.TextPrimaryBrush}"
+                                   FontSize="{StaticResource Token.TextSm}"
+                                   FontWeight="{StaticResource Token.WeightMedium}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding DisplayPath}" />
+                        <TextBlock Margin="0,2,0,0"
+                                   Text="{Binding DisplayPath}"
+                                   Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                   FontFamily="{DynamicResource Token.FontMono}"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding DisplayPath}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                Margin="6,0,0,0"
+                                VerticalAlignment="Center">
+                        <iconPacks:PackIconLucide Kind="Star"
+                                                  Width="11" Height="11"
+                                                  VerticalAlignment="Center"
+                                                  Foreground="{DynamicResource Token.AccentBrush}"
+                                                  Visibility="{Binding IsFavorite, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <Ellipse Width="7" Height="7"
+                                 Margin="6,0,0,0"
+                                 VerticalAlignment="Center">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="{DynamicResource Token.MyList.HealthUnknownBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="Healthy">
+                                            <Setter Property="Fill" Value="{DynamicResource Token.MyList.HealthOkBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="Offline">
+                                            <Setter Property="Fill" Value="{DynamicResource Token.StatusWarningBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="Missing">
+                                            <Setter Property="Fill" Value="{DynamicResource Token.MyList.HealthBadBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding HealthState}" Value="PermissionDenied">
+                                            <Setter Property="Fill" Value="{DynamicResource Token.MyList.HealthBadBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                    </StackPanel>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -648,7 +773,21 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="{DynamicResource Token.Grid.Sidebar}" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="{DynamicResource Token.Grid.Preview}" />
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="ColumnDefinition">
+                            <Setter Property="Width" Value="{DynamicResource Token.Grid.Preview}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasSelectedItem}" Value="False">
+                                    <Setter Property="Width" Value="0" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsCollectionPaneVisible}" Value="False">
+                                    <Setter Property="Width" Value="0" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
@@ -773,17 +912,8 @@
                                     <DataTemplate>
                                         <Button Style="{StaticResource Constellation.Row}"
                                                 Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
-                                                CommandParameter="{Binding}">
-                                            <Button.ContextMenu>
-                                                <ContextMenu>
-                                                    <MenuItem Header="Open"
-                                                              Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
-                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                                    <MenuItem Header="Unpin"
-                                                              Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.TogglePinCommand}"
-                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                                </ContextMenu>
-                                            </Button.ContextMenu>
+                                                CommandParameter="{Binding}"
+                                                ContextMenu="{StaticResource ModelItemContextMenu}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="14" />
@@ -825,7 +955,8 @@
                                     <DataTemplate>
                                         <Button Style="{StaticResource Constellation.Row}"
                                                 Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
-                                                CommandParameter="{Binding}">
+                                                CommandParameter="{Binding}"
+                                                ContextMenu="{StaticResource ModelItemContextMenu}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="14" />
@@ -867,7 +998,8 @@
                                     <DataTemplate>
                                         <Button Style="{StaticResource Constellation.Row}"
                                                 Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
-                                                CommandParameter="{Binding}">
+                                                CommandParameter="{Binding}"
+                                                ContextMenu="{StaticResource ModelItemContextMenu}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="14" />
@@ -1222,7 +1354,8 @@
                                      PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
                                      PreviewMouseMove="OnItemPreviewMouseMove"
                                      Drop="OnItemDrop"
-                                     AllowDrop="True">
+                                     AllowDrop="True"
+                                     ContextMenu="{StaticResource AddItemContextMenu}">
                                 <ListBox.Style>
                                     <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
                                         <Setter Property="ItemTemplate" Value="{StaticResource ListItemTemplate}" />
@@ -1268,26 +1401,25 @@
                 </Grid>
             </Border>
 
-            <!-- Preview pane -->
+            <!-- Preview pane — only present while an item is selected. -->
             <Border Grid.Column="2"
                     Background="{DynamicResource Token.BgSurfaceBrush}"
-                    CornerRadius="10,10,0,0"
-                    Visibility="{Binding IsCollectionPaneVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    CornerRadius="10,10,0,0">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsCollectionPaneVisible}" Value="True" />
+                                    <Condition Binding="{Binding HasSelectedItem}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <Grid>
-                    <Grid Style="{StaticResource PreviewVisibilityWhenEmpty}">
-                        <StackPanel Margin="18,18">
-                            <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="NO SELECTION" />
-                            <TextBlock Margin="0,8,0,0"
-                                       Style="{StaticResource Simple.PaneTitle}"
-                                       Foreground="{DynamicResource Token.TextTertiaryBrush}"
-                                       Text="Pick an item" />
-                            <TextBlock Margin="0,4,0,0"
-                                       Style="{StaticResource Simple.MetaText}"
-                                       Text="Select a row to inspect its details."
-                                       TextWrapping="Wrap" />
-                        </StackPanel>
-                    </Grid>
-
                     <Grid Style="{StaticResource PreviewVisibilityWhenSelected}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />

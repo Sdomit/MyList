@@ -231,7 +231,10 @@ public partial class App : Application
                     .Where(collection => !collection.IsSmart)
                     .Select(collection => new OrbitUserCollection(
                         collection.Id, collection.Name, collection.Items.ToList()))
-                    .ToList());
+                    .ToList(),
+                () => _mainViewModel.RecentItems,
+                () => _mainViewModel.TrendingItems,
+                () => _mainViewModel.AppData.AppSettings.HiddenQuickMenuViews);
             var viewModel = new MiniLauncherViewModel(
                 source,
                 _launcherService,
@@ -244,6 +247,15 @@ public partial class App : Application
                     if (target is not null)
                     {
                         _mainViewModel.DeleteCollectionCommand.Execute(target);
+                    }
+                },
+                viewId =>
+                {
+                    var hidden = _mainViewModel.AppData.AppSettings.HiddenQuickMenuViews;
+                    if (!hidden.Contains(viewId))
+                    {
+                        hidden.Add(viewId);
+                        _mainViewModel.QueueSave();
                     }
                 });
             _miniLauncherWindow = new MiniLauncherWindow(viewModel);

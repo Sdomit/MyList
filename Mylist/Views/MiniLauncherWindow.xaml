@@ -312,7 +312,7 @@
                                             ToolTip="{Binding Name}">
                                         <Button.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Delete"
+                                                <MenuItem Header="{Binding PlacementTarget.DataContext.DeleteLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           Command="{Binding PlacementTarget.DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                     <MenuItem.Icon>
                                                         <iconPacks:PackIconLucide Kind="Trash2" Width="13" Height="13" />

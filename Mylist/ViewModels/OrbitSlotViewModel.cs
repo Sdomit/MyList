@@ -105,9 +105,11 @@ public sealed class OrbitSlotViewModel : ObservableObject
 
     public ICommand? DeleteCommand { get; set; }
 
-    // Items and user collections can be removed; smart views (Recent, Favorites)
-    // and the "More…" sentinel cannot.
-    public bool CanDelete => IsItem || (IsCollection && Collection is { IsSmart: false });
+    // Items and collections (incl. smart views) can be removed; only the "More…"
+    // sentinel can't. Smart views are hidden, not deleted — hence the dynamic label.
+    public bool CanDelete => IsItem || IsCollection;
+
+    public string DeleteLabel => IsCollection && Collection is { IsSmart: true } ? "Hide" : "Delete";
 
     public void SetPosition(double centreX, double centreY, double nodeRadius, int zeroBasedIndex)
     {

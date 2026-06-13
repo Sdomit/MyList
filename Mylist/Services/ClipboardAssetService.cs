@@ -92,6 +92,37 @@ public sealed class ClipboardAssetService
         }
     }
 
+    /// <summary>Absolute path of the saved clipboard image, or null if missing.</summary>
+    public string? GetImageFilePath(ItemModel? item)
+    {
+        var assetPath = GetAbsoluteAssetPath(item?.ClipboardImageAssetPath);
+        return assetPath is not null && File.Exists(assetPath) ? assetPath : null;
+    }
+
+    /// <summary>Materialise the saved clipboard text to a temp .txt so it can be
+    /// opened in the default editor. Returns the path, or null on failure.</summary>
+    public string? WriteClipboardTextToTempFile(ItemModel? item)
+    {
+        if (item is null || !item.IsClipboardText)
+        {
+            return null;
+        }
+
+        try
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "MyList", "clip-text");
+            Directory.CreateDirectory(dir);
+            var path = Path.Combine(dir, $"{item.Id:N}.txt");
+            File.WriteAllText(path, item.ClipboardContent ?? string.Empty);
+            return path;
+        }
+        catch (Exception ex)
+        {
+            _log.Log(ex, "Failed to write clipboard text to temp file.");
+            return null;
+        }
+    }
+
     public bool TryCopyImageToClipboard(ItemModel item)
     {
         var bitmap = LoadClipboardBitmap(item);

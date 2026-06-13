@@ -573,6 +573,23 @@
                             </Grid>
                         </Border>
 
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="230" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Hidden quick-menu views" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Right-clicking Recent/Favorites/Trending/Pinned hides them from the quick menu. Restore them all here." />
+                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        VerticalAlignment="Top"
+                                        Content="Restore hidden views"
+                                        Command="{Binding RestoreQuickMenuViewsCommand}" />
+                            </Grid>
+                        </Border>
+
                         <Border Margin="0,18,0,0"
                                 Padding="12"
                                 Background="{DynamicResource Token.AccentSubtleBrush}"

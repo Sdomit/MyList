@@ -699,6 +699,13 @@ public partial class MainWindow : Window
             return;
         }
 
+        // Click on empty space (not on a row) clears the selection, collapsing the details pane.
+        if (sender is ListBox listBox &&
+            FindAncestor<ListBoxItem>(e.OriginalSource as DependencyObject) is null)
+        {
+            listBox.UnselectAll();
+        }
+
         _dragStart = e.GetPosition(null);
     }
 
