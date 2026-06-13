@@ -34,6 +34,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
     private readonly Action _moreRequested;
     private readonly Action<ItemModel> _deleteItem;
     private readonly Action<Guid> _deleteCollection;
+    private readonly Action<string> _hideView;
     private readonly ICommand _deleteResultCommand;
 
     private OrbitCollection? _currentCollection;
@@ -47,7 +48,8 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         Action closeRequested,
         Action moreRequested,
         Action<ItemModel> deleteItem,
-        Action<Guid> deleteCollection)
+        Action<Guid> deleteCollection,
+        Action<string> hideView)
     {
         _source = source;
         _launcherService = launcherService;
@@ -55,6 +57,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         _moreRequested = moreRequested;
         _deleteItem = deleteItem;
         _deleteCollection = deleteCollection;
+        _hideView = hideView;
 
         VisibleSlots = new ObservableCollection<OrbitSlotViewModel>();
         SearchResults = new ObservableCollection<MiniLauncherListItemViewModel>();
@@ -269,6 +272,10 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         if (slot.IsItem && slot.Item is not null)
         {
             _deleteItem(slot.Item);
+        }
+        else if (slot.Collection is { IsSmart: true } smart)
+        {
+            _hideView(smart.Id);
         }
         else if (slot.IsCollection && slot.Collection is { IsSmart: false } collection
                  && Guid.TryParse(collection.Id, out var id))

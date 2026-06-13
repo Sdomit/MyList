@@ -8,38 +8,69 @@ namespace MyList.Services;
 /// <summary>
 /// Default <see cref="IOrbitSourceService"/>. Reads everything through delegates so
 /// the launcher stays decoupled from <c>MainViewModel</c> and the resolvers stay unit
-/// testable. Smart collections (Recent, Favorites, …) are computed from the item set;
-/// user collections are matched by id against the supplied snapshot.
+/// testable. Recent/Trending mirror the app's computed smart lists; Favorites/Pinned
+/// are derived from the item set; user collections are matched by id against the
+/// supplied snapshot. Smart views the user hid (or that are empty) are dropped from
+/// the root ring.
 /// </summary>
 public sealed class OrbitSourceService : IOrbitSourceService
 {
     public const string RecentId = "recent";
     public const string FavoritesId = "fav";
+    public const string TrendingId = "trending";
     public const string PinnedId = "pinned";
     public const string HealthId = "health";
 
     private const int RingCap = 5;
 
+    private static readonly (string Id, string Name)[] SmartViews =
+    {
+        (RecentId, "Recent"),
+        (FavoritesId, "Favorites"),
+        (TrendingId, "Trending"),
+        (PinnedId, "Pinned"),
+    };
+
     private readonly Func<IReadOnlyList<ItemModel>> _allItems;
     private readonly Func<IReadOnlyList<OrbitUserCollection>> _userCollections;
+    private readonly Func<IReadOnlyList<ItemModel>> _recent;
+    private readonly Func<IReadOnlyList<ItemModel>> _trending;
+    private readonly Func<IReadOnlyCollection<string>> _hiddenViews;
 
     public OrbitSourceService(
         Func<IReadOnlyList<ItemModel>> allItems,
-        Func<IReadOnlyList<OrbitUserCollection>> userCollections)
+        Func<IReadOnlyList<OrbitUserCollection>> userCollections,
+        Func<IReadOnlyList<ItemModel>> recent,
+        Func<IReadOnlyList<ItemModel>> trending,
+        Func<IReadOnlyCollection<string>> hiddenViews)
     {
         _allItems = allItems ?? throw new ArgumentNullException(nameof(allItems));
         _userCollections = userCollections ?? throw new ArgumentNullException(nameof(userCollections));
+        _recent = recent ?? throw new ArgumentNullException(nameof(recent));
+        _trending = trending ?? throw new ArgumentNullException(nameof(trending));
+        _hiddenViews = hiddenViews ?? throw new ArgumentNullException(nameof(hiddenViews));
     }
 
     public IReadOnlyList<ItemModel> GetAllItems() => Items().ToList();
 
     public IReadOnlyList<OrbitCollection> GetRootCollections()
     {
-        var ring = new List<OrbitCollection>
+        var hidden = _hiddenViews();
+        var ring = new List<OrbitCollection>();
+
+        foreach (var (id, name) in SmartViews)
         {
-            new() { Id = RecentId, Name = "Recent", IsSmart = true },
-            new() { Id = FavoritesId, Name = "Favorites", IsSmart = true },
-        };
+            if (hidden.Contains(id))
+            {
+                continue;
+            }
+
+            var view = new OrbitCollection { Id = id, Name = name, IsSmart = true };
+            if (GetItems(view).Count > 0)
+            {
+                ring.Add(view);
+            }
+        }
 
         ring.AddRange(_userCollections()
             .Where(c => c.Items.Any(i => !i.IsClipboardImage))
@@ -57,11 +88,8 @@ public sealed class OrbitSourceService : IOrbitSourceService
 
         return collection.Id switch
         {
-            RecentId => Items()
-                .Where(i => i.LastOpenedDate != default)
-                .OrderByDescending(i => i.LastOpenedDate)
-                .Take(RingCap)
-                .ToList(),
+            RecentId => _recent().Where(i => !i.IsClipboardImage).Take(RingCap).ToList(),
+            TrendingId => _trending().Where(i => !i.IsClipboardImage).Take(RingCap).ToList(),
             FavoritesId => Items()
                 .Where(i => i.IsFavorite)
                 .OrderByDescending(i => i.LastOpenedDate)

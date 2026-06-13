@@ -24,6 +24,16 @@ public sealed class LauncherService
         Process.Start(startInfo)?.Dispose();
     }
 
+    public void OpenPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo(path) { UseShellExecute = true })?.Dispose();
+    }
+
     public void OpenNewWindow(ItemModel item)
     {
         if (string.IsNullOrWhiteSpace(item.Path))

@@ -67,6 +67,7 @@ public sealed class SettingsViewModel : ViewModelBase
         InstallExplorerIntegrationCommand = new RelayCommand(InstallExplorerIntegration);
         UninstallExplorerIntegrationCommand = new RelayCommand(UninstallExplorerIntegration);
         RepairExplorerIntegrationCommand = new RelayCommand(RepairExplorerIntegration);
+        RestoreQuickMenuViewsCommand = new RelayCommand(RestoreQuickMenuViews, () => HasHiddenQuickMenuViews);
 
         LayoutModes = Enum.GetValues<LayoutMode>();
         CollectionsLayouts = Enum.GetValues<CollectionsLayout>();
@@ -376,6 +377,25 @@ public sealed class SettingsViewModel : ViewModelBase
     public ICommand InstallExplorerIntegrationCommand { get; }
     public ICommand UninstallExplorerIntegrationCommand { get; }
     public ICommand RepairExplorerIntegrationCommand { get; }
+    public ICommand RestoreQuickMenuViewsCommand { get; }
+
+    public bool HasHiddenQuickMenuViews => _settings.HiddenQuickMenuViews.Count > 0;
+
+    public int HiddenQuickMenuViewCount => _settings.HiddenQuickMenuViews.Count;
+
+    private void RestoreQuickMenuViews()
+    {
+        if (_settings.HiddenQuickMenuViews.Count == 0)
+        {
+            return;
+        }
+
+        _settings.HiddenQuickMenuViews.Clear();
+        OnPropertyChanged(nameof(HasHiddenQuickMenuViews));
+        OnPropertyChanged(nameof(HiddenQuickMenuViewCount));
+        CommandManager.InvalidateRequerySuggested();
+        _queueSave();
+    }
 
     public void UpdateHotkey(HotkeySettings settings)
     {

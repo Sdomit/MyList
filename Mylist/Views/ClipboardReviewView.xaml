@@ -1,6 +1,7 @@
 <UserControl x:Class="MyList.Views.ClipboardReviewView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              Background="{DynamicResource Token.TransparentBrush}"
              Foreground="{DynamicResource Token.TextPrimaryBrush}"
              FontFamily="{DynamicResource Token.FontUi}">
@@ -124,7 +125,8 @@
                 </Grid.ColumnDefinitions>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
+                              HorizontalScrollBarVisibility="Disabled"
+                              Visibility="{Binding ClipboardHasImportablePaths, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel>
                         <Border Style="{StaticResource ClipboardSection}">
                             <Grid>
@@ -190,6 +192,71 @@
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
+
+                <!-- Friendly "save as item" card when the clipboard is plain text or an image. -->
+                <Border Style="{StaticResource Simple.Card}"
+                        Padding="28,26"
+                        Visibility="{Binding ClipboardShowImmediatePanel, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                MaxWidth="440">
+                        <Border Width="52" Height="52"
+                                HorizontalAlignment="Center"
+                                Background="{DynamicResource Token.AccentSubtleBrush}"
+                                CornerRadius="{DynamicResource Token.RadiusFull}">
+                            <iconPacks:PackIconLucide Width="22" Height="22"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource Token.AccentBrush}">
+                                <iconPacks:PackIconLucide.Style>
+                                    <Style TargetType="iconPacks:PackIconLucide">
+                                        <Setter Property="Kind" Value="Clipboard" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ClipboardImmediateIsImage}" Value="True">
+                                                <Setter Property="Kind" Value="Image" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </iconPacks:PackIconLucide.Style>
+                            </iconPacks:PackIconLucide>
+                        </Border>
+
+                        <TextBlock Margin="0,16,0,0"
+                                   HorizontalAlignment="Center"
+                                   Style="{StaticResource Simple.PaneTitle}"
+                                   Text="{Binding ClipboardImmediateTitle}" />
+                        <TextBlock Margin="0,6,0,0"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Style="{StaticResource Simple.MetaText}"
+                                   Text="{Binding ClipboardReviewStatusText}" />
+
+                        <Border Margin="0,18,0,0"
+                                Background="{DynamicResource Token.BgSubtleBrush}"
+                                BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{DynamicResource Token.RadiusMd}"
+                                MaxHeight="180"
+                                Padding="12,10">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <TextBlock Style="{StaticResource Simple.MonoText}"
+                                           Foreground="{DynamicResource Token.TextSecondaryBrush}"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding ClipboardImmediatePreview}" />
+                            </ScrollViewer>
+                        </Border>
+
+                        <Button Margin="0,18,0,0"
+                                MinWidth="180"
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource Simple.PrimaryButton}"
+                                Content="{Binding ClipboardApplyButtonText}"
+                                IsEnabled="{Binding CanApplyClipboardReview}"
+                                Command="{Binding ApplyClipboardReviewCommand}" />
+                    </StackPanel>
+                </Border>
 
                 <Border Grid.Column="2" Style="{StaticResource Simple.Card}" Padding="0">
                     <Grid>
