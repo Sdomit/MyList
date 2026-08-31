@@ -28,10 +28,10 @@ public sealed record OrbitUserCollection(Guid Id, string Name, IReadOnlyList<Ite
 /// </summary>
 public interface IOrbitSourceService
 {
-    /// <summary>Up to 5 collections for the root ring (slot 6 is the launcher's "More…").</summary>
+    /// <summary>The configured number of collections for the root ring; the launcher adds a separate "More…" slot.</summary>
     IReadOnlyList<OrbitCollection> GetRootCollections();
 
-    /// <summary>Up to 5 items inside <paramref name="collection"/>.</summary>
+    /// <summary>The configured number of items inside <paramref name="collection"/>.</summary>
     IReadOnlyList<ItemModel> GetItems(OrbitCollection collection);
 
     /// <summary>Every launchable item, used by the global search overlay.</summary>

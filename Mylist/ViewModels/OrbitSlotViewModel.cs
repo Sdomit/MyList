@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using System.Windows.Media;
 using MahApps.Metro.IconPacks;
 using MyList.Helpers;
 using MyList.Models;
@@ -41,6 +42,9 @@ public sealed class OrbitSlotViewModel : ObservableObject
     public string Label { get; private init; } = string.Empty;
 
     public PackIconLucideKind IconKind { get; private init; } = PackIconLucideKind.Folder;
+
+    /// <summary>Native item icon when available; collections and the More slot use <see cref="IconKind"/>.</summary>
+    public ImageSource? Icon { get; private init; }
 
     /// <summary>Drives the disc border colour through <see cref="HealthStateToBrushConverter"/>.</summary>
     public ItemHealthState HealthState { get; private init; } = ItemHealthState.Healthy;
@@ -137,6 +141,7 @@ public sealed class OrbitSlotViewModel : ObservableObject
         Name = item.Name,
         Label = Truncate(item.Name),
         IconKind = IconForKind(item.Kind),
+        Icon = item.Icon,
         HealthState = item.HealthState,
     };
 

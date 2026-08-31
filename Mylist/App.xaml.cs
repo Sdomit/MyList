@@ -234,12 +234,14 @@ public partial class App : Application
                     .ToList(),
                 () => _mainViewModel.RecentItems,
                 () => _mainViewModel.TrendingItems,
-                () => _mainViewModel.AppData.AppSettings.HiddenQuickMenuViews);
+                () => _mainViewModel.AppData.AppSettings.HiddenQuickMenuViews,
+                () => _mainViewModel.AppData.AppSettings.MiniLauncherItemLimit);
             var viewModel = new MiniLauncherViewModel(
                 source,
                 _launcherService,
                 () => _miniLauncherWindow?.Hide(),
                 ActivateMainWindow,
+                () => _mainViewModel.AppData.AppSettings.MiniLauncherItemLimit,
                 item => _mainViewModel.DeleteItemGloballyCommand.Execute(item),
                 collectionId =>
                 {

@@ -2185,7 +2185,12 @@ public sealed class MainViewModel : ViewModelBase
 
     private void ToggleViewMode()
     {
-        Settings.ViewMode = Settings.ViewMode == ViewMode.Grid ? ViewMode.List : ViewMode.Grid;
+        Settings.ViewMode = Settings.ViewMode switch
+        {
+            ViewMode.Grid => ViewMode.List,
+            ViewMode.List => ViewMode.Icons,
+            _ => ViewMode.Grid,
+        };
     }
 
     private void ToggleCollection()

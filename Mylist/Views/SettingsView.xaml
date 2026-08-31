@@ -514,8 +514,27 @@
                                                  Margin="0,0,14,0"
                                                  IsChecked="{Binding ViewMode, ConverterParameter=Grid, Converter={StaticResource EnumToBooleanConverter}}" />
                                     <RadioButton Content="List"
+                                                 Margin="0,0,14,0"
                                                  IsChecked="{Binding ViewMode, ConverterParameter=List, Converter={StaticResource EnumToBooleanConverter}}" />
+                                    <RadioButton Content="Icons"
+                                                 IsChecked="{Binding ViewMode, ConverterParameter=Icons, Converter={StaticResource EnumToBooleanConverter}}" />
                                 </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Open items with one click" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="When off, selecting is separate from opening and items open with a double-click." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1"
+                                          Style="{StaticResource SettingsToggle}"
+                                          IsChecked="{Binding OpenItemsOnSingleClick}" />
                             </Grid>
                         </Border>
                     </StackPanel>
@@ -552,6 +571,35 @@
                                                TextWrapping="Wrap" />
                                 </StackPanel>
                             </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsRow}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="230" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Quick-menu icons" />
+                                    <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Choose how many items appear per orbit. The More button remains available." />
+                                </StackPanel>
+                                <ComboBox Grid.Column="1"
+                                          SelectedItem="{Binding MiniLauncherItemLimit}"
+                                          ItemsSource="{Binding MiniLauncherItemLimits}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingsRow}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SettingsRowName}" Text="Quick-menu shortcuts" />
+                                <TextBlock Style="{StaticResource SettingsRowDesc}" Margin="0,0,0,8" Text="Choose which smart shortcuts appear in the mini launcher when they contain items." />
+                                <WrapPanel>
+                                    <CheckBox Content="Recent" Margin="0,0,18,0" IsChecked="{Binding ShowQuickMenuRecent}" />
+                                    <CheckBox Content="Favorites" Margin="0,0,18,0" IsChecked="{Binding ShowQuickMenuFavorites}" />
+                                    <CheckBox Content="Trending" Margin="0,0,18,0" IsChecked="{Binding ShowQuickMenuTrending}" />
+                                    <CheckBox Content="Pinned" IsChecked="{Binding ShowQuickMenuPinned}" />
+                                </WrapPanel>
+                            </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource SettingsRow}">

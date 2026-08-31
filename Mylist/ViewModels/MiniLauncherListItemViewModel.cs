@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using System.Windows.Media;
 using MyList.Helpers;
 using MyList.Models;
 
@@ -40,6 +41,8 @@ public sealed class MiniLauncherListItemViewModel : ViewModelBase
     public string DisplayPath => Item.DisplayPath;
 
     public ContentKind Kind => Item.Kind;
+
+    public ImageSource? Icon => Item.Icon;
 
     public ICommand ActivateCommand { get; }
 

@@ -32,6 +32,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
     private readonly LauncherService _launcherService;
     private readonly Action _closeRequested;
     private readonly Action _moreRequested;
+    private readonly Func<int> _itemLimit;
     private readonly Action<ItemModel> _deleteItem;
     private readonly Action<Guid> _deleteCollection;
     private readonly Action<string> _hideView;
@@ -47,6 +48,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         LauncherService launcherService,
         Action closeRequested,
         Action moreRequested,
+        Func<int>? itemLimit,
         Action<ItemModel> deleteItem,
         Action<Guid> deleteCollection,
         Action<string> hideView)
@@ -55,6 +57,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         _launcherService = launcherService;
         _closeRequested = closeRequested;
         _moreRequested = moreRequested;
+        _itemLimit = itemLimit ?? (() => 5);
         _deleteItem = deleteItem;
         _deleteCollection = deleteCollection;
         _hideView = hideView;
@@ -92,6 +95,10 @@ public sealed class MiniLauncherViewModel : ViewModelBase
     public ObservableCollection<MiniLauncherListItemViewModel> SearchResults { get; }
 
     public bool HasResults => SearchResults.Count > 0;
+
+    public int MaxShortcutIndex => VisibleSlots.Count;
+
+    public string ShortcutRangeHint => VisibleSlots.Count > 0 ? $"1–{VisibleSlots.Count}" : string.Empty;
 
     // ── Two-level state ──────────────────────────────────────────────────────
     public bool IsInCollection => _currentCollection is not null;
@@ -252,9 +259,8 @@ public sealed class MiniLauncherViewModel : ViewModelBase
             ? _source.GetItems(_currentCollection!).Select(OrbitSlotViewModel.FromItem).ToList()
             : _source.GetRootCollections().Select(OrbitSlotViewModel.FromCollection).ToList();
 
-        var capped = nodes.Count >= 5
-            ? nodes.Take(5).Append(OrbitSlotViewModel.MoreSlot()).ToList()
-            : nodes.Append(OrbitSlotViewModel.MoreSlot()).ToList();
+        var itemLimit = Math.Clamp(_itemLimit(), 3, 7);
+        var capped = nodes.Take(itemLimit).Append(OrbitSlotViewModel.MoreSlot()).ToList();
 
         var positions = OrbitLayoutService.Compute(capped.Count, Cx, Cy, R, R);
         for (var i = 0; i < capped.Count; i++)
@@ -265,6 +271,9 @@ public sealed class MiniLauncherViewModel : ViewModelBase
             slot.DeleteCommand = new RelayCommand(() => DeleteSlot(slot), () => slot.CanDelete);
             VisibleSlots.Add(slot);
         }
+
+        OnPropertyChanged(nameof(MaxShortcutIndex));
+        OnPropertyChanged(nameof(ShortcutRangeHint));
     }
 
     private void DeleteSlot(OrbitSlotViewModel slot)

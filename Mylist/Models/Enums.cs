@@ -26,7 +26,8 @@ public enum CollectionEntryKind
 public enum ViewMode
 {
     Grid,
-    List
+    List,
+    Icons
 }
 
 public enum LayoutMode

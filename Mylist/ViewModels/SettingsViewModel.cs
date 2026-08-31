@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MyList.Helpers;
@@ -73,6 +74,7 @@ public sealed class SettingsViewModel : ViewModelBase
         CollectionsLayouts = Enum.GetValues<CollectionsLayout>();
         DensityModes = Enum.GetValues<UiDensity>();
         SkinModes = Enum.GetValues<UiSkin>();
+        MiniLauncherItemLimits = Enumerable.Range(3, 5).ToArray();
         RuntimeStatus.DebugMode = _settings.EnableDebugMode;
         RefreshExplorerIntegrationStatus();
     }
@@ -86,6 +88,8 @@ public sealed class SettingsViewModel : ViewModelBase
     public Array DensityModes { get; }
 
     public Array SkinModes { get; }
+
+    public int[] MiniLauncherItemLimits { get; }
 
     public ThemeMode Theme
     {
@@ -149,6 +153,20 @@ public sealed class SettingsViewModel : ViewModelBase
             if (_settings.ViewMode != value)
             {
                 _settings.ViewMode = value;
+                OnPropertyChanged();
+                _queueSave();
+            }
+        }
+    }
+
+    public bool OpenItemsOnSingleClick
+    {
+        get => _settings.OpenItemsOnSingleClick;
+        set
+        {
+            if (_settings.OpenItemsOnSingleClick != value)
+            {
+                _settings.OpenItemsOnSingleClick = value;
                 OnPropertyChanged();
                 _queueSave();
             }
@@ -314,6 +332,45 @@ public sealed class SettingsViewModel : ViewModelBase
 
     public string MiniLauncherHotkeyDisplay => _settings.MiniLauncherHotkey.ToString();
 
+    public int MiniLauncherItemLimit
+    {
+        get => ClampMiniLauncherItemLimit(_settings.MiniLauncherItemLimit);
+        set
+        {
+            var clamped = ClampMiniLauncherItemLimit(value);
+            if (_settings.MiniLauncherItemLimit != clamped)
+            {
+                _settings.MiniLauncherItemLimit = clamped;
+                OnPropertyChanged();
+                _queueSave();
+            }
+        }
+    }
+
+    public bool ShowQuickMenuRecent
+    {
+        get => IsQuickMenuViewVisible(OrbitSourceService.RecentId);
+        set => SetQuickMenuViewVisible(OrbitSourceService.RecentId, value);
+    }
+
+    public bool ShowQuickMenuFavorites
+    {
+        get => IsQuickMenuViewVisible(OrbitSourceService.FavoritesId);
+        set => SetQuickMenuViewVisible(OrbitSourceService.FavoritesId, value);
+    }
+
+    public bool ShowQuickMenuTrending
+    {
+        get => IsQuickMenuViewVisible(OrbitSourceService.TrendingId);
+        set => SetQuickMenuViewVisible(OrbitSourceService.TrendingId, value);
+    }
+
+    public bool ShowQuickMenuPinned
+    {
+        get => IsQuickMenuViewVisible(OrbitSourceService.PinnedId);
+        set => SetQuickMenuViewVisible(OrbitSourceService.PinnedId, value);
+    }
+
     public UiDensity UiDensity
     {
         get => _settings.UiDensity;
@@ -419,6 +476,7 @@ public sealed class SettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(FollowSystemTheme));
         OnPropertyChanged(nameof(IsDarkMode));
         OnPropertyChanged(nameof(ViewMode));
+        OnPropertyChanged(nameof(OpenItemsOnSingleClick));
         OnPropertyChanged(nameof(LayoutMode));
         OnPropertyChanged(nameof(CollectionsLayout));
         OnPropertyChanged(nameof(AlwaysOnTop));
@@ -432,6 +490,11 @@ public sealed class SettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(HotkeyStatusMessage));
         OnPropertyChanged(nameof(MiniLauncherHotkey));
         OnPropertyChanged(nameof(MiniLauncherHotkeyDisplay));
+        OnPropertyChanged(nameof(MiniLauncherItemLimit));
+        OnPropertyChanged(nameof(ShowQuickMenuRecent));
+        OnPropertyChanged(nameof(ShowQuickMenuFavorites));
+        OnPropertyChanged(nameof(ShowQuickMenuTrending));
+        OnPropertyChanged(nameof(ShowQuickMenuPinned));
         OnPropertyChanged(nameof(UiDensity));
         OnPropertyChanged(nameof(Skin));
         OnPropertyChanged(nameof(EnableDebugMode));
@@ -448,6 +511,37 @@ public sealed class SettingsViewModel : ViewModelBase
         }
 
         return Math.Clamp(value, 0.75, 1.5);
+    }
+
+    private static int ClampMiniLauncherItemLimit(int value) => Math.Clamp(value, 3, 7);
+
+    private bool IsQuickMenuViewVisible(string viewId) => !_settings.HiddenQuickMenuViews.Contains(viewId);
+
+    private void SetQuickMenuViewVisible(string viewId, bool isVisible)
+    {
+        var isCurrentlyVisible = IsQuickMenuViewVisible(viewId);
+        if (isCurrentlyVisible == isVisible)
+        {
+            return;
+        }
+
+        if (isVisible)
+        {
+            _settings.HiddenQuickMenuViews.Remove(viewId);
+        }
+        else
+        {
+            _settings.HiddenQuickMenuViews.Add(viewId);
+        }
+
+        OnPropertyChanged(nameof(ShowQuickMenuRecent));
+        OnPropertyChanged(nameof(ShowQuickMenuFavorites));
+        OnPropertyChanged(nameof(ShowQuickMenuTrending));
+        OnPropertyChanged(nameof(ShowQuickMenuPinned));
+        OnPropertyChanged(nameof(HasHiddenQuickMenuViews));
+        OnPropertyChanged(nameof(HiddenQuickMenuViewCount));
+        CommandManager.InvalidateRequerySuggested();
+        _queueSave();
     }
 
     private void CopyDebugReport()

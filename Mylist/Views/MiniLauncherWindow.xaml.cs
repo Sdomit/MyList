@@ -138,7 +138,8 @@ public partial class MiniLauncherWindow : Window
                 break;
 
             default:
-                if (!_viewModel.IsSearching && TryGetDigit(e.Key, out var digit) && digit is >= 1 and <= 6)
+                if (!_viewModel.IsSearching && TryGetDigit(e.Key, out var digit)
+                    && digit >= 1 && digit <= _viewModel.MaxShortcutIndex)
                 {
                     _viewModel.OpenIndexedCommand.Execute(digit.ToString());
                     e.Handled = true;

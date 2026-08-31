@@ -7,6 +7,16 @@ namespace MyList.Tests.Models;
 public class ItemModelTests
 {
     [Fact]
+    public void AppSettings_DefaultsKeepExistingInteractionAndLauncherCapacity()
+    {
+        var settings = new AppSettings();
+
+        Assert.False(settings.OpenItemsOnSingleClick);
+        Assert.Equal(ViewMode.Grid, settings.ViewMode);
+        Assert.Equal(5, settings.MiniLauncherItemLimit);
+    }
+
+    [Fact]
     public void Kind_DefaultsToFile_WhenNoFlagsSetAndTypeFile()
     {
         var item = new ItemModel { Type = ItemType.File };

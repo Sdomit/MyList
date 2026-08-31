@@ -459,6 +459,7 @@ public sealed class StorageService
 
         data.AppSettings ??= new AppSettings();
         data.AppSettings.GlobalHotkey ??= new HotkeySettings();
+        data.AppSettings.HiddenQuickMenuViews ??= new List<string>();
         data.Items ??= new System.Collections.ObjectModel.ObservableCollection<ItemModel>();
         data.Collections ??= new System.Collections.ObjectModel.ObservableCollection<CollectionModel>();
         data.ClipboardImportHistory ??= new System.Collections.ObjectModel.ObservableCollection<ClipboardImportHistoryEntry>();
@@ -478,6 +479,13 @@ public sealed class StorageService
         {
             data.AppSettings.ItemScale = Math.Clamp(data.AppSettings.ItemScale, 0.75, 1.5);
         }
+
+        if (!Enum.IsDefined(typeof(ViewMode), data.AppSettings.ViewMode))
+        {
+            data.AppSettings.ViewMode = ViewMode.Grid;
+        }
+
+        data.AppSettings.MiniLauncherItemLimit = Math.Clamp(data.AppSettings.MiniLauncherItemLimit, 3, 7);
 
         if (!Enum.IsDefined(typeof(UiSkin), data.AppSettings.Skin))
         {

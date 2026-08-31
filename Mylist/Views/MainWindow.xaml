@@ -545,6 +545,65 @@
             </Border>
         </DataTemplate>
 
+        <DataTemplate x:Key="IconItemTemplate">
+            <Grid>
+                <Border x:Name="IconContent"
+                        Width="106"
+                        Margin="5"
+                        Padding="8"
+                        Background="{DynamicResource Token.BgSurfaceBrush}"
+                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource Token.RadiusLg}"
+                        ContextMenu="{StaticResource EntryItemContextMenu}"
+                        ToolTip="{Binding DisplayPath}">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Grid Width="58" Height="58" Margin="0,2,0,7">
+                            <Border Background="{DynamicResource Token.BgSubtleBrush}"
+                                    BorderBrush="{Binding HealthState, Converter={StaticResource HealthStateToBrushConverter}}"
+                                    BorderThickness="1.5"
+                                    CornerRadius="{StaticResource Token.RadiusMd}" />
+                            <Image x:Name="NativeIcon"
+                                   Source="{Binding Icon}"
+                                   Width="38" Height="38"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Stretch="Uniform"
+                                   RenderOptions.BitmapScalingMode="HighQuality" />
+                            <iconPacks:PackIconLucide x:Name="FallbackIcon"
+                                                      Kind="{Binding Item.Kind, Converter={StaticResource KindToLucideKindConverter}}"
+                                                      Width="25" Height="25"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource Token.TextSecondaryBrush}"
+                                                      Visibility="Collapsed" />
+                        </Grid>
+                        <TextBlock Text="{Binding Name}"
+                                   MaxWidth="90"
+                                   TextAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   FontSize="{StaticResource Token.TextXs}"
+                                   FontWeight="{StaticResource Token.WeightMedium}" />
+                    </StackPanel>
+                </Border>
+                <Border x:Name="SeparatorRow"
+                        Visibility="Collapsed"
+                        Padding="0,8">
+                    <Border Height="1" Background="{DynamicResource Token.BorderSubtleBrush}" />
+                </Border>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
+                    <Setter TargetName="NativeIcon" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="FallbackIcon" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                    <Setter TargetName="IconContent" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="SeparatorRow" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
         <Style x:Key="PreviewVisibilityWhenSelected" TargetType="Grid">
             <Setter Property="Visibility" Value="Visible" />
             <Style.Triggers>
@@ -713,33 +772,8 @@
                         MinWidth="28"
                         Padding="0"
                         Command="{Binding ToggleViewModeCommand}"
-                        ToolTip="Toggle list / grid view">
-                    <Grid>
-                        <iconPacks:PackIconLucide Kind="LayoutGrid" Width="14" Height="14">
-                            <iconPacks:PackIconLucide.Style>
-                                <Style TargetType="iconPacks:PackIconLucide">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Settings.ViewMode}" Value="List">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </iconPacks:PackIconLucide.Style>
-                        </iconPacks:PackIconLucide>
-                        <iconPacks:PackIconLucide Kind="List" Width="14" Height="14">
-                            <iconPacks:PackIconLucide.Style>
-                                <Style TargetType="iconPacks:PackIconLucide">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Settings.ViewMode}" Value="Grid">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </iconPacks:PackIconLucide.Style>
-                        </iconPacks:PackIconLucide>
-                    </Grid>
+                        ToolTip="Cycle grid, list, and icon views">
+                    <iconPacks:PackIconLucide Kind="LayoutGrid" Width="14" Height="14" />
                 </Button>
                 <Button Style="{StaticResource Simple.PrimaryButton}"
                         Content="Add"
@@ -1350,6 +1384,7 @@
                                      SelectionChanged="OnItemSelectionChanged"
                                      ItemContainerStyle="{StaticResource Simple.ItemListBoxItem}"
                                      AlternationCount="9999"
+                                     MouseLeftButtonUp="OnItemMouseLeftButtonUp"
                                      MouseDoubleClick="OnItemMouseDoubleClick"
                                      PreviewMouseLeftButtonDown="OnItemPreviewMouseLeftButtonDown"
                                      PreviewMouseMove="OnItemPreviewMouseMove"
@@ -1369,6 +1404,16 @@
                                                                  viewport height is split across rows and a single row of
                                                                  cards stretches to fill the whole list. -->
                                                             <UniformGrid Columns="2" VerticalAlignment="Top" />
+                                                        </ItemsPanelTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Settings.ViewMode}" Value="Icons">
+                                                <Setter Property="ItemTemplate" Value="{StaticResource IconItemTemplate}" />
+                                                <Setter Property="ItemsPanel">
+                                                    <Setter.Value>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel VerticalAlignment="Top" />
                                                         </ItemsPanelTemplate>
                                                     </Setter.Value>
                                                 </Setter>

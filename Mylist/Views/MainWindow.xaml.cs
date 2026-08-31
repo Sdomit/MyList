@@ -999,7 +999,7 @@ public partial class MainWindow : Window
 
     private void OnItemMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (_isDragging || ViewModel is null)
+        if (_isDragging || ViewModel is null || !ViewModel.Settings.OpenItemsOnSingleClick)
         {
             return;
         }
@@ -1031,7 +1031,8 @@ public partial class MainWindow : Window
 
     private void OnItemMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (ViewModel is null)
+        // A single click has already launched the item when this option is on.
+        if (_isDragging || ViewModel is null || ViewModel.Settings.OpenItemsOnSingleClick)
         {
             return;
         }

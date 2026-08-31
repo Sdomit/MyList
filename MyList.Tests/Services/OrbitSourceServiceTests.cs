@@ -31,13 +31,15 @@ public class OrbitSourceServiceTests
         IReadOnlyList<OrbitUserCollection>? collections = null,
         IReadOnlyList<ItemModel>? recent = null,
         IReadOnlyList<ItemModel>? trending = null,
-        IReadOnlyCollection<string>? hidden = null)
+        IReadOnlyCollection<string>? hidden = null,
+        Func<int>? itemLimit = null)
         => new(
             () => items,
             () => collections ?? Array.Empty<OrbitUserCollection>(),
             () => recent ?? Array.Empty<ItemModel>(),
             () => trending ?? Array.Empty<ItemModel>(),
-            () => hidden ?? Array.Empty<string>());
+            () => hidden ?? Array.Empty<string>(),
+            itemLimit);
 
     [Fact]
     public void GetItems_SmartRecent_ReturnsProvidedRecentList()
@@ -112,6 +114,34 @@ public class OrbitSourceServiceTests
         var items = service.GetItems(new OrbitCollection { Id = id.ToString() });
 
         items.Should().HaveCount(5);
+    }
+
+    [Fact]
+    public void GetItems_UserCollection_UsesConfiguredLimit()
+    {
+        var id = Guid.NewGuid();
+        var members = Enumerable.Range(0, 9).Select(i => Item($"m{i}")).ToList();
+        var service = Build(
+            members,
+            new[] { new OrbitUserCollection(id, "Work", members) },
+            itemLimit: () => 7);
+
+        var items = service.GetItems(new OrbitCollection { Id = id.ToString() });
+
+        items.Should().HaveCount(7);
+    }
+
+    [Fact]
+    public void GetItems_ClampsConfiguredLimitToSafeRange()
+    {
+        var id = Guid.NewGuid();
+        var members = Enumerable.Range(0, 9).Select(i => Item($"m{i}")).ToList();
+        var service = Build(
+            members,
+            new[] { new OrbitUserCollection(id, "Work", members) },
+            itemLimit: () => 100);
+
+        service.GetItems(new OrbitCollection { Id = id.ToString() }).Should().HaveCount(7);
     }
 
     [Fact]
