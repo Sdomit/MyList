@@ -1026,6 +1026,7 @@ public partial class MainWindow : Window
         }
 
         ViewModel.OpenItemCommand.Execute(item);
+        listBox.UnselectAll();
         e.Handled = true;
     }
 

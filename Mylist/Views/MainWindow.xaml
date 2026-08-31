@@ -1458,6 +1458,7 @@
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsCollectionPaneVisible}" Value="True" />
                                     <Condition Binding="{Binding HasSelectedItem}" Value="True" />
+                                    <Condition Binding="{Binding Settings.OpenItemsOnSingleClick}" Value="False" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Visibility" Value="Visible" />
                             </MultiDataTrigger>
