@@ -12,7 +12,7 @@
     <Product>MyList</Product>
     <AssemblyTitle>MyList</AssemblyTitle>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <Version>1.6.0</Version>
+    <Version>1.7.0</Version>
     <!-- AssemblyInformationalVersion is auto-composed by the SDK as
          $(Version)+$(SourceRevisionId). SourceRevisionId is stamped from
          git below so it stays accurate for every build, no manual bump. -->

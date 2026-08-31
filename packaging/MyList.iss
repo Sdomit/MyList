@@ -3,7 +3,7 @@
 ; Build:  ISCC.exe packaging\MyList.iss   (run from the repo root)
 
 #define MyAppName "MyList"
-#define MyAppVersion "1.6.0"
+#define MyAppVersion "1.7.0"
 #define MyAppPublisher "Sarmad Domit"
 #define MyAppExeName "MyList.exe"
 
