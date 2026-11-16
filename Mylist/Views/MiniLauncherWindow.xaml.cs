@@ -163,9 +163,11 @@ public partial class MiniLauncherWindow : Window
                 break;
 
             case Key.Delete:
-                // In search, Del edits text unless the caret is at the end of the query.
+                // In search, Del edits text unless the caret sits at the end with no selection.
                 if (!_viewModel.IsSearching
-                    || (_viewModel.SelectedResultIndex >= 0 && SearchBox.CaretIndex == SearchBox.Text.Length))
+                    || (_viewModel.SelectedResultIndex >= 0
+                        && SearchBox.SelectionLength == 0
+                        && SearchBox.CaretIndex == SearchBox.Text.Length))
                 {
                     // The global-delete confirm steals activation; don't auto-hide behind it.
                     _suppressHide = true;
