@@ -220,7 +220,7 @@
 
         <DataTemplate x:Key="ListItemTemplate">
             <Grid>
-                <Border x:Name="ItemContent">
+                <Border x:Name="ItemContent" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28" />
@@ -412,7 +412,7 @@
 
         <DataTemplate x:Key="GridItemTemplate">
           <Grid>
-            <Border x:Name="GridContent"
+            <Border x:Name="GridContent" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
                     Margin="3"
                     Padding="10,9"
                     BorderThickness="1"
@@ -551,7 +551,7 @@
 
         <DataTemplate x:Key="IconItemTemplate">
             <Grid>
-                <Border x:Name="IconContent"
+                <Border x:Name="IconContent" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
                         Width="106"
                         Margin="5"
                         Padding="8"

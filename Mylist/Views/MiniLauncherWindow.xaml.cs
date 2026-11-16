@@ -167,7 +167,18 @@ public partial class MiniLauncherWindow : Window
                 if (!_viewModel.IsSearching
                     || (_viewModel.SelectedResultIndex >= 0 && SearchBox.CaretIndex == SearchBox.Text.Length))
                 {
-                    _viewModel.DeleteSelectedCommand.Execute(null);
+                    // The global-delete confirm steals activation; don't auto-hide behind it.
+                    _suppressHide = true;
+                    try
+                    {
+                        _viewModel.DeleteSelectedCommand.Execute(null);
+                    }
+                    finally
+                    {
+                        _suppressHide = false;
+                    }
+
+                    Activate();
                     e.Handled = true;
                 }
 
