@@ -28,12 +28,14 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" Grid.Row="0">
-                <Border Width="30" Height="30"
+                <Border x:Name="IconChip"
+                        Width="30" Height="30"
                         Margin="0,0,12,0"
                         Background="{DynamicResource Token.StatusDangerBackgroundBrush}"
                         CornerRadius="{DynamicResource Token.RadiusFull}"
                         VerticalAlignment="Center">
-                    <iconPacks:PackIconLucide Kind="Trash2"
+                    <iconPacks:PackIconLucide x:Name="KindIcon"
+                                              Kind="Trash2"
                                               Width="15" Height="15"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
@@ -95,11 +97,12 @@
                         Cursor="Hand"
                         IsDefault="True"
                         Foreground="{DynamicResource Token.AccentForegroundBrush}"
+                        Background="{DynamicResource Token.StatusDangerBrush}"
                         Click="OnConfirm">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border x:Name="Chrome"
-                                    Background="{DynamicResource Token.StatusDangerBrush}"
+                                    Background="{TemplateBinding Background}"
                                     CornerRadius="{DynamicResource Token.RadiusMd}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>

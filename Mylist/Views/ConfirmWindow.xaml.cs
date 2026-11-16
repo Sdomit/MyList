@@ -6,6 +6,8 @@ using System.Windows.Interop;
 
 namespace MyList.Views;
 
+public enum MessageKind { Info, Warning, Error }
+
 public partial class ConfirmWindow : Window
 {
     // Match the quick menu (MiniLauncherWindow) exactly.
@@ -23,14 +25,34 @@ public partial class ConfirmWindow : Window
 
     /// <summary>Themed Yes/No confirm. Returns true when the user confirms.</summary>
     public static bool Show(string title, string message, string confirmLabel = "Delete")
+        => ShowCore(new ConfirmWindow(title, message, confirmLabel));
+
+    /// <summary>Themed OK-only message (replaces MessageBox info/warning/error).</summary>
+    public static void Inform(string title, string message, MessageKind kind = MessageKind.Info)
     {
-        var dialog = new ConfirmWindow(title, message, confirmLabel)
+        var dialog = new ConfirmWindow(title, message, "OK");
+        dialog.CancelButton.Visibility = Visibility.Collapsed;
+        dialog.ConfirmButton.IsCancel = true;
+        var (icon, fg, bg) = kind switch
         {
-            Owner = System.Windows.Application.Current?.Windows
-                .OfType<Window>()
-                .FirstOrDefault(w => w.IsActive && w is not ConfirmWindow)
-                ?? System.Windows.Application.Current?.MainWindow,
+            MessageKind.Error => (MahApps.Metro.IconPacks.PackIconLucideKind.CircleX, "Token.StatusDangerBrush", "Token.StatusDangerBackgroundBrush"),
+            MessageKind.Warning => (MahApps.Metro.IconPacks.PackIconLucideKind.TriangleAlert, "Token.StatusWarningBrush", "Token.StatusWarningBackgroundBrush"),
+            _ => (MahApps.Metro.IconPacks.PackIconLucideKind.Info, "Token.AccentBrush", "Token.AccentSubtleBrush"),
         };
+        dialog.KindIcon.Kind = icon;
+        dialog.KindIcon.SetResourceReference(ForegroundProperty, fg);
+        dialog.IconChip.SetResourceReference(System.Windows.Controls.Border.BackgroundProperty, bg);
+        dialog.ConfirmButton.SetResourceReference(BackgroundProperty, "Token.AccentBrush");
+
+        ShowCore(dialog);
+    }
+
+    private static bool ShowCore(ConfirmWindow dialog)
+    {
+        dialog.Owner = System.Windows.Application.Current?.Windows
+            .OfType<Window>()
+            .FirstOrDefault(w => w.IsActive && w is not ConfirmWindow)
+            ?? System.Windows.Application.Current?.MainWindow;
 
         if (dialog.Owner is null)
         {

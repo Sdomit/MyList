@@ -18,8 +18,7 @@
             Padding="16">
         <StackPanel>
             <TextBlock Text="Transfer Item"
-                       FontSize="20"
-                       FontWeight="SemiBold" />
+                       Style="{StaticResource Dialog.Title}" />
             <TextBlock Margin="0,10,0,0"
                        Foreground="{DynamicResource TextSecondary}"
                        TextWrapping="Wrap"
@@ -27,30 +26,31 @@
 
             <Grid Margin="0,18,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        Content="Copy to Collection"
-                        Style="{StaticResource Simple.PrimaryButton}"
-                        MinWidth="160"
+                <Button IsCancel="True" Grid.Column="0"
+                        Content="Cancel"
+                        Style="{StaticResource Simple.Button}"
+                        MinWidth="96"
                         MinHeight="34"
-                        Margin="0,0,8,0"
-                        Click="OnCopyToCollection" />
-                <Button Grid.Column="1"
+                        Click="OnCancel" />
+                <Button Grid.Column="2"
                         Content="Move to Collection"
                         Style="{StaticResource Simple.Button}"
                         MinWidth="160"
                         MinHeight="34"
                         Margin="0,0,8,0"
                         Click="OnMoveToCollection" />
-                <Button Grid.Column="2"
-                        Content="Cancel"
-                        Style="{StaticResource Simple.Button}"
-                        MinWidth="96"
+                <Button IsDefault="True" Grid.Column="3"
+                        Content="Copy to Collection"
+                        Style="{StaticResource Simple.PrimaryButton}"
+                        MinWidth="160"
                         MinHeight="34"
-                        Click="OnCancel" />
+                        Margin="0"
+                        Click="OnCopyToCollection" />
             </Grid>
         </StackPanel>
     </Border>

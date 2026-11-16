@@ -77,17 +77,18 @@
             <Setter Property="Margin" Value="12,0,12,4" />
         </Style>
 
-        <!-- Right-click menu for grid/list rows (DataContext = CollectionEntryViewModel, item at .Item). -->
+        <!-- Right-click menu for List/Grid/Icon item rows (DataContext = CollectionEntryViewModel, item at .Item). -->
         <ContextMenu x:Key="EntryItemContextMenu" x:Shared="False">
             <MenuItem Header="Open"
                       Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
                       CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-            <MenuItem Header="Edit"
-                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditItemCommand}"
+            <MenuItem Header="Open in new window"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenNewWindowCommand}"
                       CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-            <MenuItem Header="Rename"
-                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.QuickEditItemCommand}"
+            <MenuItem Header="Open in Terminal here"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenInTerminalCommand}"
                       CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <Separator />
             <MenuItem Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.TogglePinCommand}"
                       CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                 <MenuItem.Style>
@@ -101,11 +102,44 @@
                     </Style>
                 </MenuItem.Style>
             </MenuItem>
+            <Separator />
             <MenuItem Header="Copy"
                       Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.CopyPathCommand}"
                       CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Retry health check"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RetryHealthCheckCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Edit…"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Rename"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.QuickEditItemCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Edit Mtab…"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditMtabCommand}"
+                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                <MenuItem.Style>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Item.IsMtab, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+            </MenuItem>
             <Separator />
-            <MenuItem Header="Delete"
+            <MenuItem Header="Remove from Collection"
+                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RemoveItemFromCurrentCollectionCommand}">
+                <MenuItem.CommandParameter>
+                    <MultiBinding Converter="{StaticResource ItemCollectionActionContextConverter}">
+                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.DataContext.Item" />
+                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.Tag" />
+                    </MultiBinding>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+            <MenuItem Header="Delete globally…"
                       Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.DeleteItemGloballyCommand}"
                       CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
         </ContextMenu>
@@ -149,13 +183,15 @@
                       Command="{Binding PlacementTarget.DataContext.AddFileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
             <MenuItem Header="Add folder…"
                       Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-            <MenuItem Header="New Mtab"
+            <MenuItem Header="New Mtab…"
                       Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-            <MenuItem Header="New action / script"
+            <MenuItem Header="New action / script…"
                       Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
             <Separator />
             <MenuItem Header="Add from clipboard…"
                       Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Add separator"
+                      Command="{Binding PlacementTarget.DataContext.AddSeparatorCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
         </ContextMenu>
 
         <DataTemplate x:Key="CollectionTemplate">
@@ -184,7 +220,7 @@
 
         <DataTemplate x:Key="ListItemTemplate">
             <Grid>
-                <Border x:Name="ItemContent">
+                <Border x:Name="ItemContent" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28" />
@@ -269,12 +305,13 @@
                                     VerticalAlignment="Center">
                             <TextBlock Text="{Binding Name}"
                                        Foreground="{DynamicResource Token.TextPrimaryBrush}"
-                                       FontSize="13"
-                                       FontWeight="Medium"
+                                       FontSize="{StaticResource Token.TextSm}"
+                                       FontWeight="{StaticResource Token.WeightMedium}"
                                        TextTrimming="CharacterEllipsis" />
                             <TextBlock Margin="0,2,0,0"
                                        Style="{StaticResource Simple.MonoText}"
                                        Text="{Binding DisplayPath}"
+                                       ToolTip="{Binding DisplayPath}"
                                        TextTrimming="CharacterEllipsis" />
                         </StackPanel>
 
@@ -354,68 +391,7 @@
                         </ContentControl>
                     </Grid>
                     <Border.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Open"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenItemCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Open in new window"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenNewWindowCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Open in Terminal here"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.OpenInTerminalCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <Separator />
-                            <MenuItem Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.TogglePinCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                <MenuItem.Style>
-                                    <Style TargetType="MenuItem">
-                                        <Setter Property="Header" Value="Pin to Constellation" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Item.IsPinned, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
-                                                <Setter Property="Header" Value="Unpin from Constellation" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                            </MenuItem>
-                            <Separator />
-                            <MenuItem Header="Copy"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.CopyPathCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Retry health check"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RetryHealthCheckCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Edit"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditItemCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Edit Mtab..."
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.EditMtabCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                <MenuItem.Style>
-                                    <Style TargetType="MenuItem">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Item.IsMtab, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                            </MenuItem>
-                            <Separator />
-                            <MenuItem Header="Remove from Collection"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.RemoveItemFromCurrentCollectionCommand}">
-                                <MenuItem.CommandParameter>
-                                    <MultiBinding Converter="{StaticResource ItemCollectionActionContextConverter}">
-                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.DataContext.Item" />
-                                        <Binding RelativeSource="{RelativeSource AncestorType=ContextMenu}" Path="PlacementTarget.Tag" />
-                                    </MultiBinding>
-                                </MenuItem.CommandParameter>
-                            </MenuItem>
-                            <MenuItem Header="Delete Globally"
-                                      Command="{Binding Source={x:Reference RootWindow}, Path=DataContext.DeleteItemGloballyCommand}"
-                                      CommandParameter="{Binding PlacementTarget.DataContext.Item, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                        </ContextMenu>
+                        <StaticResource ResourceKey="EntryItemContextMenu" />
                     </Border.ContextMenu>
                 </Border>
 
@@ -435,13 +411,29 @@
         </DataTemplate>
 
         <DataTemplate x:Key="GridItemTemplate">
-            <Border Margin="3"
+          <Grid>
+            <Border x:Name="GridContent" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                    Margin="3"
                     Padding="10,9"
-                    Background="{DynamicResource Token.BgSurfaceBrush}"
-                    BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                     BorderThickness="1"
                     CornerRadius="{StaticResource Token.RadiusLg}"
                     ContextMenu="{StaticResource EntryItemContextMenu}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderDefaultBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="26" />
@@ -543,20 +535,46 @@
                     </StackPanel>
                 </Grid>
             </Border>
+            <Border x:Name="SeparatorRow"
+                    Visibility="Collapsed"
+                    Padding="0,8">
+                <Border Height="1" Background="{DynamicResource Token.BorderSubtleBrush}" />
+            </Border>
+          </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+                    <Setter TargetName="GridContent" Property="Visibility" Value="Collapsed" />
+                    <Setter TargetName="SeparatorRow" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
 
         <DataTemplate x:Key="IconItemTemplate">
             <Grid>
-                <Border x:Name="IconContent"
+                <Border x:Name="IconContent" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ListBox}}"
                         Width="106"
                         Margin="5"
                         Padding="8"
-                        Background="{DynamicResource Token.BgSurfaceBrush}"
-                        BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                         BorderThickness="1"
                         CornerRadius="{StaticResource Token.RadiusLg}"
                         ContextMenu="{StaticResource EntryItemContextMenu}"
                         ToolTip="{Binding DisplayPath}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource Token.BgSurfaceBrush}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderSubtleBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Token.BgHoverBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.BorderDefaultBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
                     <StackPanel HorizontalAlignment="Center">
                         <Grid Width="58" Height="58" Margin="0,2,0,7">
                             <Border Background="{DynamicResource Token.BgSubtleBrush}"
@@ -743,12 +761,13 @@
                             </Border.Style>
                             <TextBlock Style="{StaticResource Simple.MonoText}" Text="Ctrl+K" FontSize="10" />
                         </Border>
-                        <Button Width="22"
-                                Height="22"
-                                MinWidth="22"
+                        <Button Width="24"
+                                Height="24"
+                                MinWidth="24"
                                 Padding="0"
                                 Click="OnSearchClearClick"
-                                ToolTip="Clear search">
+                                ToolTip="Clear search"
+                                AutomationProperties.Name="Clear search">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource Simple.IconButton}">
                                     <Style.Triggers>
@@ -772,7 +791,8 @@
                         MinWidth="28"
                         Padding="0"
                         Command="{Binding ToggleViewModeCommand}"
-                        ToolTip="Cycle grid, list, and icon views">
+                        ToolTip="Cycle grid, list, and icon views"
+                        AutomationProperties.Name="Change view">
                     <iconPacks:PackIconLucide Kind="LayoutGrid" Width="14" Height="14" />
                 </Button>
                 <Button Style="{StaticResource Simple.PrimaryButton}"
@@ -780,13 +800,7 @@
                         Margin="0,0,4,0"
                         Click="OnMoreActionsClick">
                     <Button.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="File..." Command="{Binding PlacementTarget.DataContext.AddFileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Folder..." Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Mtab" Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Action / script" Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            <MenuItem Header="Clipboard" Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                        </ContextMenu>
+                        <StaticResource ResourceKey="AddItemContextMenu" />
                     </Button.ContextMenu>
                 </Button>
             </StackPanel>
@@ -837,22 +851,24 @@
                         <Grid Margin="10,4,6,3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Style="{StaticResource Simple.SectionLabel}"
                                        Text="COLLECTIONS"
                                        VerticalAlignment="Center" />
                             <Button Grid.Column="1"
-                                    Width="18"
-                                    Height="18"
-                                    MinWidth="18"
+                                    Width="{StaticResource Token.Size.IconButton}"
+                                    Height="{StaticResource Token.Size.IconButton}"
+                                    MinWidth="0"
                                     Padding="0"
-                                    Style="{StaticResource Simple.GhostButton}"
+                                    Style="{StaticResource Simple.IconButton}"
+                                    ToolTip="New collection"
+                                    AutomationProperties.Name="New collection"
                                     Command="{Binding AddCollectionCommand}">
                                 <iconPacks:PackIconLucide Kind="Plus"
-                                                          Width="10"
-                                                          Height="10"
-                                                          Foreground="{DynamicResource Token.TextTertiaryBrush}" />
+                                                          Width="14"
+                                                          Height="14"
+                                                          Foreground="{DynamicResource Token.TextSecondaryBrush}" />
                             </Button>
                         </Grid>
 
@@ -1104,7 +1120,8 @@
                         <Button Grid.Column="2"
                                 Style="{StaticResource Simple.IconButton}"
                                 Command="{Binding ToggleSettingsCommand}"
-                                ToolTip="Settings">
+                                ToolTip="Settings"
+                                AutomationProperties.Name="Settings">
                             <iconPacks:PackIconLucide Kind="Settings"
                                                       Width="13"
                                                       Height="13"
@@ -1205,14 +1222,7 @@
                                 </ControlTemplate>
                             </Button.Template>
                             <Button.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Add file..." Command="{Binding PlacementTarget.DataContext.AddFileCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                    <MenuItem Header="Add folder..." Command="{Binding PlacementTarget.DataContext.AddFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                    <MenuItem Header="New Mtab" Command="{Binding PlacementTarget.DataContext.NewMtabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                    <MenuItem Header="New action / script" Command="{Binding PlacementTarget.DataContext.NewActionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                    <MenuItem Header="Add from clipboard" Command="{Binding PlacementTarget.DataContext.OpenClipboardReviewPaneCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                    <MenuItem Header="Add separator" Command="{Binding PlacementTarget.DataContext.AddSeparatorCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                                </ContextMenu>
+                                <StaticResource ResourceKey="AddItemContextMenu" />
                             </Button.ContextMenu>
                             <Grid Margin="10,0">
                                 <Grid.ColumnDefinitions>
@@ -1289,7 +1299,8 @@
                                             Margin="4,0,0,0"
                                             Style="{StaticResource Simple.IconButton}"
                                             Command="{Binding CancelInlineAddCommand}"
-                                            ToolTip="Cancel">
+                                            ToolTip="Cancel"
+                                            AutomationProperties.Name="Cancel add">
                                         <iconPacks:PackIconLucide Kind="X" Width="13" Height="13" />
                                     </Button>
                                 </Grid>
@@ -1344,11 +1355,71 @@
                                     <ColumnDefinition Width="2*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox Text="{Binding QuickEditName}" Margin="0,0,6,0" />
-                                <TextBox Grid.Column="1" Text="{Binding QuickEditPath}" Margin="0,0,6,0" />
-                                <TextBox Grid.Column="2" Text="{Binding QuickEditTags}" Margin="0,0,6,0" />
+                                <Grid Margin="0,0,6,0">
+                                    <TextBox x:Name="QuickEditNameBox" Text="{Binding QuickEditName}" AutomationProperties.Name="Name" />
+                                    <TextBlock Margin="9,0,9,0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                               FontSize="{StaticResource Token.TextSm}"
+                                               Text="Name"
+                                               TextTrimming="CharacterEllipsis"
+                                               IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=QuickEditNameBox}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                <Grid Grid.Column="1" Margin="0,0,6,0">
+                                    <TextBox x:Name="QuickEditPathBox" Text="{Binding QuickEditPath}" AutomationProperties.Name="Path" />
+                                    <TextBlock Margin="9,0,9,0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                               FontSize="{StaticResource Token.TextSm}"
+                                               Text="Path"
+                                               TextTrimming="CharacterEllipsis"
+                                               IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=QuickEditPathBox}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                                <Grid Grid.Column="2" Margin="0,0,6,0">
+                                    <TextBox x:Name="QuickEditTagsBox" Text="{Binding QuickEditTags}" AutomationProperties.Name="Tags (comma-separated)" />
+                                    <TextBlock Margin="9,0,9,0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                               FontSize="{StaticResource Token.TextSm}"
+                                               Text="Tags (comma-separated)"
+                                               TextTrimming="CharacterEllipsis"
+                                               IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=QuickEditTagsBox}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
                                 <StackPanel Grid.Column="3" Orientation="Horizontal">
-                                    <Button Content="Cancel" Style="{StaticResource Simple.GhostButton}" Command="{Binding CancelQuickEditCommand}" />
+                                    <Button Content="Cancel" Style="{StaticResource Simple.Button}" Command="{Binding CancelQuickEditCommand}" />
                                     <Button Content="Save" Margin="4,0,0,0" Style="{StaticResource Simple.PrimaryButton}" Command="{Binding SaveQuickEditCommand}" />
                                 </StackPanel>
                             </Grid>
@@ -1427,19 +1498,66 @@
                                         VerticalAlignment="Center"
                                         MaxWidth="300"
                                         Visibility="{Binding SelectedCollection.FilteredEntries.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <TextBlock Text="Nothing here yet"
-                                           FontSize="{DynamicResource Token.TextBase}"
+                                <TextBlock FontSize="{DynamicResource Token.TextBase}"
                                            FontWeight="Medium"
-                                           TextAlignment="Center" />
-                                <TextBlock Margin="0,5,0,14"
-                                           Style="{StaticResource Simple.MetaText}"
-                                           Text="Drop a file, paste a path, or use the add row above."
                                            TextAlignment="Center"
-                                           TextWrapping="Wrap" />
-                                <Button Content="Add folder"
-                                        Width="110"
-                                        Style="{StaticResource Simple.PrimaryButton}"
-                                        Command="{Binding AddFolderCommand}" />
+                                           TextWrapping="Wrap">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                            <Setter Property="Text" Value="{Binding SearchText, StringFormat='No matches for &quot;{0}&quot;'}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SearchText}" Value="">
+                                                    <Setter Property="Text" Value="Nothing here yet" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Margin="0,5,0,14"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource Simple.MetaText}">
+                                            <Setter Property="Text" Value="Try a different search or clear it." />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SearchText}" Value="">
+                                                    <Setter Property="Text" Value="Drop a file, paste a path, or use the add row above." />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <Button Content="Clear search"
+                                        MinWidth="110"
+                                        HorizontalAlignment="Center"
+                                        Click="OnSearchClearClick">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SearchText}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button Content="Add item…"
+                                        MinWidth="110"
+                                        HorizontalAlignment="Center"
+                                        Click="OnMoreActionsClick"
+                                        ContextMenu="{StaticResource AddItemContextMenu}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SearchText}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -1480,6 +1598,8 @@
                                     <TextBlock Style="{StaticResource Simple.SectionLabel}" Text="{Binding SelectedItem.Type}" />
                                     <Button HorizontalAlignment="Right"
                                             Style="{StaticResource Simple.IconButton}"
+                                            ToolTip="Close preview"
+                                            AutomationProperties.Name="Close preview"
                                             Click="OnClearSelectionClick">
                                         <iconPacks:PackIconLucide Kind="X"
                                                                   Width="11"
@@ -1522,7 +1642,8 @@
                                             Style="{StaticResource Simple.IconButton}"
                                             Command="{Binding CopyPathCommand}"
                                             CommandParameter="{Binding SelectedItem}"
-                                            ToolTip="Copy">
+                                            ToolTip="Copy path"
+                                            AutomationProperties.Name="Copy path">
                                         <iconPacks:PackIconLucide Kind="Copy"
                                                                   Width="12"
                                                                   Height="12"

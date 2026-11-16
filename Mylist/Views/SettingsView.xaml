@@ -241,58 +241,58 @@
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="How MyList runs on this machine." />
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Launch on startup" />
+                                    <TextBlock x:Name="StartWithWindowsLabel" Style="{StaticResource SettingsRowName}" Text="Launch on startup" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Open MyList minimized to the tray when you sign in." />
                                 </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" IsChecked="{Binding StartWithWindows}" />
+                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=StartWithWindowsLabel}" IsChecked="{Binding StartWithWindows}" />
                             </Grid>
                         </Border>
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Run in system tray" />
+                                    <TextBlock x:Name="MinimizeToTrayLabel" Style="{StaticResource SettingsRowName}" Text="Run in system tray" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Keep MyList resident when the window is minimized." />
                                 </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" IsChecked="{Binding MinimizeToTray}" />
+                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=MinimizeToTrayLabel}" IsChecked="{Binding MinimizeToTray}" />
                             </Grid>
                         </Border>
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Always on top" />
+                                    <TextBlock x:Name="AlwaysOnTopLabel" Style="{StaticResource SettingsRowName}" Text="Always on top" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Keep the main window above other applications." />
                                 </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" IsChecked="{Binding AlwaysOnTop}" />
+                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=AlwaysOnTopLabel}" IsChecked="{Binding AlwaysOnTop}" />
                             </Grid>
                         </Border>
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Auto-hide to edge" />
+                                    <TextBlock x:Name="AutoHideLabel" Style="{StaticResource SettingsRowName}" Text="Auto-hide to edge" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Hide docked MyList when the pointer leaves its edge." />
                                 </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" IsChecked="{Binding AutoHide}" />
+                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=AutoHideLabel}" IsChecked="{Binding AutoHide}" />
                             </Grid>
                         </Border>
 
@@ -325,31 +325,31 @@
                         <TextBlock Style="{StaticResource SettingsSectionSub}" Text="Theme, density, and visual scale." />
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Follow system theme" />
+                                    <TextBlock x:Name="FollowSystemThemeLabel" Style="{StaticResource SettingsRowName}" Text="Follow system theme" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Use the current Windows light or dark appearance." />
                                 </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" IsChecked="{Binding FollowSystemTheme}" />
+                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=FollowSystemThemeLabel}" IsChecked="{Binding FollowSystemTheme}" />
                             </Grid>
                         </Border>
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Dark mode" />
+                                    <TextBlock x:Name="IsDarkModeLabel" Style="{StaticResource SettingsRowName}" Text="Dark mode" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="Use MyList's dark semantic token set." />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1"
-                                          Style="{StaticResource SettingsToggle}"
+                                          Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=IsDarkModeLabel}"
                                           IsChecked="{Binding IsDarkMode}"
                                           IsEnabled="{Binding FollowSystemTheme, Converter={StaticResource InverseBooleanConverter}}" />
                             </Grid>
@@ -523,17 +523,17 @@
                         </Border>
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Open items with one click" />
+                                    <TextBlock x:Name="OpenItemsOnSingleClickLabel" Style="{StaticResource SettingsRowName}" Text="Open items with one click" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="When off, selecting is separate from opening and items open with a double-click." />
                                 </StackPanel>
                                 <CheckBox Grid.Column="1"
-                                          Style="{StaticResource SettingsToggle}"
+                                          Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=OpenItemsOnSingleClickLabel}"
                                           IsChecked="{Binding OpenItemsOnSingleClick}" />
                             </Grid>
                         </Border>
@@ -756,16 +756,16 @@
                         </Border>
 
                         <Border Style="{StaticResource SettingsRow}">
-                            <Grid>
+                            <Grid Background="Transparent" Cursor="Hand" MouseLeftButtonUp="OnToggleRowMouseLeftButtonUp">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Style="{StaticResource SettingsRowName}" Text="Verbose Mtab diagnostics" />
+                                    <TextBlock x:Name="EnableDebugModeLabel" Style="{StaticResource SettingsRowName}" Text="Verbose Mtab diagnostics" />
                                     <TextBlock Style="{StaticResource SettingsRowDesc}" Text="{Binding DebugModeStatusText}" />
                                 </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" IsChecked="{Binding EnableDebugMode}" />
+                                <CheckBox Grid.Column="1" Style="{StaticResource SettingsToggle}" AutomationProperties.LabeledBy="{Binding ElementName=EnableDebugModeLabel}" IsChecked="{Binding EnableDebugMode}" />
                             </Grid>
                         </Border>
 

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using MyList.ViewModels;
 using Key = System.Windows.Input.Key;
@@ -49,10 +50,30 @@ public partial class MiniLauncherWindow : Window
         }
 
         PositionAtCursor();
+        PlayScaleIn();
         Activate();
         Focus();
         SearchBox.SelectAll();
         SearchBox.Focus();
+    }
+
+    // Runs on every Summon (a Loaded trigger only fires on the first Show);
+    // skipped when the OS has client-area animation turned off.
+    private void PlayScaleIn()
+    {
+        if (!SystemParameters.ClientAreaAnimation)
+        {
+            ShellScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, null);
+            ShellScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, null);
+            return;
+        }
+
+        var anim = new DoubleAnimation(0.9, 1, TimeSpan.FromMilliseconds(220))
+        {
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+        };
+        ShellScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, anim);
+        ShellScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, anim);
     }
 
     // Spring up centred on the mouse, clamped to the cursor's monitor work area.
@@ -78,7 +99,19 @@ public partial class MiniLauncherWindow : Window
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        // Modifier combos are reserved (none used today); let them pass through.
+        // Ctrl+digit opens the numbered search result (plain digits type into search).
+        if (Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            if (_viewModel.IsSearching && TryGetDigit(e.Key, out var ctrlDigit)
+                && ctrlDigit >= 1 && ctrlDigit <= _viewModel.MaxShortcutIndex)
+            {
+                _viewModel.OpenIndexedCommand.Execute(ctrlDigit.ToString());
+                e.Handled = true;
+            }
+
+            return;
+        }
+
         if (Keyboard.Modifiers is not ModifierKeys.None)
         {
             return;
@@ -114,6 +147,40 @@ public partial class MiniLauncherWindow : Window
                 if (!_viewModel.IsSearching && _viewModel.IsInCollection)
                 {
                     _viewModel.DrillUpCommand.Execute(null);
+                    e.Handled = true;
+                }
+
+                break;
+
+            case Key.Up:
+            case Key.Down:
+                if (_viewModel.IsSearching)
+                {
+                    _viewModel.MoveResultSelection(e.Key == Key.Down ? 1 : -1);
+                    e.Handled = true;
+                }
+
+                break;
+
+            case Key.Delete:
+                // In search, Del edits text unless the caret sits at the end with no selection.
+                if (!_viewModel.IsSearching
+                    || (_viewModel.SelectedResultIndex >= 0
+                        && SearchBox.SelectionLength == 0
+                        && SearchBox.CaretIndex == SearchBox.Text.Length))
+                {
+                    // The global-delete confirm steals activation; don't auto-hide behind it.
+                    _suppressHide = true;
+                    try
+                    {
+                        _viewModel.DeleteSelectedCommand.Execute(null);
+                    }
+                    finally
+                    {
+                        _suppressHide = false;
+                    }
+
+                    Activate();
                     e.Handled = true;
                 }
 

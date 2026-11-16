@@ -272,10 +272,10 @@
                                    VerticalAlignment="Center"
                                    TextTrimming="CharacterEllipsis"
                                    Margin="0,0,12,0" />
-                        <Button Grid.Column="1"
+                        <Button IsCancel="True" Grid.Column="1"
                                 MinWidth="90"
                                 Content="Close"
-                                Style="{StaticResource Simple.GhostButton}"
+                                Style="{StaticResource Simple.Button}"
                                 Click="OnClose" />
                     </Grid>
                 </Border>

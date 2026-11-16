@@ -130,7 +130,7 @@ public sealed class OrbitSlotViewModel : ObservableObject
     {
         Collection = collection,
         Name = collection.Name,
-        Label = Truncate(collection.Name),
+        Label = collection.Name,
         IconKind = PackIconLucideKind.Folder,
         HealthState = ItemHealthState.Healthy,
     };
@@ -139,7 +139,7 @@ public sealed class OrbitSlotViewModel : ObservableObject
     {
         Item = item,
         Name = item.Name,
-        Label = Truncate(item.Name),
+        Label = item.Name,
         IconKind = IconForKind(item.Kind),
         Icon = item.Icon,
         HealthState = item.HealthState,
@@ -153,9 +153,6 @@ public sealed class OrbitSlotViewModel : ObservableObject
         IconKind = PackIconLucideKind.LayoutGrid,
         HealthState = ItemHealthState.Healthy,
     };
-
-    private static string Truncate(string value) =>
-        value.Length > 11 ? value[..10] + "…" : value;
 
     private static PackIconLucideKind IconForKind(ContentKind kind) => kind switch
     {

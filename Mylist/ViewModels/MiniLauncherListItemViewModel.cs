@@ -8,6 +8,7 @@ namespace MyList.ViewModels;
 public sealed class MiniLauncherListItemViewModel : ViewModelBase
 {
     private int _index;
+    private bool _isSelected;
 
     public MiniLauncherListItemViewModel(ItemModel item, int index, ICommand activateCommand, ICommand deleteCommand)
     {
@@ -35,6 +36,14 @@ public sealed class MiniLauncherListItemViewModel : ViewModelBase
     public bool HasIndex => _index >= 1 && _index <= 9;
 
     public string IndexLabel => HasIndex ? $"Ctrl+{_index}" : string.Empty;
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
+    }
+
+    public string DeleteLabel => "Delete";
 
     public string Name => Item.Name;
 

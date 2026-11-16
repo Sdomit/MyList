@@ -17,7 +17,6 @@ using MyList.Services;
 using MyList.Views;
 using Application = System.Windows.Application;
 using Clipboard = System.Windows.Clipboard;
-using MessageBox = System.Windows.MessageBox;
 
 namespace MyList.ViewModels;
 
@@ -773,13 +772,7 @@ public sealed class MainViewModel : ViewModelBase
             }
 
             var collectionName = sourceCollection?.Name ?? "this collection";
-            var result = MessageBox.Show(
-                $"Delete this separator from '{collectionName}'?",
-                "Delete Separator",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (result != MessageBoxResult.Yes)
+            if (!ConfirmWindow.Show("Delete Separator", $"Delete this separator from '{collectionName}'?", "Delete"))
             {
                 return;
             }
@@ -1472,7 +1465,7 @@ public sealed class MainViewModel : ViewModelBase
                 }
 
                 ShowClipboardFeedback("Image Failed");
-                MessageBox.Show("Clipboard image could not be saved.", "Clipboard Image", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ConfirmWindow.Inform("Clipboard Image", "Clipboard image could not be saved.", MessageKind.Warning);
                 return;
             }
 
@@ -1488,7 +1481,7 @@ public sealed class MainViewModel : ViewModelBase
             if (entries.Count == 0)
             {
                 ShowClipboardFeedback("No Valid Path");
-                MessageBox.Show("Clipboard does not contain importable paths.", "Clipboard Review", MessageBoxButton.OK, MessageBoxImage.Information);
+                ConfirmWindow.Inform("Clipboard Review", "Clipboard does not contain importable paths.", MessageKind.Info);
                 return;
             }
 
@@ -1530,20 +1523,12 @@ public sealed class MainViewModel : ViewModelBase
                 ShowClipboardFeedback("No New Item");
             }
 
-            MessageBox.Show(
-                $"Added new: {summary.addedNew}\nLinked existing: {summary.linkedExisting}\nSkipped invalid: {summary.skippedInvalid}\nSkipped duplicate/already linked: {summary.skippedDuplicate}",
-                "Clipboard Review",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            ConfirmWindow.Inform("Clipboard Review", $"Added new: {summary.addedNew}\nLinked existing: {summary.linkedExisting}\nSkipped invalid: {summary.skippedInvalid}\nSkipped duplicate/already linked: {summary.skippedDuplicate}", MessageKind.Info);
         }
         catch (Exception ex)
         {
             LogService.Instance.Log(ex, "Clipboard import flow failed.");
-            MessageBox.Show(
-                "Clipboard import failed. Please copy paths again and retry.",
-                "Clipboard Review",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            ConfirmWindow.Inform("Clipboard Review", "Clipboard import failed. Please copy paths again and retry.", MessageKind.Error);
         }
     }
 
@@ -1559,11 +1544,7 @@ public sealed class MainViewModel : ViewModelBase
         {
             StatusText = "Explorer add: no valid folder paths were found.";
             LogService.Instance.Log($"Explorer add-to-mtab skipped. Valid: 0, invalid: {invalidCount}, duplicate payload: {duplicatePayloadCount}.");
-            MessageBox.Show(
-                "No valid folders were received from Explorer.",
-                "Add to MyList Mtab",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            ConfirmWindow.Inform("Add to MyList Mtab", "No valid folders were received from Explorer.", MessageKind.Info);
             return;
         }
 
@@ -1590,7 +1571,7 @@ public sealed class MainViewModel : ViewModelBase
 
             if (!CreateMtabFromPaths(createDialog.MtabName, createDialog.ValidPaths, ResolveTargetCollection(), out var createStatus))
             {
-                MessageBox.Show(createStatus, "Add to MyList Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ConfirmWindow.Inform("Add to MyList Mtab", createStatus, MessageKind.Warning);
                 StatusText = createStatus;
                 return;
             }
@@ -1859,7 +1840,7 @@ public sealed class MainViewModel : ViewModelBase
             var firstPath = GetMtabFolderPaths(item).FirstOrDefault();
             if (string.IsNullOrWhiteSpace(firstPath))
             {
-                MessageBox.Show("Mtab has no valid folder paths.", "Open in Terminal", MessageBoxButton.OK, MessageBoxImage.Information);
+                ConfirmWindow.Inform("Open in Terminal", "Mtab has no valid folder paths.", MessageKind.Info);
                 return;
             }
 
@@ -1979,11 +1960,7 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         StatusText = $"Failed to run action item: {item.Name}";
-        MessageBox.Show(
-            string.IsNullOrWhiteSpace(error) ? "The action item could not be executed." : error,
-            "Action Item",
-            MessageBoxButton.OK,
-            MessageBoxImage.Error);
+        ConfirmWindow.Inform("Action Item", string.IsNullOrWhiteSpace(error) ? "The action item could not be executed." : error, MessageKind.Error);
         return false;
     }
 
@@ -2386,7 +2363,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (!CreateMtabFromPaths(editor.MtabName, editor.ValidPaths, ResolveTargetCollection(), out var status))
         {
-            MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Mtab", status, MessageKind.Warning);
             return;
         }
 
@@ -2398,11 +2375,7 @@ public sealed class MainViewModel : ViewModelBase
         var capturedPaths = _explorerTabAutomationService.CaptureOpenFolderPaths();
         if (capturedPaths.Count < 2)
         {
-            MessageBox.Show(
-                "Open at least two Explorer folders before capturing them as an Mtab.",
-                "Capture Explorer Windows",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            ConfirmWindow.Inform("Capture Explorer Windows", "Open at least two Explorer folders before capturing them as an Mtab.", MessageKind.Info);
             return;
         }
 
@@ -2421,7 +2394,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (!CreateMtabFromPaths(editor.MtabName, editor.ValidPaths, ResolveTargetCollection(), out var status))
         {
-            MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Mtab", status, MessageKind.Warning);
             return;
         }
 
@@ -2444,7 +2417,7 @@ public sealed class MainViewModel : ViewModelBase
         {
             if (!AddSeparatorToCollection(ResolveTargetCollection(), out var separatorStatus))
             {
-                MessageBox.Show(separatorStatus, "Separator", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ConfirmWindow.Inform("Separator", separatorStatus, MessageKind.Warning);
                 return;
             }
 
@@ -2454,7 +2427,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (!CreateActionItem(dialog.ViewModel, ResolveTargetCollection(), out var status))
         {
-            MessageBox.Show(status, "Action Item", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Action Item", status, MessageKind.Warning);
             return;
         }
 
@@ -2465,7 +2438,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         if (!AddSeparatorToCollection(ResolveTargetCollection(), out var status))
         {
-            MessageBox.Show(status, "Add Separator", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Add Separator", status, MessageKind.Warning);
             return;
         }
 
@@ -2550,7 +2523,7 @@ public sealed class MainViewModel : ViewModelBase
 
             if (!CreateMtabFromPaths(editor.MtabName, editor.ValidPaths, ResolveTargetCollection(), out var status))
             {
-                MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ConfirmWindow.Inform("Mtab", status, MessageKind.Warning);
                 return true;
             }
 
@@ -2567,7 +2540,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (!CreateCollectionWithItems(collectionName, new[] { targetItem, sourceItem }, out var collectionStatus))
         {
-            MessageBox.Show(collectionStatus, "Create Collection", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Create Collection", collectionStatus, MessageKind.Warning);
             return true;
         }
 
@@ -2626,7 +2599,7 @@ public sealed class MainViewModel : ViewModelBase
 
             if (!CreateMtabFromPaths(editor.MtabName, editor.ValidPaths, ResolveTargetCollection(), out var status))
             {
-                MessageBox.Show(status, "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ConfirmWindow.Inform("Mtab", status, MessageKind.Warning);
                 return true;
             }
 
@@ -2649,7 +2622,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (!CreateCollectionWithPaths(collectionName, candidatePaths, out var collectionStatus))
         {
-            MessageBox.Show(collectionStatus, "Create Collection", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Create Collection", collectionStatus, MessageKind.Warning);
             return true;
         }
 
@@ -3090,7 +3063,7 @@ public sealed class MainViewModel : ViewModelBase
         var folderPaths = GetMtabFolderPaths(mtab);
         if (folderPaths.Count == 0)
         {
-            MessageBox.Show("This Mtab has no valid folder members.", "Mtab", MessageBoxButton.OK, MessageBoxImage.Information);
+            ConfirmWindow.Inform("Mtab", "This Mtab has no valid folder members.", MessageKind.Info);
             return null;
         }
 
@@ -4913,7 +4886,7 @@ public sealed class MainViewModel : ViewModelBase
             var message = string.IsNullOrWhiteSpace(_storageService.LastImportError)
                 ? "Import failed."
                 : _storageService.LastImportError;
-            MessageBox.Show(message, "Import", MessageBoxButton.OK, MessageBoxImage.Error);
+            ConfirmWindow.Inform("Import", message, MessageKind.Error);
             return;
         }
 
@@ -4926,7 +4899,7 @@ public sealed class MainViewModel : ViewModelBase
         var restored = await _storageService.RestoreLatestBackupAsync();
         if (restored is null)
         {
-            MessageBox.Show("No backups found.", "Restore", MessageBoxButton.OK, MessageBoxImage.Information);
+            ConfirmWindow.Inform("Restore", "No backups found.", MessageKind.Info);
             return;
         }
 

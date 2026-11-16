@@ -113,6 +113,15 @@
             </Border>
 
             <Grid Grid.Row="1" Margin="16">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DuplicateManager.Groups.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="240" MaxWidth="285" />
                     <ColumnDefinition Width="14" />
@@ -185,17 +194,43 @@
                                 <ComboBox Grid.Column="1"
                                           ItemsSource="{Binding DuplicateManager.SelectedGroup.Items}"
                                           SelectedItem="{Binding DuplicateManager.SelectedGroup.SelectedSurvivor}"
-                                          DisplayMemberPath="Name"
-                                          VerticalAlignment="Center" />
+                                          VerticalAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" Foreground="{DynamicResource Token.TextPrimaryBrush}" />
+                                                <TextBlock Text="{Binding DisplayPath}"
+                                                           Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                                                           FontSize="{DynamicResource Token.TextXs}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                             </Grid>
                         </Border>
-                        <ListBox Grid.Row="2"
-                                 ItemsSource="{Binding DuplicateManager.SelectedGroup.Items}"
-                                 ItemTemplate="{StaticResource DuplicateItemTemplate}"
-                                 IsHitTestVisible="False" />
+                        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding DuplicateManager.SelectedGroup.Items}"
+                                          ItemTemplate="{StaticResource DuplicateItemTemplate}" />
+                        </ScrollViewer>
                     </Grid>
                 </Border>
             </Grid>
+
+            <TextBlock Grid.Row="1" Text="No duplicates found"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="{DynamicResource Token.TextSecondaryBrush}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DuplicateManager.Groups.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
 
             <Border Grid.Row="2"
                     Padding="16,10"
