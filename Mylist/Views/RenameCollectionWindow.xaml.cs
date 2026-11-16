@@ -36,17 +36,13 @@ public partial class RenameCollectionWindow : Window
         var trimmedName = CollectionName?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(trimmedName))
         {
-            System.Windows.MessageBox.Show("Collection name is required.", DialogTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            ShowValidationError("Collection name is required.");
             return;
         }
 
         if (IsCollectionNameAvailable is not null && !IsCollectionNameAvailable(trimmedName))
         {
-            System.Windows.MessageBox.Show(
-                $"A collection named '{trimmedName}' already exists.",
-                DialogTitle,
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+            ShowValidationError($"A collection named '{trimmedName}' already exists.");
             return;
         }
 
@@ -56,6 +52,23 @@ public partial class RenameCollectionWindow : Window
         _collection.SmartType = SmartType;
         _collection.SmartValue = SmartValue;
         DialogResult = true;
+    }
+
+    private void ShowValidationError(string message)
+    {
+        ErrorText.Text = message;
+        ErrorText.Visibility = Visibility.Visible;
+        NameTextBox.Focus();
+    }
+
+    private void OnNameTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        if (ErrorText is not null) ErrorText.Visibility = Visibility.Collapsed;
+    }
+
+    private void OnNameLoaded(object sender, RoutedEventArgs e)
+    {
+        NameTextBox.SelectAll();
     }
 
     private void OnCancel(object sender, RoutedEventArgs e)

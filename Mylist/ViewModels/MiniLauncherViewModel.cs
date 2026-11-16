@@ -40,6 +40,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
     private OrbitCollection? _currentCollection;
     private int _selectedIndex = -1;
+    private int _selectedResultIndex = -1;
     private string _searchText = string.Empty;
     private string _statusText = string.Empty;
 
@@ -71,6 +72,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         ActivateSelectedCommand = new RelayCommand(ActivateSelected);
         RotateCommand = new RelayCommand<string>(p => Rotate(p == "-1" ? -1 : 1));
         OpenIndexedCommand = new RelayCommand<string>(OpenIndexed);
+        DeleteSelectedCommand = new RelayCommand(DeleteSelected);
         ActivateResultCommand = new RelayCommand<ItemModel>(item =>
         {
             if (item is not null)
@@ -96,7 +98,43 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
     public bool HasResults => SearchResults.Count > 0;
 
-    public int MaxShortcutIndex => VisibleSlots.Count;
+    public int MaxShortcutIndex => IsSearching ? SearchResults.Count : VisibleSlots.Count;
+
+    public bool IsRingEmpty => !IsSearching && VisibleSlots.Count == 0;
+
+    public string EmptyRingText => IsInCollection
+        ? "No items here — Esc to go back"
+        : "No collections yet";
+
+    public double EmptyRingTop => Cy - 9;
+
+    public string HubAutomationName => IsInCollection ? "Back to collections" : "MyList";
+
+    public int SelectedResultIndex
+    {
+        get => _selectedResultIndex;
+        private set
+        {
+            if (_selectedResultIndex == value)
+            {
+                return;
+            }
+
+            if (_selectedResultIndex >= 0 && _selectedResultIndex < SearchResults.Count)
+            {
+                SearchResults[_selectedResultIndex].IsSelected = false;
+            }
+
+            _selectedResultIndex = value;
+
+            if (_selectedResultIndex >= 0 && _selectedResultIndex < SearchResults.Count)
+            {
+                SearchResults[_selectedResultIndex].IsSelected = true;
+            }
+
+            OnPropertyChanged();
+        }
+    }
 
     public string ShortcutRangeHint => VisibleSlots.Count > 0 ? $"1–{VisibleSlots.Count}" : string.Empty;
 
@@ -163,6 +201,8 @@ public sealed class MiniLauncherViewModel : ViewModelBase
                 SelectedIndex = -1;
                 RefreshSearch();
                 OnPropertyChanged(nameof(IsSearching));
+                OnPropertyChanged(nameof(IsRingEmpty));
+                OnPropertyChanged(nameof(MaxShortcutIndex));
             }
         }
     }
@@ -202,6 +242,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
     public ICommand ActivateSelectedCommand { get; }
     public ICommand RotateCommand { get; }
     public ICommand OpenIndexedCommand { get; }
+    public ICommand DeleteSelectedCommand { get; }
     public ICommand ActivateResultCommand { get; }
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
@@ -246,6 +287,8 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         OnPropertyChanged(nameof(HubSublabel));
         OnPropertyChanged(nameof(EyebrowText));
         OnPropertyChanged(nameof(FooterBackVisible));
+        OnPropertyChanged(nameof(EmptyRingText));
+        OnPropertyChanged(nameof(HubAutomationName));
         CommandManager.InvalidateRequerySuggested();
     }
 
@@ -260,7 +303,9 @@ public sealed class MiniLauncherViewModel : ViewModelBase
             : _source.GetRootCollections().Select(OrbitSlotViewModel.FromCollection).ToList();
 
         var itemLimit = Math.Clamp(_itemLimit(), 3, 7);
-        var capped = nodes.Take(itemLimit).Append(OrbitSlotViewModel.MoreSlot()).ToList();
+        var capped = nodes.Count == 0
+            ? nodes
+            : nodes.Take(itemLimit).Append(OrbitSlotViewModel.MoreSlot()).ToList();
 
         var positions = OrbitLayoutService.Compute(capped.Count, Cx, Cy, R, R);
         for (var i = 0; i < capped.Count; i++)
@@ -274,6 +319,35 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
         OnPropertyChanged(nameof(MaxShortcutIndex));
         OnPropertyChanged(nameof(ShortcutRangeHint));
+        OnPropertyChanged(nameof(IsRingEmpty));
+    }
+
+    public void MoveResultSelection(int delta)
+    {
+        if (!IsSearching || SearchResults.Count == 0)
+        {
+            return;
+        }
+
+        var n = SearchResults.Count;
+        SelectedResultIndex = _selectedResultIndex < 0
+            ? (delta > 0 ? 0 : n - 1)
+            : (((_selectedResultIndex + delta) % n) + n) % n;
+    }
+
+    private void DeleteSelected()
+    {
+        if (IsSearching)
+        {
+            if (_selectedResultIndex >= 0 && _selectedResultIndex < SearchResults.Count)
+            {
+                DeleteResult(SearchResults[_selectedResultIndex].Item);
+            }
+        }
+        else if (HasSelection && VisibleSlots[_selectedIndex].CanDelete)
+        {
+            DeleteSlot(VisibleSlots[_selectedIndex]);
+        }
     }
 
     private void DeleteSlot(OrbitSlotViewModel slot)
@@ -331,10 +405,12 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
         if (IsSearching)
         {
-            var first = SearchResults.FirstOrDefault();
-            if (first?.Item is not null)
+            var target = _selectedResultIndex >= 0 && _selectedResultIndex < SearchResults.Count
+                ? SearchResults[_selectedResultIndex]
+                : SearchResults.FirstOrDefault();
+            if (target?.Item is not null)
             {
-                Launch(first.Item);
+                Launch(target.Item);
             }
         }
     }
@@ -354,8 +430,19 @@ public sealed class MiniLauncherViewModel : ViewModelBase
 
     private void OpenIndexed(string? parameter)
     {
-        if (IsSearching || !int.TryParse(parameter, out var index))
+        if (!int.TryParse(parameter, out var index))
         {
+            return;
+        }
+
+        if (IsSearching)
+        {
+            var result = SearchResults.FirstOrDefault(r => r.Index == index);
+            if (result is not null)
+            {
+                Launch(result.Item);
+            }
+
             return;
         }
 
@@ -397,6 +484,7 @@ public sealed class MiniLauncherViewModel : ViewModelBase
     // ── Search ───────────────────────────────────────────────────────────────
     private void RefreshSearch()
     {
+        _selectedResultIndex = -1;
         SearchResults.Clear();
 
         if (!string.IsNullOrWhiteSpace(_searchText))
@@ -417,6 +505,8 @@ public sealed class MiniLauncherViewModel : ViewModelBase
         }
 
         OnPropertyChanged(nameof(HasResults));
+        OnPropertyChanged(nameof(SelectedResultIndex));
+        OnPropertyChanged(nameof(MaxShortcutIndex));
     }
 
     private static bool Matches(ItemModel item, string needle) =>

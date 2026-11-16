@@ -21,6 +21,12 @@
         <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
     </Style>
 
+    <Style x:Key="Dialog.Title" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{DynamicResource Token.TextXl}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource Token.TextPrimaryBrush}" />
+    </Style>
+
     <Style TargetType="Button" BasedOn="{StaticResource Simple.Button}" />
 
     <Style TargetType="TextBox" BasedOn="{StaticResource Simple.TextBox}" />

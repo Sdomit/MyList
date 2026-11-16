@@ -4,6 +4,7 @@ using System.Windows.Input;
 using MyList.Helpers;
 using MyList.Models;
 using MyList.Services;
+using MyList.Views;
 
 namespace MyList.ViewModels;
 
@@ -67,6 +68,11 @@ public sealed class DuplicateManagerViewModel : ViewModelBase
 
     private void MergeAll()
     {
+        if (!ConfirmWindow.Show("Merge all duplicates", $"Merge {Groups.Count} groups? This cannot be undone.", "Merge all"))
+        {
+            return;
+        }
+
         foreach (var group in Groups.ToList())
         {
             _mainViewModel.MergeDuplicateGroup(group);

@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Select Mtab"
+        FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}"
         Width="620"
         Height="520"
         MinWidth="540"
@@ -24,18 +25,43 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="Add To Existing Mtab"
-                       FontSize="18"
-                       FontWeight="SemiBold" />
+                       Style="{StaticResource Dialog.Title}" />
 
             <StackPanel Grid.Row="1"
                         Margin="0,10,0,12">
                 <TextBlock x:Name="IncomingSummaryText"
                            Foreground="{DynamicResource TextSecondary}"
                            Margin="0,0,0,8" />
-                <TextBox MinHeight="32"
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip="Search Mtab by name or path"
-                         Margin="0" />
+                <Grid>
+                    <TextBox x:Name="SearchTextBox" MinHeight="32"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             TextChanged="OnSearchTextChanged"
+                             AutomationProperties.Name="Search Mtabs"
+                             ToolTip="Search Mtab by name or path"
+                             Margin="0" />
+                    <TextBlock Text="Search Mtabs…"
+                               IsHitTestVisible="False"
+                               Foreground="{DynamicResource Token.TextTertiaryBrush}"
+                               Margin="10,0"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text.Length, ElementName=SearchTextBox}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <TextBlock x:Name="ErrorText"
+                           Foreground="{DynamicResource Token.StatusDangerBrush}"
+                           FontSize="{DynamicResource Token.TextSm}"
+                           Visibility="Collapsed"
+                           Margin="0,6,0,0"
+                           TextWrapping="Wrap" />
             </StackPanel>
 
             <Grid Grid.Row="2">
@@ -81,7 +107,7 @@
                     </Grid>
                 </Border>
 
-                <TextBlock Text="No existing Mtab found."
+                <TextBlock
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            FontWeight="SemiBold"
@@ -89,9 +115,17 @@
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Text">
+                                <Setter.Value>
+                                    <Binding Path="SearchText" StringFormat="No Mtab matches '{0}'" />
+                                </Setter.Value>
+                            </Setter>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasMtabs}" Value="False">
+                                <DataTrigger Binding="{Binding Items.Count, ElementName=MtabListBox}" Value="0">
                                     <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Mtabs.Count}" Value="0">
+                                    <Setter Property="Text" Value="No existing Mtab found." />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -103,11 +137,12 @@
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Margin="0,12,0,0">
-                <Button Content="Cancel"
+                <Button IsCancel="True" Content="Cancel"
+                        Style="{StaticResource Simple.Button}"
                         Width="100"
                         Margin="0,0,8,0"
                         Click="OnCancel" />
-                <Button Content="Add to Mtab"
+                <Button IsDefault="True" Content="Add to Mtab"
                         Width="132"
                         Style="{StaticResource Simple.PrimaryButton}"
                         Click="OnConfirm" />

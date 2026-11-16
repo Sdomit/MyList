@@ -227,22 +227,24 @@
                                          Fill="{DynamicResource Token.AccentBrush}"
                                          RenderTransformOrigin="0.5,0.5">
                                     <Ellipse.RenderTransform>
-                                        <ScaleTransform x:Name="CenterPulseScale" />
+                                        <ScaleTransform />
                                     </Ellipse.RenderTransform>
-                                    <Ellipse.Triggers>
-                                        <EventTrigger RoutedEvent="Loaded">
-                                            <BeginStoryboard>
+                                    <!-- Idle pulse only when the OS allows client-area animation (reduced motion). -->
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static SystemParameters.ClientAreaAnimation}}" Value="True">
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard>
                                                 <Storyboard RepeatBehavior="Forever" AutoReverse="True">
-                                                    <DoubleAnimation Storyboard.TargetName="CenterPulseScale"
-                                                                     Storyboard.TargetProperty="ScaleX"
+                                                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
                                                                      From="1" To="1.08"
                                                                      Duration="0:0:1.2">
                                                         <DoubleAnimation.EasingFunction>
                                                             <SineEase EasingMode="EaseInOut" />
                                                         </DoubleAnimation.EasingFunction>
                                                     </DoubleAnimation>
-                                                    <DoubleAnimation Storyboard.TargetName="CenterPulseScale"
-                                                                     Storyboard.TargetProperty="ScaleY"
+                                                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
                                                                      From="1" To="1.08"
                                                                      Duration="0:0:1.2">
                                                         <DoubleAnimation.EasingFunction>
@@ -250,9 +252,12 @@
                                                         </DoubleAnimation.EasingFunction>
                                                     </DoubleAnimation>
                                                 </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </Ellipse.Triggers>
+                                                        </BeginStoryboard>
+                                                    </DataTrigger.EnterActions>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
                                 </Ellipse>
                                 <Ellipse Canvas.Left="131"
                                          Canvas.Top="85"

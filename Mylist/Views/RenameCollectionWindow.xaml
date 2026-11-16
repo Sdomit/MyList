@@ -8,6 +8,7 @@
         Foreground="{DynamicResource TextPrimary}"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
+        FocusManager.FocusedElement="{Binding ElementName=NameTextBox}"
         ShowInTaskbar="False">
     <Border Margin="12"
             Background="{DynamicResource SurfaceBackground}"
@@ -26,14 +27,20 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="{Binding DialogTitle}"
-                       FontSize="20"
-                       FontWeight="SemiBold" />
+                       Style="{StaticResource Dialog.Title}" />
 
             <StackPanel Grid.Row="1" Margin="0,16,0,0">
                 <TextBlock Text="Collection name"
                            Margin="0,0,0,6"
                            Foreground="{DynamicResource TextSecondary}" />
-                <TextBox Text="{Binding CollectionName}" />
+                <TextBox x:Name="NameTextBox" Text="{Binding CollectionName, UpdateSourceTrigger=PropertyChanged}"
+                         TextChanged="OnNameTextChanged" Loaded="OnNameLoaded" />
+                <TextBlock x:Name="ErrorText"
+                           Foreground="{DynamicResource Token.StatusDangerBrush}"
+                           FontSize="{DynamicResource Token.TextSm}"
+                           Visibility="Collapsed"
+                           Margin="0,6,0,0"
+                           TextWrapping="Wrap" />
             </StackPanel>
 
             <CheckBox Grid.Row="2"
@@ -66,13 +73,13 @@
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         Margin="0,18,0,0">
-                <Button Content="Cancel"
+                <Button IsCancel="True" Content="Cancel"
                         Style="{StaticResource Simple.Button}"
                         MinWidth="96"
                         MinHeight="34"
                         Margin="0,0,8,0"
                         Click="OnCancel" />
-                <Button Content="Save"
+                <Button IsDefault="True" Content="Save"
                         Style="{StaticResource Simple.PrimaryButton}"
                         MinWidth="96"
                         MinHeight="34"

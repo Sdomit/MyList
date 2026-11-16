@@ -326,11 +326,11 @@
                                    TextTrimming="CharacterEllipsis"
                                    Margin="0,0,12,0" />
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Button Content="Cancel"
+                            <Button IsCancel="True" Content="Cancel"
                                     MinWidth="88"
-                                    Style="{StaticResource Simple.GhostButton}"
+                                    Style="{StaticResource Simple.Button}"
                                     Click="OnCancel" />
-                            <Button Content="{Binding ConfirmButtonText}"
+                            <Button IsDefault="True" Content="{Binding ConfirmButtonText}"
                                     MinWidth="140"
                                     Margin="8,0,0,0"
                                     Style="{StaticResource Simple.PrimaryButton}"

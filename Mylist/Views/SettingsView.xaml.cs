@@ -21,6 +21,23 @@ public partial class SettingsView : System.Windows.Controls.UserControl
         DataContextChanged += OnDataContextChanged;
     }
 
+    private void OnToggleRowMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not Grid row) return;
+        var source = e.OriginalSource as System.Windows.DependencyObject;
+        while (source is not null && source != row)
+        {
+            if (source is System.Windows.Controls.Primitives.ToggleButton) return;
+            source = source is System.Windows.Media.Visual
+                ? System.Windows.Media.VisualTreeHelper.GetParent(source)
+                : System.Windows.LogicalTreeHelper.GetParent(source);
+        }
+        var toggle = row.Children.OfType<System.Windows.Controls.Primitives.ToggleButton>().FirstOrDefault();
+        if (toggle is null || !toggle.IsEnabled) return;
+        toggle.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, toggle.IsChecked != true);
+        e.Handled = true;
+    }
+
     private void OnDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
     {
         if (_subscribedVm is not null)

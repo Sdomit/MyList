@@ -15,7 +15,7 @@
     <Color x:Key="Token.TextPrimaryColor">#FFE4E6</Color>
     <Color x:Key="Token.TextSecondaryColor">#FDA4AF</Color>
     <Color x:Key="Token.TextTertiaryColor">#D45A78</Color>
-    <Color x:Key="Token.TextDisabledColor">#2EFFFFFF</Color>
+    <Color x:Key="Token.TextDisabledColor">#5CFFFFFF</Color>
     <Color x:Key="Token.TextInverseColor">#280810</Color>
     <Color x:Key="Token.TextAccentColor">#FDA4AF</Color>
     <Color x:Key="Token.BorderSubtleColor">#0FFFFFFF</Color>

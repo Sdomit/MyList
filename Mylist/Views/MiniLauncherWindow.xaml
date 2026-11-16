@@ -31,26 +31,6 @@
         <Border.RenderTransform>
             <ScaleTransform x:Name="ShellScale" CenterX="200" CenterY="227" ScaleX="1" ScaleY="1" />
         </Border.RenderTransform>
-        <Border.Triggers>
-            <EventTrigger RoutedEvent="Loaded">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation Storyboard.TargetName="ShellScale" Storyboard.TargetProperty="ScaleX"
-                                         From="0.9" To="1" Duration="0:0:0.22">
-                            <DoubleAnimation.EasingFunction>
-                                <CubicEase EasingMode="EaseOut" />
-                            </DoubleAnimation.EasingFunction>
-                        </DoubleAnimation>
-                        <DoubleAnimation Storyboard.TargetName="ShellScale" Storyboard.TargetProperty="ScaleY"
-                                         From="0.9" To="1" Duration="0:0:0.22">
-                            <DoubleAnimation.EasingFunction>
-                                <CubicEase EasingMode="EaseOut" />
-                            </DoubleAnimation.EasingFunction>
-                        </DoubleAnimation>
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Border.Triggers>
 
         <Grid>
             <!-- Border doesn't clip children to CornerRadius, so the square row
@@ -192,9 +172,8 @@
                     <TextBlock Canvas.Top="10" Width="400"
                                Text="{Binding EyebrowText}"
                                TextAlignment="Center"
-                               FontSize="9"
+                               FontSize="{StaticResource Token.TextXs}"
                                FontWeight="Bold"
-                               Opacity="0.7"
                                Foreground="{DynamicResource Token.TextTertiaryBrush}">
                         <TextBlock.LayoutTransform>
                             <ScaleTransform ScaleX="1" ScaleY="1" />
@@ -244,6 +223,7 @@
                             Canvas.Top="{Binding HubTop}"
                             Width="72" Height="72"
                             Command="{Binding DrillUpCommand}"
+                            AutomationProperties.Name="{Binding HubAutomationName}"
                             BorderThickness="0"
                             Background="Transparent"
                             Padding="0">
@@ -265,7 +245,7 @@
                                                    Foreground="{DynamicResource Token.TextAccentBrush}" />
                                         <TextBlock Text="{Binding HubSublabel}"
                                                    TextAlignment="Center"
-                                                   FontSize="8"
+                                                   FontSize="{StaticResource Token.TextXs}"
                                                    Margin="0,1,0,0"
                                                    Foreground="{DynamicResource Token.TextTertiaryBrush}" />
                                     </StackPanel>
@@ -309,6 +289,7 @@
                                             Background="Transparent"
                                             Padding="0"
                                             Cursor="Hand"
+                                            AutomationProperties.Name="{Binding Name}"
                                             ToolTip="{Binding Name}">
                                         <Button.ContextMenu>
                                             <ContextMenu>
@@ -360,7 +341,8 @@
                                                             BorderBrush="{DynamicResource Token.BorderSubtleBrush}"
                                                             BorderThickness="1"
                                                             CornerRadius="8">
-                                                        <TextBlock Text="{Binding IndexLabel}"
+                                                        <TextBlock x:Name="BadgeText"
+                                                                   Text="{Binding IndexLabel}"
                                                                    FontFamily="{DynamicResource Token.FontMono}"
                                                                    FontSize="8.5"
                                                                    FontWeight="Bold"
@@ -380,27 +362,35 @@
                                                         <Setter TargetName="Disc" Property="BorderThickness" Value="2" />
                                                         <Setter TargetName="NodeIcon" Property="Foreground" Value="{DynamicResource Token.AccentBrush}" />
                                                         <Setter TargetName="Badge" Property="Background" Value="{DynamicResource Token.AccentBrush}" />
-                                                        <DataTrigger.EnterActions>
-                                                            <BeginStoryboard>
-                                                                <Storyboard>
-                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleX"
-                                                                                     To="1.11" Duration="0:0:0.18" />
-                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleY"
-                                                                                     To="1.11" Duration="0:0:0.18" />
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </DataTrigger.EnterActions>
-                                                        <DataTrigger.ExitActions>
-                                                            <BeginStoryboard>
-                                                                <Storyboard>
-                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleX"
-                                                                                     To="1" Duration="0:0:0.18" />
-                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleY"
-                                                                                     To="1" Duration="0:0:0.18" />
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </DataTrigger.ExitActions>
+                                                        <Setter TargetName="BadgeText" Property="Foreground" Value="{DynamicResource Token.AccentForegroundBrush}" />
                                                     </DataTrigger>
+                                                    <!-- Selection pop only when the OS allows client-area animation (reduced motion). -->
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsSelected}" Value="True" />
+                                                            <Condition Binding="{Binding Source={x:Static SystemParameters.ClientAreaAnimation}}" Value="True" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <MultiDataTrigger.EnterActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleX"
+                                                                                     To="1.11" Duration="0:0:0.18" />
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleY"
+                                                                                     To="1.11" Duration="0:0:0.18" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </MultiDataTrigger.EnterActions>
+                                                        <MultiDataTrigger.ExitActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleX"
+                                                                                     To="1" Duration="0:0:0.18" />
+                                                                    <DoubleAnimation Storyboard.TargetName="DiscScale" Storyboard.TargetProperty="ScaleY"
+                                                                                     To="1" Duration="0:0:0.18" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </MultiDataTrigger.ExitActions>
+                                                    </MultiDataTrigger>
                                                     <Trigger Property="IsMouseOver" Value="True">
                                                         <Setter TargetName="Disc" Property="BorderBrush" Value="{DynamicResource Token.AccentBrush}" />
                                                     </Trigger>
@@ -432,6 +422,14 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
+                    <!-- Empty ring -->
+                    <TextBlock Canvas.Top="{Binding EmptyRingTop}" Width="400"
+                               Text="{Binding EmptyRingText}"
+                               TextAlignment="Center"
+                               FontSize="{StaticResource Token.TextSm}"
+                               Foreground="{DynamicResource Token.TextSecondaryBrush}"
+                               Visibility="{Binding IsRingEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </Canvas>
 
                 <!-- Search results overlay -->
@@ -459,10 +457,12 @@
                                             Background="Transparent"
                                             BorderThickness="0"
                                             Padding="10,0"
-                                            Cursor="Hand">
+                                            Cursor="Hand"
+                                            AutomationProperties.Name="{Binding Name}"
+                                            ToolTip="{Binding DisplayPath}">
                                         <Button.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Delete"
+                                                <MenuItem Header="{Binding PlacementTarget.DataContext.DeleteLabel, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           Command="{Binding PlacementTarget.DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                     <MenuItem.Icon>
                                                         <iconPacks:PackIconLucide Kind="Trash2" Width="13" Height="13" />
@@ -482,6 +482,9 @@
                                                     <Trigger Property="IsMouseOver" Value="True">
                                                         <Setter TargetName="Row" Property="Background" Value="{DynamicResource Token.BgSubtleBrush}" />
                                                     </Trigger>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter TargetName="Row" Property="Background" Value="{DynamicResource Token.AccentSubtleBrush}" />
+                                                    </DataTrigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
                                         </Button.Template>
@@ -590,7 +593,34 @@
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <!-- Keyboard legend -->
+                    <!-- Keyboard legend (search mode) -->
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsSearching}" Value="True" />
+                                            <Condition Binding="{Binding HasStatus}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="↑↓" FontFamily="{DynamicResource Token.FontMono}" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="select" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextTertiaryBrush}" Margin="3,0,12,0" />
+                        <TextBlock Text="↵" FontFamily="{DynamicResource Token.FontMono}" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="open" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextTertiaryBrush}" Margin="3,0,12,0" />
+                        <TextBlock Text="Del" FontFamily="{DynamicResource Token.FontMono}" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="delete" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextTertiaryBrush}" Margin="3,0,12,0" />
+                        <TextBlock Text="Esc" FontFamily="{DynamicResource Token.FontMono}" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="clear" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextTertiaryBrush}" Margin="3,0,0,0" />
+                    </StackPanel>
+
+                    <!-- Keyboard legend (orbit mode) -->
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
                         <StackPanel.Style>
@@ -598,6 +628,9 @@
                                 <Setter Property="Visibility" Value="Visible" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasStatus}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsSearching}" Value="True">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -628,6 +661,8 @@
                                    FontSize="{StaticResource Token.TextXs}"
                                    Foreground="{DynamicResource Token.TextTertiaryBrush}"
                                    Margin="3,0,12,0" />
+                        <TextBlock Text="Del" FontFamily="{DynamicResource Token.FontMono}" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextSecondaryBrush}" />
+                        <TextBlock Text="delete" FontSize="{StaticResource Token.TextXs}" Foreground="{DynamicResource Token.TextTertiaryBrush}" Margin="3,0,12,0" />
                         <TextBlock Text="⌫"
                                    FontFamily="{DynamicResource Token.FontMono}"
                                    FontSize="{StaticResource Token.TextXs}"

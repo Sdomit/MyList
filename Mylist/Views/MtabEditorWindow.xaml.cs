@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Threading;
 using MyList.Helpers;
-using MessageBox = System.Windows.MessageBox;
 
 namespace MyList.Views;
 
@@ -312,13 +311,13 @@ public partial class MtabEditorWindow : Window, INotifyPropertyChanged
 
         if (string.IsNullOrWhiteSpace(MtabName))
         {
-            MessageBox.Show("Mtab name is required.", "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Mtab", "Mtab name is required.", MessageKind.Warning);
             return;
         }
 
         if (_validPaths.Count < 2)
         {
-            MessageBox.Show("Add at least 2 valid folder paths.", "Mtab", MessageBoxButton.OK, MessageBoxImage.Warning);
+            ConfirmWindow.Inform("Mtab", "Add at least 2 valid folder paths.", MessageKind.Warning);
             return;
         }
 

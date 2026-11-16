@@ -204,11 +204,11 @@
                 BorderThickness="0,1,0,0">
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                <Button Content="Cancel"
+                <Button IsCancel="True" Content="Cancel"
                         MinWidth="90"
                         Style="{StaticResource Simple.GhostButton}"
                         Command="{Binding CancelCommand}" />
-                <Button Content="Save changes"
+                <Button IsDefault="True" Content="Save changes"
                         MinWidth="112"
                         Margin="8,0,0,0"
                         Style="{StaticResource Simple.PrimaryButton}"

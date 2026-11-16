@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using MyList.Models;
 using MyList.ViewModels;
-using MessageBox = System.Windows.MessageBox;
 
 namespace MyList.Views;
 
@@ -31,11 +30,18 @@ public partial class MtabPickerWindow : Window
         DialogResult = false;
     }
 
+    private void OnSearchTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        if (ErrorText is not null) ErrorText.Visibility = Visibility.Collapsed;
+    }
+
     private void OnConfirm(object sender, RoutedEventArgs e)
     {
         if (ViewModel.SelectedMtab is null)
         {
-            MessageBox.Show("Select an Mtab first.", "Add to Mtab", MessageBoxButton.OK, MessageBoxImage.Information);
+            ErrorText.Text = "Select an Mtab first.";
+            ErrorText.Visibility = Visibility.Visible;
+            SearchTextBox.Focus();
             return;
         }
 
